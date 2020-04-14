@@ -1,0 +1,94 @@
+Skip to content
+Search
+Dashboard
+Pull requests
+Issues
+Marketplace
+Explore
+@ittat ittat
+ b2g2onyxL / B2GOS-ci
+Code Pull requests 0 Projects 0 Actions Wiki Security Pulse
+B2GOS-ci/.github/workflows/build.yml
+@ittat ittat Update build.yml
+03c2aa9 on 10 Feb
+111 lines (98 sloc)  3.51 KB
+ 
+#=================================================
+# Description: Build ubports using GitHub Actions
+# Lisence: MIT
+#=================================================
+
+name: Build System Image
+
+on: 
+#  push:
+#    branches:
+#      - master
+#  release:
+#    types: [published]
+  schedule:
+    - cron: 0 8  1 * ?
+  watch:
+    types: [started]
+
+env:
+  SSH_ACTIONS: false
+
+jobs:
+
+  build:
+    runs-on: ubuntu-18.04
+
+    env:
+      DEVICE: onyx
+      ANDROID_ROOT: /home/runner/work/b2g/
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    
+    - name: Initialization environment
+      run: |
+        sudo apt-get update
+        sudo dpkg --add-architecture i386
+        sudo dpkg --add-architecture amd64
+        sudo apt-get install -y  --no-install-recommends autoconf2.13 \
+        bison bzip2 ccache curl flex gawk gcc g++ g++-multilib git lib32ncurses5-dev \
+        lib32z1-dev libgconf2-dev \
+        libgl1-mesa-dev libx11-dev make zip lzop libxml2-utils \
+        openjdk-8-jdk nodejs unzip python
+        sudo apt-get install -y \
+        openjdk-8-jdk android-tools-adb bc  \
+        bison build-essential curl flex g++-multilib m4 libxml2-utils \
+        gcc-multilib gnupg gperf imagemagick lib32ncurses5-dev \
+        lib32readline-dev lib32z1-dev libesd0-dev liblz4-tool flex \
+        libncurses5-dev libsdl1.2-dev libssl-dev repo libwxgtk3.0-dev \
+        libxml2 libxml2-utils lzop pngcrush rsync schedtool ccache bison \
+        squashfs-tools xsltproc yasm zip zlib1g-dev git
+        sudo docker rmi `docker images -q`
+        sudo rm -rf \
+          /usr/share/dotnet \
+          /etc/mysql \
+          /etc/php
+        mkdir -p ~/bin
+        wget 'https://storage.googleapis.com/git-repo-downloads/repo' -P ~/bin
+        chmod +x ~/bin/repo
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+    - name: Downloading source code
+      run: |
+        mkdir -p $ANDROID_ROOT
+        cd $ANDROID_ROOT
+        git clone https://github.com/ReB2GOS/B2G -b exp
+        cd $ANDROID_ROOT/B2G
+        ./config.sh emulator-10
+    
+        
+    - name: Build B2GOS
+      run: |
+        cd $ANDROID_ROOT/B2G
+        export SHELL=/bin/bash
+        export DISABLE_SOURCES_XML=true
+        export USE_CCACHE=1
+        ./build.sh -j$(nproc) 
+        
