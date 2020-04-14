@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-18.04
 
     env:
-      DEVICE: onyx
+      DEVICE: emulator-10
       ANDROID_ROOT: /home/runner/work/b2g/
 
     steps:
@@ -42,10 +42,10 @@ jobs:
         openjdk-8-jdk android-tools-adb bc  \
         bison build-essential curl flex g++-multilib m4 libxml2-utils \
         gcc-multilib gnupg gperf imagemagick lib32ncurses5-dev \
-        lib32readline-dev lib32z1-dev libesd0-dev liblz4-tool flex \
+        lib32readline-dev lib32z1-dev  liblz4-tool flex \
         libncurses5-dev libsdl1.2-dev libssl-dev repo libwxgtk3.0-dev \
         libxml2 libxml2-utils lzop pngcrush rsync schedtool ccache bison \
-        squashfs-tools xsltproc yasm zip zlib1g-dev git
+        squashfs-tools xsltproc yasm zip zlib1g-dev git rustc
         sudo docker rmi `docker images -q`
         sudo rm -rf \
           /usr/share/dotnet \
