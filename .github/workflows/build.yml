@@ -46,8 +46,6 @@ jobs:
         cd $ANDROID_ROOT
         git clone https://github.com/ReB2GOS/B2G -b exp
         cd $ANDROID_ROOT/B2G
-        curl  https://storage.googleapis.com/git-repo-downloads/repo -o repo
-        chmod +x repo
         ./config.sh emulator-10
       
         
