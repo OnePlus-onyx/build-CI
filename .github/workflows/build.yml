@@ -31,9 +31,7 @@ jobs:
     - name: Initialization environment
       run: |
         sudo apt-get update
-        sudo dpkg --add-architecture i386
-        sudo dpkg --add-architecture amd64
-        sudo apt-get install -y  --no-install-recommends autoconf2.13 git rustc
+        sudo apt-get install -y  --no-install-recommends  git 
         sudo docker rmi `docker images -q`
         sudo rm -rf \
           /usr/share/dotnet \
@@ -43,17 +41,19 @@ jobs:
         git config --global user.email "ittat@github.com"
     - name: Downloading source code
       run: |
+        df -h
         mkdir -p $ANDROID_ROOT
         cd $ANDROID_ROOT
         git clone https://github.com/ReB2GOS/B2G -b exp
         cd $ANDROID_ROOT/B2G
-        wget 'https://storage.googleapis.com/git-repo-downloads/repo'
+        curl  https://storage.googleapis.com/git-repo-downloads/repo -o repo
         chmod +x repo
         ./config.sh emulator-10
-    
+      
         
     - name: Build B2GOS
       run: |
+        df -h
         cd $ANDROID_ROOT/B2G
         export SHELL=/bin/bash
         export DISABLE_SOURCES_XML=true
