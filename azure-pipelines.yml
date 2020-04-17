@@ -16,6 +16,10 @@ steps:
         brew install autoconf expect
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        cd /Users/runner
+        ls
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
   displayName: ' Initialization environment'
 
 - script: |
@@ -24,8 +28,6 @@ steps:
     cd ~
     git config --global user.name "ittat"
     git config --global user.email "ittat@github.com"
-    hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
-    hdiutil attach ~/android.dmg -mountpoint /Volumes/android
     cd /Volumes/android
     git clone https://github.com/ReB2GOS/B2G -b exp
     cd ./B2G
