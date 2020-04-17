@@ -18,7 +18,7 @@ jobs:
     - name: Fetch dependencies
       run: |
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install autoconf automake coreutils gcc 
+        brew install autoconf
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         df -h
