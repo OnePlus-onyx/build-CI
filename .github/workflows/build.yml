@@ -27,18 +27,27 @@ jobs:
         
     - name: Fetch source
       run: |
+        df -h
         pwd
         cd ~
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         git clone https://github.com/ReB2GOS/B2G -b exp
         cd ./B2G
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh onyx
-        df -h
-
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh emulator-10
+ 
+        
+    - name: Setup Debug Session
+      uses: csexton/debugger-action@master
+      
     - name: Build
       run: |
-          echo Build
+        df -h
+        cd ~
+        ls
+        cd ./B2G
+        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        ./build.sh -j16
         
 
 
