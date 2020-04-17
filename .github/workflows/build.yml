@@ -27,11 +27,12 @@ jobs:
         
     - name: Fetch source
       run: |
-        cd /System/Volumes/Data
+        pwd
+        cd ~
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         git clone https://github.com/ReB2GOS/B2G -b exp
-        cd $ANDROID_ROOT/B2G
+        cd ./B2G
         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh onyx
         df -h
 
