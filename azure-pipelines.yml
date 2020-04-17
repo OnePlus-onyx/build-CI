@@ -41,6 +41,11 @@ steps:
     echo "spawn ./mach bootstrap --no-system-changes" >> boot.exp  
     echo "expect  \"Your choice:\" " >> boot.exp
     echo "send \"4\r\" " >> boot.exp
+    echo "expect  \"(Yn):\" " >> boot.exp
+    echo "send \"Y\r\" " >> boot.exp
+    echo "expect  \"(Yn):\" " >> boot.exp
+    echo "send \"Y\r\" " >> boot.exp
+
     echo "interact " >> boot.exp
     cat ./boot.exp
     expect ./boot.exp
