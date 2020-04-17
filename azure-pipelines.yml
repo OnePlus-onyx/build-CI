@@ -24,8 +24,6 @@ steps:
 
 - script: |
     df -h
-    pwd
-    cd ~
     git config --global user.name "ittat"
     git config --global user.email "ittat@github.com"
     cd /Volumes/android
@@ -36,17 +34,15 @@ steps:
 
 - script: |
     df -h
-    cd ~
-    /Volumes/android
+    cd /Volumes/android
     ls
     cd ./B2G/gecko
     touch ./boot.exp
-    echo -e "#!/bin/expect" > boot.exp  
-    echo -e "spawn ./mach bootstrap --no-system-changes" > boot.exp  
-    echo -e "expect {" > boot.exp
-    echo -e "\"Your choice:\" {send \"4\r\" ;exp_continue}" > boot.exp
-    echo -e "} " > boot.exp
-    echo -e "interact " > boot.exp
+    echo "spawn ./mach bootstrap --no-system-changes" >> boot.exp  
+    echo "expect {" >> boot.exp
+    echo "\"Your choice:\"{send \"4\r\" ;exp_continue}" >> boot.exp
+    echo "} " >> boot.exp
+    echo "interact " >> boot.exp
     cat ./boot.exp
     expect ./boot.exp
     cd ../
