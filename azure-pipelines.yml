@@ -21,7 +21,6 @@ steps:
 - script: |
     df -h
     pwd
-    cd ~
     git config --global user.name "ittat"
     git config --global user.email "ittat@github.com"
     git clone https://github.com/ReB2GOS/B2G -b exp
@@ -31,7 +30,8 @@ steps:
 
 - script: |
     df -h
-    cd ~/B2G
+    cd /Users/runner/runners/2.165.2/work/1/s/B2G
+    ls
     export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
     cd gecko && ./mach bootstrap && 4
     cd ../
