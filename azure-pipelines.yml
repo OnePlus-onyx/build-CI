@@ -12,7 +12,7 @@ pool:
 steps:
 - script: |
     df -h
-    dpkg-query -Wf '${Installed-size}\t${Status}\t${Package}\n'|grep deinstall|awk '{print $5}'|xargs dpkg -P
+    sudo dpkg-query -Wf '${Installed-size}\t${Status}\t${Package}\n'|grep deinstall|awk '{print $5}'|xargs dpkg -P
   displayName: ' Initialization environment'
 
 - script: |
