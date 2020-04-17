@@ -39,9 +39,8 @@ steps:
     cd ./B2G/gecko
     touch ./boot.exp
     echo "spawn ./mach bootstrap --no-system-changes" >> boot.exp  
-    echo "expect {" >> boot.exp
-    echo "\"Your choice:\"{send \"4\r\" ;exp_continue}" >> boot.exp
-    echo "} " >> boot.exp
+    echo "expect  \"Your choice:\" " >> boot.exp
+    echo "send \"4\r\" " >> boot.exp
     echo "interact " >> boot.exp
     cat ./boot.exp
     expect ./boot.exp
