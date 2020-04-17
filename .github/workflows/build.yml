@@ -21,4 +21,4 @@ jobs:
     - name: Update packages
       run: |
         df -h
-        free -m
+        top -l 1 | head -n 10 | grep PhysMem
