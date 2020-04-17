@@ -13,7 +13,7 @@ steps:
 - script: |
         df -h
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install autoconf
+        brew install autoconf expect
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
   displayName: ' Initialization environment'
@@ -24,6 +24,9 @@ steps:
     cd ~
     git config --global user.name "ittat"
     git config --global user.email "ittat@github.com"
+    hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
+    hdiutil attach ~/android.dmg -mountpoint /Volumes/android
+    cd /Volumes/android
     git clone https://github.com/ReB2GOS/B2G -b exp
     cd ./B2G
     REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh emulator-10
@@ -32,9 +35,21 @@ steps:
 - script: |
     df -h
     cd ~
+    /Volumes/android
     ls
-    cd ./B2G
+    cd ./B2G/gecko
+    touch ./boot.exp
+    echo -e "#!/bin/expect" > boot.exp  
+    echo -e "spawn ./mach bootstrap --no-system-changes" > boot.exp  
+    echo -e "expect {" > boot.exp
+    echo -e "\"Your choice:\" {send \"4\r\" ;exp_continue}" > boot.exp
+    echo -e "} " > boot.exp
+    echo -e "interact " > boot.exp
+    cat ./boot.exp
+    expect ./boot.exp
+    cd ../
     export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
     ./build.sh -j16
+    hdiutil detach /Volumes/android
   displayName: 'build source'
 
