@@ -10,9 +10,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world! |
+- script: |
     df -h
-  displayName: 'Run a one-line script'
+    dpkg-query -Wf '${Installed-size}\t${Status}\t${Package}\n'|grep deinstall|awk '{print $5}'|xargs dpkg -P
+  displayName: ' Initialization environment'
 
 - script: |
     sudo apt-get update
