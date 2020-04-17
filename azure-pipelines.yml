@@ -35,8 +35,6 @@ steps:
     ls
     cd ./B2G
     export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-    cd gecko && ./mach bootstrap && 4
-    cd ../
     ./build.sh -j16
   displayName: 'build source'
 
