@@ -11,15 +11,30 @@ pool:
 
 steps:
 - script: |
+        df -h
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install autoconf
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        df -h
-        sysctl -a | grep ".cpu."
-        sysctl machdep.cpu
   displayName: ' Initialization environment'
 
 - script: |
     df -h
-  displayName: 'Run a multi-line script'
+    pwd
+    cd ~
+    git config --global user.name "ittat"
+    git config --global user.email "ittat@github.com"
+    git clone https://github.com/ReB2GOS/B2G -b exp
+    cd ./B2G
+    REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh onyx
+  displayName: 'Fetch source'
+
+- script: |
+    df -h
+    cd ~/B2G
+    export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+    cd gecko && ./mach bootstrap && 4
+    cd ../
+    ./build.sh -j16
+  displayName: 'build source'
+
