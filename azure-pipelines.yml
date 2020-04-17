@@ -10,11 +10,18 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
+- script: echo Hello, world! |
+    df -h
   displayName: 'Run a one-line script'
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
+    sudo apt-get update
+    sudo apt-get install -y  --no-install-recommends  git 
+    sudo rm -rf \
+      /usr/share/dotnet \
+      /etc/mysql \
+      /etc/php
+    git config --global user.name "ittat"
+    git config --global user.email "ittat@github.com"
     df -h
   displayName: 'Run a multi-line script'
