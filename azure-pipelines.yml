@@ -27,7 +27,7 @@ steps:
     git config --global user.name "ittat"
     git config --global user.email "ittat@github.com"
     cd /Volumes/android
-    git clone https://github.com/ReB2GOS/B2G -b exp
+    git clone https://github.com/ReB2GOS/B2G -b master
     cd ./B2G
     REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh emulator-10
   displayName: 'Fetch source'
