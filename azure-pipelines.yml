@@ -16,7 +16,8 @@ steps:
         brew install autoconf expect
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        clang -version
+        clang --version
+        ls /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
         cd /Users/runner
         ls
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
@@ -51,6 +52,8 @@ steps:
     cat ./boot.exp
     expect ./boot.exp
     cd ../
+    sed -i '65i \"10.15\"\,'  ./build/soong/cc/config/x86_darwin_host.go
+    cat ./build/soong/cc/config/x86_darwin_host.go
     export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
     ./build.sh -j16
     hdiutil detach /Volumes/android
