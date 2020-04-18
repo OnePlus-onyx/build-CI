@@ -15,39 +15,71 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
-    - name: Fetch dependencies
+    - name: Initialization system environment
       run: |
+        df -h
+        echo Check:$(sysctl -n hw.logicalcpu)
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install autoconf
+        brew install autoconf expect
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
-        sysctl -a | grep ".cpu."
-        sysctl machdep.cpu
         
     - name: Fetch source
       run: |
         df -h
-        pwd
-        cd ~
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
+        cd /Volumes/android
         git clone https://github.com/ReB2GOS/B2G -b exp
         cd ./B2G
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh emulator-10
- 
-        
-    - name: Setup Debug Session
-      uses: csexton/debugger-action@master
-      
-    - name: Build
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh onyx
+        df -h
+#
+#    - name: Setup Debug Session
+#      uses: csexton/debugger-action@master
+
+    - name: Initialization gecko environment and fix issue
       run: |
         df -h
-        cd ~
-        ls
-        cd ./B2G
+        cd /Volumes/android
+        cd ./B2G/gecko
+        touch ./boot.exp
+        echo "spawn ./mach bootstrap --no-system-changes" >> boot.exp  
+        echo "expect  \"Your choice:\" " >> boot.exp
+        echo "send \"4\r\" " >> boot.exp
+        echo "expect  \"(Yn):\" " >> boot.exp
+        echo "send \"Y\r\" " >> boot.exp
+        echo "expect  \"(Yn):\" " >> boot.exp
+        echo "send \"Y\r\" " >> boot.exp
+        echo "interact " >> boot.exp
+        cat ./boot.exp
+        expect ./boot.exp
+        cd ../
+        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
+        cat ./build/soong/cc/config/x86_darwin_host.go 
+        df -h
+        
+    - name: Build B2G
+      run: |
+        df -h
+        cd /Volumes/android/B2G
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        ./build.sh -j16
+        ./build.sh -j$(sysctl -n hw.logicalcpu)
+        df -h
+        
+    - name: Check
+      run: |
+        df -h
+        ls -al /Volumes/android/B2G/out/target/product/onyx 
+
+    - name: Remove android.img
+      run: |
+        cd ~
+        hdiutil detach /Volumes/android
         
 
 
