@@ -18,7 +18,7 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        echo Check:$(sysctl -n hw.logicalcpu)
+        echo Check:$(sysctl -n hw.logicalcpu) $( sysctl -n hw.physicalcpu )
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install autoconf expect
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
