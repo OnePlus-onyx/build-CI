@@ -52,7 +52,7 @@ steps:
     cat ./boot.exp
     expect ./boot.exp
     cd ../
-    sed -i '65i \"10.15\"\,'  ./build/soong/cc/config/x86_darwin_host.go
+    sed -i '' '65i\'$'\n\"10\.15\"\,' build/soong/cc/config/x86_darwin_host.go
     cat ./build/soong/cc/config/x86_darwin_host.go
     export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
     ./build.sh -j16
