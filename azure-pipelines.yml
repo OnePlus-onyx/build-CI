@@ -12,6 +12,7 @@ pool:
 steps:
 - script: |
         df -h
+        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -off -restart -agent -privs -all -allowAccessFor -allUsers
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install autoconf expect
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
