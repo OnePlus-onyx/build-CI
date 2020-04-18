@@ -29,7 +29,7 @@ steps:
     git config --global user.name "ittat"
     git config --global user.email "ittat@github.com"
     cd /Volumes/android
-    git clone https://github.com/ReB2GOS/B2G -b master
+    git clone https://github.com/ReB2GOS/B2G -b exp
     cd ./B2G
     REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh emulator-10
   displayName: 'Fetch source'
@@ -52,10 +52,11 @@ steps:
     cat ./boot.exp
     expect ./boot.exp
     cd ../
-    sed -i '' '65i\'$'\n\"10\.15\"\,' build/soong/cc/config/x86_darwin_host.go
+    sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
     cat ./build/soong/cc/config/x86_darwin_host.go
     export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-    ./build.sh -j16
+    ./build.sh
+    df -h
     hdiutil detach /Volumes/android
   displayName: 'build source'
 
