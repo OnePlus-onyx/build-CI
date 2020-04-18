@@ -10,7 +10,7 @@ jobs:
   build:
 
     runs-on: macos-latest
-
+    timeout-minutes: 360
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -73,7 +73,7 @@ jobs:
     - name: Check
       run: |
         df -h
-        ls -al /Volumes/android/B2G/out/target/product/onyx 
+        ls -al /Volumes/android/B2G/out/target/product/
     - name: Remove android.img
       run: |
         cd ~
