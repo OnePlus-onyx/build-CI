@@ -35,7 +35,7 @@ jobs:
         cd /Volumes/android
         git clone https://github.com/ReB2GOS/B2G -b master
         cd ./B2G
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh emulator-10
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128 --no-tags --no-clone-bundle" ./config.sh emulator-10
         df -h
 #
 #    - name: Setup Debug Session
