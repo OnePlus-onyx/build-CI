@@ -69,7 +69,9 @@ jobs:
         df -h
         cd /Volumes/android/B2G
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        ./build.sh
+        ccache -M 50G
+        export USE_CCACHE=1
+        ./build.sh 
         df -h
         
     - name: Check
