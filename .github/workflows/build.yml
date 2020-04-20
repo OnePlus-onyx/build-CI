@@ -60,8 +60,8 @@ jobs:
         cd ../
         sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
         cat ./build/soong/cc/config/x86_darwin_host.go 
-        sed -i '' '14d'  /system/sepolicy/Android.bp
-        cat /system/sepolicy/Android.bp
+        sed -i '' '14d'  system/sepolicy/Android.bp
+        cat system/sepolicy/Android.bp
         df -h
         
     - name: Build B2G
