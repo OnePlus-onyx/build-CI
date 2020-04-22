@@ -24,8 +24,8 @@ jobs:
         #tar -xvf MacOSX10.13.sdk.tar.xz 
         #ls
         #sudo mv MacOSX10.13.sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
-        cd /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform
-        sudo ln -s Developer/SDKs/MacOSX10.15.sdk Developer/SDKs/MacOSX10.13.sdk
+        #cd /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform
+        #sudo ln -s Developer/SDKs/MacOSX10.15.sdk Developer/SDKs/MacOSX10.13.sdk
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
@@ -50,8 +50,8 @@ jobs:
     - name: fix
       run: |
         cd /Volumes/android
-        #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-        #cat ./build/soong/cc/config/x86_darwin_host.go 
+        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
+        cat ./build/soong/cc/config/x86_darwin_host.go 
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         cat system/sepolicy/tests/Android.bp
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
