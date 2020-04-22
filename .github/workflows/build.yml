@@ -35,7 +35,7 @@ jobs:
         cd /Volumes/android
         mkdir ~/bin
         export PATH=~/bin:$PATH
-        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        sudo curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
         repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
         ls
         repo sync --depth=1 -j128  --no-tags --no-clone-bundle
