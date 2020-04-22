@@ -19,9 +19,9 @@ jobs:
       run: |
         df -h
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install autoconf expect
-        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        #brew install autoconf expect
+        #ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        #ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
@@ -33,8 +33,9 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo
-        chmod +X ./repo 
+        curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
+        chmod +x repo
+        ls
         ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
         ls
         ./repo sync --depth=1 -j128  --no-tags --no-clone-bundle
