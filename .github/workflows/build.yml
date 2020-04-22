@@ -19,9 +19,9 @@ jobs:
       run: |
         df -h
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        #brew install autoconf expect 
-        #ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-        #ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        brew install autoconf expect  gnu-sed
+        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
