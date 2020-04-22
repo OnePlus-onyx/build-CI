@@ -48,8 +48,8 @@ jobs:
     - name: fix
       run: |
         cd /Volumes/android
-        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-        cat ./build/soong/cc/config/x86_darwin_host.go 
+        #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
+        #cat ./build/soong/cc/config/x86_darwin_host.go 
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         cat system/sepolicy/tests/Android.bp
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
