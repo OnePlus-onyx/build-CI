@@ -39,13 +39,22 @@ jobs:
         ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
         ls
         ./repo sync  -j128  --no-tags --no-clone-bundle
+
+
+    - name: fix
+      run: |
+        cd /Volumes/android
+        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
+        cat ./build/soong/cc/config/x86_darwin_host.go 
+        sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        cat system/sepolicy/tests/Android.bp
         df -h
 #
 #    - name: Setup Debug Session
 #      uses: csexton/debugger-action@master
 
 
-    - name: Build B2G
+    - name: Build 
       run: |
         df -h
         cd /Volumes/android/
