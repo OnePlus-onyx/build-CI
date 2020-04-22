@@ -20,6 +20,7 @@ jobs:
         df -h
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install autoconf expect  gnu-sed
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
