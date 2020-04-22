@@ -19,7 +19,7 @@ jobs:
       run: |
         df -h
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        #brew install autoconf expect
+        #brew install autoconf expect 
         #ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         #ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
