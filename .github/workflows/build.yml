@@ -38,7 +38,7 @@ jobs:
         ls
         ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
         ls
-        ./repo sync --depth=1 -j128  --no-tags --no-clone-bundle
+        ./repo sync  -j128  --no-tags --no-clone-bundle
         df -h
 #
 #    - name: Setup Debug Session
