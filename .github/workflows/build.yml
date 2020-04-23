@@ -30,6 +30,10 @@ jobs:
     - name: Fetch source
       run: |
         df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 50G
+        export CCACHE_COMPRESS=1
+        export USE_CCACHE=1
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
@@ -58,10 +62,6 @@ jobs:
         df -h
         cd /Volumes/android/
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx6G" 
-        export CCACHE_DIR=~/.ccache
-        ccache  -M 50G
-        export CCACHE_COMPRESS=1
-        export USE_CCACHE=1
         source build/envsetup.sh
         lunch lemon_onyx-eng
         make -j8
