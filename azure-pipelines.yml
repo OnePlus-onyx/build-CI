@@ -13,61 +13,40 @@ jobs:
   steps:
   - script: |
         df -h
-        #sudo xcode-select --switch /Applications/Xcode_11.4.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install autoconf expect  gnu-sed ccache
+        brew install autoconf expect
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 100g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
+        sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+        
     displayName: ' Initialization environment'
 
   - script: |
         df -h
-        export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 50G
-        export CCACHE_COMPRESS=1
-        export USE_CCACHE=1
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
-        chmod +x repo
-        ls
-        ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
-        ls
-        ./repo sync  -j128  --no-tags --no-clone-bundle
+        mkdir ~/bin
+        export PATH=~/bin:$PATH
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        chmod a+x ~/bin/repo
+        repo init -u https://github.com/ReB2GOS/manifests -b ndk --depth=1
+        repo sync -j128 --no-tags --no-clone-bundle
+        df -h
     displayName: 'Fetch source'
 
+
+
   - script: |
+        df -h
         cd /Volumes/android
-        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-        cat ./build/soong/cc/config/x86_darwin_host.go 
-        sed -i '' '14d'  system/sepolicy/tests/Android.bp
-        cat system/sepolicy/tests/Android.bp
-        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        python ndk/checkbuild.py --no-build-tests
         df -h
-    displayName: 'fix source'
+    displayName: 'build ndk'
 
 
-  - script: |
-        df -h
-        cd /Volumes/android/
-        export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx6G" 
-        source build/envsetup.sh
-        lunch lemon_onyx-eng 
-        make -j8
-        df -h
-    displayName: 'build source'
-
-
-  - script: |
-        df -h
-        ls -al /Volumes/android/B2G/out/target/product/onyx 
-        cd ~
-        hdiutil detach /Volumes/android
-        df -h
-    displayName: 'End'
 
