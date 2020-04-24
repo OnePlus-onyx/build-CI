@@ -8,7 +8,7 @@
 jobs:
 - job: build
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-10.15'
   timeoutInMinutes: 360
   steps:
   - script: |
