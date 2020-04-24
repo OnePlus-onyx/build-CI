@@ -63,7 +63,7 @@ jobs:
         cd /Volumes/android/
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx6G" 
         source build/envsetup.sh
-        lunch lemon_onyx-eng
+        lunch lemon_onyx-eng 
         make -j8
         df -h
         
