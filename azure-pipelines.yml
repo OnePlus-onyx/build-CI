@@ -22,7 +22,7 @@ jobs:
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
         sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
-        brew reinstall python@2
+        #brew reinstall python@2
         python --version
         which python2.7
     displayName: ' Initialization environment'
@@ -46,7 +46,7 @@ jobs:
   - script: |
         df -h
         cd /Volumes/android
-        python ndk/checkbuild.py --no-build-tests
+        /usr/local/bin/python2.7 ndk/checkbuild.py --no-build-tests
         df -h
     displayName: 'build ndk'
 
