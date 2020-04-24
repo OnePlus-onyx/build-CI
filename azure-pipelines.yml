@@ -51,6 +51,7 @@ jobs:
         cat system/sepolicy/tests/Android.bp
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         df -h
+        sudo rm -r ./.repo
     displayName: 'fix source'
 
 
