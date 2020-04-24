@@ -13,9 +13,9 @@ jobs:
   steps:
   - script: |
         df -h
-        more /System/Library/CoreServices/SystemVersion.plist
-        sudo ls /Applications
-        #sudo xcode-select --switch /Applications/Xcode_11.4.app/Contents/Developer
+        #more /System/Library/CoreServices/SystemVersion.plist
+        #sudo ls /Applications
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install autoconf expect  gnu-sed ccache
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
@@ -45,8 +45,8 @@ jobs:
 
   - script: |
         cd /Volumes/android
-        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-        cat ./build/soong/cc/config/x86_darwin_host.go 
+        #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
+        #cat ./build/soong/cc/config/x86_darwin_host.go 
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         cat system/sepolicy/tests/Android.bp
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
