@@ -13,6 +13,8 @@ jobs:
   steps:
   - script: |
         df -h
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo ls /Applications
         #sudo xcode-select --switch /Applications/Xcode_11.4.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install autoconf expect  gnu-sed ccache
