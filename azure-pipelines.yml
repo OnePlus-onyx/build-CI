@@ -12,19 +12,11 @@ jobs:
 - job: build
 
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-10.13'
     timeoutInMinutes: 360
 
 
   steps:
-    
-  - task: Docker@2
-    displayName: Login to ACR
-    inputs:
-      command: login
-      containerRegistry: dockerRegistryServiceConnection1
-
-
 
   - script: |
         df -h
