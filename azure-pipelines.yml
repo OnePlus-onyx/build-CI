@@ -5,59 +5,69 @@
 
 #trigger:
 #- azure-pipelines
-
-pool:
-  vmImage: 'macos-latest'
-
-steps:
-- script: |
+jobs:
+- job: build
+  pool:
+    vmImage: 'macOS-10.14'
+  timeoutInMinutes: 360
+  steps:
+  - script: |
         df -h
-        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -off -restart -agent -privs -all -allowAccessFor -allUsers
+        #sudo xcode-select --switch /Applications/Xcode_11.4.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install autoconf expect
+        brew install autoconf expect  gnu-sed ccache
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        clang --version
-        ls /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
         cd /Users/runner
-        ls
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 200g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
-  displayName: ' Initialization environment'
+        df -h
+    displayName: ' Initialization environment'
 
-- script: |
-    df -h
-    git config --global user.name "ittat"
-    git config --global user.email "ittat@github.com"
-    cd /Volumes/android
-    git clone https://github.com/ReB2GOS/B2G -b exp
-    cd ./B2G
-    REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS="-j128" ./config.sh emulator-10
-  displayName: 'Fetch source'
+  - script: |
+        df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 50G
+        export CCACHE_COMPRESS=1
+        export USE_CCACHE=1
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        cd /Volumes/android
+        curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
+        chmod +x repo
+        ls
+        ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
+        ls
+        ./repo sync  -j128  --no-tags --no-clone-bundle
+    displayName: 'Fetch source'
 
-- script: |
-    df -h
-    cd /Volumes/android
-    ls
-    cd ./B2G/gecko
-    touch ./boot.exp
-    echo "spawn ./mach bootstrap --no-system-changes" >> boot.exp  
-    echo "expect  \"Your choice:\" " >> boot.exp
-    echo "send \"4\r\" " >> boot.exp
-    echo "expect  \"(Yn):\" " >> boot.exp
-    echo "send \"Y\r\" " >> boot.exp
-    echo "expect  \"(Yn):\" " >> boot.exp
-    echo "send \"Y\r\" " >> boot.exp
+  - script: |
+        cd /Volumes/android
+        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
+        cat ./build/soong/cc/config/x86_darwin_host.go 
+        sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        cat system/sepolicy/tests/Android.bp
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        df -h
+    displayName: 'fix source'
 
-    echo "interact " >> boot.exp
-    cat ./boot.exp
-    expect ./boot.exp
-    cd ../
-    sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-    cat ./build/soong/cc/config/x86_darwin_host.go
-    export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-    ./build.sh
-    df -h
-    hdiutil detach /Volumes/android
-  displayName: 'build source'
+
+  - script: |
+        df -h
+        cd /Volumes/android/
+        export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx6G" 
+        source build/envsetup.sh
+        lunch lemon_onyx-eng 
+        make -j8
+        df -h
+    displayName: 'build source'
+
+
+  - script: |
+        df -h
+        ls -al /Volumes/android/B2G/out/target/product/onyx 
+        cd ~
+        hdiutil detach /Volumes/android
+        df -h
+    displayName: 'End'
 
