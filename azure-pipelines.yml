@@ -8,7 +8,7 @@
 jobs:
 - job: build
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'macOS-10.14'
   timeoutInMinutes: 360
   steps:
   - script: |
@@ -22,8 +22,8 @@ jobs:
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
         sudo ls /Applications
-        #sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
-        #sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
         #brew reinstall python@3
     displayName: ' Initialization environment'
 
