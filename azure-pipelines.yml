@@ -13,7 +13,7 @@ jobs:
 
   pool:
     vmImage: 'macOS-10.14'
-    timeoutInMinutes: 360
+  timeoutInMinutes: 360
 
 
   steps:
@@ -45,10 +45,8 @@ jobs:
         cd /Volumes/android
         curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
         chmod +x repo
-        ls
         ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
-        ls
-        ./repo sync  -j128  --no-tags --no-clone-bundle
+        ./repo sync  -j128   --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune 
     displayName: 'Fetch source'
 
   - script: |
@@ -60,6 +58,7 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         df -h
         sudo rm -r ./.repo
+        df -h
     displayName: 'fix source'
 
 
