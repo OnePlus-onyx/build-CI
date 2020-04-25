@@ -20,9 +20,9 @@ jobs:
 
   - script: |
         df -h
-        #more /System/Library/CoreServices/SystemVersion.plist
-        #sudo ls /Applications
-        #sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo ls /Applications
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install autoconf expect  gnu-sed ccache
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
