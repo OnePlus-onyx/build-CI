@@ -46,7 +46,7 @@ jobs:
   - script: |
         df -h
         cd /Volumes/android
-        /usr/local/bin/python2.7 ndk/checkbuild.py --no-build-tests
+        /usr/local/bin/python3 ndk/checkbuild.py --no-build-tests
         df -h
     displayName: 'build ndk'
 
