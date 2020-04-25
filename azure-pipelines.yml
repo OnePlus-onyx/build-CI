@@ -22,16 +22,10 @@ jobs:
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
         sudo ls /Applications
-        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        sudo xcode-select --switch /Applications/Xcode_10.1.app/Contents/Developer
         sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
         sudo ls /System/Library/Frameworks/Python.framework/Versions/
-        sudo cp /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.7/lib/python3.7/lib-dynload/_scproxy.cpython-37m-darwin.so /Users/LDianaAmorim/Documents/opt/spack/opt/spack/darwin-catalina-skylake/gcc-9.3.0/python-3.7.6-rztnajc6br75odyhxikw7hfk52fnddb7/lib/python3.7/lib-dynload/
-        wget http://www.python.org/ftp/python/2.6.6/Python-2.6.6.tgz
-        tar zxf Python-2.6.6.tgz
-        cd Python-2.6.6
-        ./configure
-        make sharedmods
-        sudo cp ./build/lib.macosx-10.4-x86_64-2.6/_scproxy.so /System/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/lib-dynload
+        #sudo cp ./build/lib.macosx-10.4-x86_64-2.6/_scproxy.so /System/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/lib-dynload
     displayName: ' Initialization environment'
 
   - script: |
@@ -53,7 +47,7 @@ jobs:
   - script: |
         df -h
         cd /Volumes/android
-        /usr/local/bin/python3 ndk/checkbuild.py --no-build-tests
+        SDKROOT=/Applications/Xcode_10.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk MACOSX_DEPLOYMENT_TARGET=10.14 python ndk/checkbuild.py --no-build-tests
         df -h
     displayName: 'build ndk'
 
