@@ -5,7 +5,9 @@
 
 #trigger:
 #- azure-pipelines
-
+variables:
+  # DEBUG
+    system.debug: true
 
 jobs:
 
