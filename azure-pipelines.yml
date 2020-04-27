@@ -15,7 +15,7 @@ jobs:
 
   pool:
     vmImage: 'macOS-10.14'
-  timeoutInMinutes: 420
+  timeoutInMinutes: 360
 
 
   steps:
@@ -29,7 +29,7 @@ jobs:
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 250g ~/android.dmg
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 210g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
     displayName: ' Initialization environment'
