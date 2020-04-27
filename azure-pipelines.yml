@@ -68,6 +68,7 @@ jobs:
         df -h
         cd /Volumes/android/
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx6G" 
+        export ALLOW_MISSING_DEPENDENCIES=true
         source build/envsetup.sh
         lunch lemon_onyx-eng 
         make -j8
