@@ -40,7 +40,7 @@ jobs:
   - script: |
         df -h
         export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 100G
+        /usr/local/bin/ccache  -M 70G
         /usr/local/bin/ccache -s
         #export CCACHE_COMPRESS=1
         export USE_CCACHE=1
@@ -68,7 +68,7 @@ jobs:
   - script: |
         df -h
         cd /Volumes/android/
-        export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx6G" 
+        export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
         export ALLOW_MISSING_DEPENDENCIES=true
         source build/envsetup.sh
         lunch lemon_onyx-eng 
