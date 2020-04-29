@@ -84,7 +84,7 @@ jobs:
 
   - script: |
         df -h
-        cd /Volumes/android/
+        cd /Volumes/android/B2G
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
         #export ALLOW_MISSING_DEPENDENCIES=true
         ./build.sh 
