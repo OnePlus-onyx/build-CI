@@ -47,14 +47,31 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
+        git clone https://github.com/ReB2GOS/B2G -b exp  --depth=1 
+        cd ./B2G
         curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
         chmod +x repo
-        ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
-        ./repo sync  -j128   --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune 
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        df -h
     displayName: 'Fetch source'
 
   - script: |
         cd /Volumes/android
+        # gecko
+#        cd ./B2G/gecko
+#        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+#        touch ./boot.exp
+#        echo "spawn ./mach bootstrap --no-system-changes" >> boot.exp  
+#        echo "expect  \"Your choice:\" " >> boot.exp
+#        echo "send \"4\r\" " >> boot.exp
+#        echo "expect  \"(Yn):\" " >> boot.exp
+#        echo "send \"Y\r\" " >> boot.exp
+#        echo "expect  \"(Yn):\" " >> boot.exp
+#        echo "send \"Y\r\" " >> boot.exp
+#        echo "interact " >> boot.exp
+#        cat ./boot.exp
+#        expect ./boot.exp
+#        cd ../../
         #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
         #cat ./build/soong/cc/config/x86_darwin_host.go 
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
@@ -69,10 +86,8 @@ jobs:
         df -h
         cd /Volumes/android/
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
-        export ALLOW_MISSING_DEPENDENCIES=true
-        source build/envsetup.sh
-        lunch lemon_onyx-eng 
-        make -j8
+        #export ALLOW_MISSING_DEPENDENCIES=true
+        ./build.sh 
         df -h
     displayName: 'build source'
 
