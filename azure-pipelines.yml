@@ -58,20 +58,20 @@ jobs:
   - script: |
         cd /Volumes/android
         # gecko
-        #        cd ./B2G/gecko
-        #        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        #        touch ./boot.exp
-        #        echo "spawn ./mach bootstrap --no-system-changes" >> boot.exp  
-        #        echo "expect  \"Your choice:\" " >> boot.exp
-        #        echo "send \"4\r\" " >> boot.exp
+                cd ./B2G/gecko
+                export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+                touch ./boot.exp
+                echo "spawn ./mach bootstrap" >> boot.exp  
+                echo "expect  \"Your choice:\" " >> boot.exp
+                echo "send \"4\r\" " >> boot.exp
+                echo "expect  \"(Yn):\" " >> boot.exp
+                echo "send \"Y\r\" " >> boot.exp
         #        echo "expect  \"(Yn):\" " >> boot.exp
         #        echo "send \"Y\r\" " >> boot.exp
-        #        echo "expect  \"(Yn):\" " >> boot.exp
-        #        echo "send \"Y\r\" " >> boot.exp
-        #        echo "interact " >> boot.exp
-        #        cat ./boot.exp
-        #        expect ./boot.exp
-        #        cd ../../
+                echo "interact " >> boot.exp
+                cat ./boot.exp
+                expect ./boot.exp
+                cd ../../
         #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
         #cat ./build/soong/cc/config/x86_darwin_host.go 
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
