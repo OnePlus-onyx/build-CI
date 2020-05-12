@@ -60,7 +60,7 @@ jobs:
         df -h
     displayName: 'build ndk'
 
- - script: |
+  - script: |
       # Install tmate on macOS or Ubuntu
 
       echo Setting up tmate...
