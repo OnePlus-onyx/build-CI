@@ -144,6 +144,7 @@ jobs:
   - script: |
         df -h
         ls -al /Volumes/android/B2G/out/target/product/onyx 
+        ls  /Volumes/android/B2G/out/target/product/onyx/system
         /usr/local/bin/ccache -s
         cd ~
         hdiutil detach /Volumes/android
