@@ -14,9 +14,11 @@ jobs:
   - script: |
         df -h
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install autoconf expect
-        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        #brew install autoconf expect
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        #ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        #ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 100g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
@@ -30,6 +32,10 @@ jobs:
 
   - script: |
         df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        export USE_CCACHE=1
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
@@ -37,8 +43,9 @@ jobs:
         export PATH=~/bin:$PATH
         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
         chmod a+x ~/bin/repo
-        repo init -u https://github.com/ReB2GOS/manifests -b ndk --depth=1
-        repo sync -j128 --no-tags --no-clone-bundle
+        #repo init -u https://github.com/ReB2GOS/manifests -b ndk --depth=1
+        repo init -u https://android.googlesource.com/platform/manifest -b master-ndk  --depth=1
+        repo sync  -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune
         df -h
     displayName: 'Fetch source'
 
@@ -47,7 +54,9 @@ jobs:
   - script: |
         df -h
         cd /Volumes/android
-        SDKROOT=/Applications/Xcode_10.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk MACOSX_DEPLOYMENT_TARGET=10.14 python ndk/checkbuild.py --no-build-tests
+        #python ndk/checkbuild.py --no-build-tests
+        ls
+        python checkbuild.py
         df -h
     displayName: 'build ndk'
 
