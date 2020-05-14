@@ -58,10 +58,10 @@ jobs:
   - script: |
         cd /Volumes/android
         # gecko
-        cd ./B2G/gecko
-        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        ./mach bootstrap --no-interactive --no-system-changes --application-choice 'GeckoView/Firefox for Android'
-        cd ../
+        # cd ./B2G/gecko
+        # export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        # ./mach bootstrap --no-interactive --no-system-changes --application-choice 'GeckoView/Firefox for Android'
+        # cd ../
         # touch ./boot.exp
         # echo "spawn ./mach bootstrap" >> boot.exp  
         # echo "expect  \"Your choice:\" " >> boot.exp
@@ -86,14 +86,14 @@ jobs:
 
 
 
-  # - script: |
-  #       df -h
-  #       cd /Volumes/android/B2G
-  #       export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
-  #       #export ALLOW_MISSING_DEPENDENCIES=true
-  #       ./build.sh 
-  #       df -h
-  #   displayName: 'build source'
+  - script: |
+        df -h
+        cd /Volumes/android/B2G
+        export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
+        #export ALLOW_MISSING_DEPENDENCIES=true
+        ./build.sh 
+        df -h
+    displayName: 'build source'
 
 
 
@@ -140,13 +140,13 @@ jobs:
   #     done
   #   displayName:  tmate
 
-  # - script: |
-  #       df -h
-  #       ls -al /Volumes/android/B2G/out/target/product/onyx 
-  #       ls  /Volumes/android/B2G/out/target/product/onyx/system
-  #       /usr/local/bin/ccache -s
-  #       cd ~
-  #       hdiutil detach /Volumes/android
-  #       df -h
-  #   displayName: 'End'
+  - script: |
+        df -h
+        ls -al /Volumes/android/B2G/out/target/product/onyx 
+        ls  /Volumes/android/B2G/out/target/product/onyx/system
+        /usr/local/bin/ccache -s
+        cd ~
+        hdiutil detach /Volumes/android
+        df -h
+    displayName: 'End'
 
