@@ -60,22 +60,25 @@ jobs:
         # gecko
         cd ./B2G/gecko
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        touch ./boot.exp
-        echo "spawn ./mach bootstrap" >> boot.exp  
-        echo "expect  \"Your choice:\" " >> boot.exp
-        echo "send \"4\r\" " >> boot.exp
-        echo "expect  \"(Yn):\" " >> boot.exp
-        echo "send \"Y\r\" " >> boot.exp
-        #        echo "expect  \"(Yn):\" " >> boot.exp
-        #        echo "send \"Y\r\" " >> boot.exp
-        echo "interact " >> boot.exp
-        cat ./boot.exp
-        expect ./boot.exp
-        cd ../../
+        ./mach bootstrap --no-interactive --no-system-changes --application-choice 'GeckoView/Firefox for Android'
+        cd ../
+        # touch ./boot.exp
+        # echo "spawn ./mach bootstrap" >> boot.exp  
+        # echo "expect  \"Your choice:\" " >> boot.exp
+        # echo "send \"4\r\" " >> boot.exp
+        # echo "expect  \"(Yn):\" " >> boot.exp
+        # echo "send \"Y\r\" " >> boot.exp
+        # #        echo "expect  \"(Yn):\" " >> boot.exp
+        # #        echo "send \"Y\r\" " >> boot.exp
+        # echo "interact " >> boot.exp
+        # cat ./boot.exp
+        # expect ./boot.exp
+        # cd ../../
         #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
         #cat ./build/soong/cc/config/x86_darwin_host.go 
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         cat system/sepolicy/tests/Android.bp
+        # Bootstrap gekco build
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         df -h
         #sudo rm -r ./.repo
@@ -83,14 +86,14 @@ jobs:
 
 
 
-  - script: |
-        df -h
-        cd /Volumes/android/B2G
-        export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
-        #export ALLOW_MISSING_DEPENDENCIES=true
-        ./build.sh 
-        df -h
-    displayName: 'build source'
+  # - script: |
+  #       df -h
+  #       cd /Volumes/android/B2G
+  #       export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
+  #       #export ALLOW_MISSING_DEPENDENCIES=true
+  #       ./build.sh 
+  #       df -h
+  #   displayName: 'build source'
 
 
 
@@ -137,13 +140,13 @@ jobs:
   #     done
   #   displayName:  tmate
 
-  - script: |
-        df -h
-        ls -al /Volumes/android/B2G/out/target/product/onyx 
-        ls  /Volumes/android/B2G/out/target/product/onyx/system
-        /usr/local/bin/ccache -s
-        cd ~
-        hdiutil detach /Volumes/android
-        df -h
-    displayName: 'End'
+  # - script: |
+  #       df -h
+  #       ls -al /Volumes/android/B2G/out/target/product/onyx 
+  #       ls  /Volumes/android/B2G/out/target/product/onyx/system
+  #       /usr/local/bin/ccache -s
+  #       cd ~
+  #       hdiutil detach /Volumes/android
+  #       df -h
+  #   displayName: 'End'
 
