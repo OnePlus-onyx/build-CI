@@ -51,7 +51,7 @@ jobs:
         cd ./B2G
         curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
         chmod +x repo
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10
         df -h
     displayName: 'Fetch source'
 
@@ -59,8 +59,8 @@ jobs:
         cd /Volumes/android
         # gecko
         # cd ./B2G/gecko
-        # export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        # ./mach bootstrap --no-interactive --no-system-changes --application-choice 'GeckoView/Firefox for Android'
+         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+         ./mach bootstrap --no-interactive --no-system-changes --application-choice 'GeckoView/Firefox for Android'
         # cd ../
         # touch ./boot.exp
         # echo "spawn ./mach bootstrap" >> boot.exp  
