@@ -1,10 +1,10 @@
 
-name: Build System Image
+name: Build B2G-desktop
 
 on: 
   push:
     branches:
-      - master
+      - b2g-desktop-ci
 
 jobs:
   build:
