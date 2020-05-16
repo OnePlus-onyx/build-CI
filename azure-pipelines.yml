@@ -27,9 +27,6 @@ jobs:
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache
-        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 210g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
@@ -47,34 +44,13 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
-        chmod +x repo
-        ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
-        ./repo sync  -j128   --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune 
-    displayName: 'Fetch source'
-
-  - script: |
-        cd /Volumes/android
-        #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-        #cat ./build/soong/cc/config/x86_darwin_host.go 
-        sed -i '' '14d'  system/sepolicy/tests/Android.bp
-        cat system/sepolicy/tests/Android.bp
-        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        df -h
-        #sudo rm -r ./.repo
-    displayName: 'fix source'
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+   displayName: 'Fetch source'
 
 
-  - script: |
-        df -h
-        cd /Volumes/android/
-        export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
-        export ALLOW_MISSING_DEPENDENCIES=true
-        source build/envsetup.sh
-        lunch lemon_onyx-eng 
-        make -j8
-        df -h
-    displayName: 'build source'
+
+
+
 
   - script: |
       # Install tmate on macOS or Ubuntu
