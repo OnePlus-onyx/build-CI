@@ -47,7 +47,7 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        git clone https://github.com/ReB2GOS/B2G -b test  --depth=1 
+        git clone https://github.com/ReB2GOS/B2G -b exp  --depth=1 
         cd ./B2G
         curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
         chmod +x repo
