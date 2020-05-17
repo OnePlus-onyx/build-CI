@@ -52,6 +52,7 @@ jobs:
         curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
         chmod +x repo
         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10
+        ls -al /Volumes/android/B2G/out
         df -h
     displayName: 'Fetch source'
 
