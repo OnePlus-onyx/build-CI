@@ -61,7 +61,9 @@ jobs:
         ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
         ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
         cd ../
+        mv  ~/.mozbuild/android-ndk-r20b  ~/.mozbuild/android-ndk-r20b-canary
         ls ~/.mozbuild
+        ls  ~/.mozbuild/android-ndk-r20b-canary
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         #cat system/sepolicy/tests/Android.bp
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
