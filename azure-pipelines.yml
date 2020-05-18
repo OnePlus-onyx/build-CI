@@ -49,7 +49,8 @@ jobs:
         cd /Volumes/android
         git clone https://github.com/ReB2GOS/B2G -b exp  --depth=1 
         cd ./B2G
-        curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
+        #curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo
         chmod +x repo
         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
         df -h
