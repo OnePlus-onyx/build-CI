@@ -52,7 +52,8 @@ jobs:
         #curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
         curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo
         chmod +x repo
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        echo Download ...
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx > /dev/null
         df -h
     displayName: 'Fetch source'
 
@@ -92,7 +93,8 @@ jobs:
         cd /Volumes/android/B2G
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
         #export ALLOW_MISSING_DEPENDENCIES=true
-        ./build.sh 
+        eecho buiding....
+        ./build.sh  > /dev/null
         df -h
     displayName: 'build source'
 
