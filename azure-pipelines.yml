@@ -46,8 +46,10 @@ jobs:
         cd ./B2G
         curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
         chmod +x repo
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10
-        ls -al /Volumes/android/B2G/out
+        #REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10
+        #ls -al /Volumes/android/B2G/out
+        cd ../
+        git clone  https://github.com/ReB2GOS/gecko-b2g -b gonk-mac --depth=1
         df -h
     displayName: 'Fetch source'
 
