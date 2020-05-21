@@ -49,7 +49,7 @@ jobs:
         #REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10
         #ls -al /Volumes/android/B2G/out
         cd ../
-        git clone  https://github.com/ReB2GOS/gecko-b2g -b cbccff64e4 --depth=1
+        git clone  https://github.com/ReB2GOS/gecko-b2g -b cbccff6 --depth=1
         df -h
     displayName: 'Fetch source'
 
