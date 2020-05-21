@@ -57,7 +57,7 @@ jobs:
         #tar -zcvf /Volumes/android/b2gdebug.tar.gz /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
         df -h
         
-    - name : B2Gdebug.app
+    - name : B2Gdebug.app 
       uses: actions/upload-artifact@master
       with:
         name: B2Gdebug.app
