@@ -42,7 +42,7 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        git clone  https://github.com/ReB2GOS/gecko-b2g -b gonk-mac --depth=1
+        git clone  https://github.com/ReB2GOS/gecko-b2g -b gonk --depth=1
 
         
     - name: Build B2G
