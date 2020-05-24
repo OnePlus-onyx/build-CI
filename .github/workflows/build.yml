@@ -23,7 +23,8 @@ jobs:
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache
+        brew install expect  gnu-sed ccache autoconf@2.13 gnu-tar node terminal-notifier watchman 
+        brew install nasm  yasm
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
@@ -52,9 +53,6 @@ jobs:
         export LOCAL_NDK_BASE_URL='https://github.com/ReB2GOS/Note/releases/download/ndk/android-ndk-0' 
         ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
         ./mach bootstrap --no-interactive  --application-choice 'Firefox for Desktop'
-        brew reinstall nasm 
-        brew reinstall yasm
-        brew install autoconf@2.13
         MOZCONFIG=./mozconfig-b2g-desktop ./mach build
         df -h
         
