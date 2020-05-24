@@ -4,14 +4,14 @@ name: Build B2G-desktop
 on: 
   push:
     branches:
-      - b2g-desktop-ci
+      - test
   schedule:
      - cron: 0 8 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29 * ?
 
 jobs:
   build:
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
     - name: Checkout
@@ -20,48 +20,27 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        more /System/Library/CoreServices/SystemVersion.plist
-        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache
-        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 70g ~/android.dmg
-        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
-        df -h
-        
+        sudo apt install ccache
+
     - name: Fetch source
       run: |
         df -h
-        export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 20G
-        /usr/local/bin/ccache -s
-        #export CCACHE_COMPRESS=1
-        export USE_CCACHE=1
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
-        cd /Volumes/android
+        mkdir ~/android
+        cd ~/android
         git clone  https://github.com/ReB2GOS/gecko-b2g -b test4 --depth=1
         #git clone https://github.com/mozilla/gecko-dev -b master --depth=1
         
     - name: Build B2G
       run: |
         df -h
-        cd /Volumes/android/gecko-b2g
+        cd ~/android/gecko-b2g
         ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
         ./mach bootstrap --no-interactive  --application-choice 'Firefox for Desktop'
-        brew reinstall nasm 
-        brew reinstall yasm
-        brew install autoconf@2.13
         MOZCONFIG=./mozconfig-b2g-desktop ./mach build
         #and run it with ./mach run
         #tar -zcvf /Volumes/android/b2gdebug.tar.gz /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
         df -h
         
-    - name : B2Gdebug.app 
-      uses: actions/upload-artifact@master
-      with:
-        name: B2Gdebug.app
-        path: /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
         
