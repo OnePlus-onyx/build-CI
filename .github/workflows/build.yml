@@ -89,7 +89,8 @@ jobs:
         cd ~/android/gecko-b2g
         export SHELL=/bin/bash
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        MOZCONFIG=./mozconfig-b2g-desktop ./mach build
+        ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
+        #MOZCONFIG=./mozconfig-b2g-desktop ./mach build
         df -h
     
         
