@@ -6,10 +6,11 @@ on:
     branches:
       - checkboot
   schedule:
-     - cron: 0 8 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29 * ?
+     - cron: 0 8 1-30 * ?
 
-jobsmacos:
-  build:
+jobs:
+  build_on_mac:
+    name: check boot on mac
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
@@ -64,8 +65,8 @@ jobsmacos:
 #         path: /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
 
 
-jobsubuntu:
-  build:
+  build_on_ubuntu:
+    name: check boot on ubuntu
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
