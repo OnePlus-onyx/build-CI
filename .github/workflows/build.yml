@@ -64,33 +64,33 @@ jobs:
 #         path: /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
 
 
-  build_on_ubuntu:
-    name: check boot on ubuntu
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v1
+#   build_on_ubuntu:
+#     name: check boot on ubuntu
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 360
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@v1
 
         
-    - name: Fetch source
-      run: |
-        df -h
-        git config --global user.name "ittat"
-        git config --global user.email "ittat@github.com"
-        mkdir ~/android
-        cd ~/android
-        #git clone  https://github.com/ReB2GOS/gecko-b2g -b gonk --depth=1
-        git clone https://github.com/mozilla/gecko-dev -b master --depth=1
+#     - name: Fetch source
+#       run: |
+#         df -h
+#         git config --global user.name "ittat"
+#         git config --global user.email "ittat@github.com"
+#         mkdir ~/android
+#         cd ~/android
+#         #git clone  https://github.com/ReB2GOS/gecko-b2g -b gonk --depth=1
+#         git clone https://github.com/mozilla/gecko-dev -b master --depth=1
         
-    - name: Build B2G
-      run: |
-        df -h
-        cd ~/android/gecko-dev
-        export SHELL=/bin/bash
-        #export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
-        #MOZCONFIG=./mozconfig-b2g-desktop ./mach build
-        df -h
+#     - name: Build B2G
+#       run: |
+#         df -h
+#         cd ~/android/gecko-dev
+#         export SHELL=/bin/bash
+#         #export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+#         ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
+#         #MOZCONFIG=./mozconfig-b2g-desktop ./mach build
+#         df -h
     
         
