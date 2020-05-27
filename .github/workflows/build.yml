@@ -52,13 +52,13 @@ jobs:
 #         git config --global user.name "ittat"
 #         git config --global user.email "ittat@github.com"
 #         cd /Volumes/android
-#         #git clone  https://github.com/ReB2GOS/gecko-b2g -b gonk --depth=1
-#         git clone https://github.com/mozilla/gecko-dev -b master --depth=1
+#         git clone  https://github.com/ReB2GOS/gecko-b2g -b gonk --depth=1
+#         #git clone https://github.com/mozilla/gecko-dev -b master --depth=1
         
 #     - name: Build B2G
 #       run: |
 #         df -h
-#         cd /Volumes/android/gecko-dev
+#         cd /Volumes/android/gecko-b2g
 #         #export LOCAL_NDK_BASE_URL='https://github.com/ReB2GOS/Note/releases/download/ndk/android-ndk-0' 
 #         ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
 #         ./mach bootstrap --no-interactive  --application-choice 'Firefox for Desktop'
