@@ -38,11 +38,11 @@ jobs:
     - name: Fetch source
       run: |
         df -h
-        export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 20G
-        /usr/local/bin/ccache -s
+        #export CCACHE_DIR=~/.ccache
+        #/usr/local/bin/ccache  -M 20G
+        #/usr/local/bin/ccache -s
         #export CCACHE_COMPRESS=1
-        export USE_CCACHE=1
+        #export USE_CCACHE=1
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
