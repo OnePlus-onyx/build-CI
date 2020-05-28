@@ -26,8 +26,8 @@ jobs:
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache autoconf@2.13 gnu-tar node terminal-notifier watchman 
-        brew install nasm  yasm
+        #brew install expect  gnu-sed ccache autoconf@2.13 gnu-tar node terminal-notifier watchman 
+        #brew install nasm  yasm
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         cd /Users/runner
