@@ -50,10 +50,11 @@ jobs:
         git clone https://github.com/ReB2GOS/B2G -b exp  --depth=1 
         cd ./B2G
         #curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
-        curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo
-        chmod +x repo
+        #curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo
+        #chmod +x repo
         echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx > /dev/null
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh sargo
         df -h
     displayName: 'Fetch source'
 
@@ -93,8 +94,8 @@ jobs:
         cd /Volumes/android/B2G
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
         #export ALLOW_MISSING_DEPENDENCIES=true
-        eecho buiding....
-        ./build.sh  > /dev/null
+        echo buiding....
+        ./build.sh 
         df -h
     displayName: 'build source'
 
