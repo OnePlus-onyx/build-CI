@@ -56,7 +56,7 @@ jobs:
         export PATH=$PATH:~/bin/
         mkdir -p $ANDROID_ROOT
         cd $ANDROID_ROOT
-        repo init -u https://github.com/Halium/android -b halium-7.1 --depth=1
+        repo init -u https://github.com/Halium/android -b halium-5.1 --depth=1
         repo sync -j8 -c --no-clone-bundle --no-tags
         
     - name: Clone device spec source
@@ -64,10 +64,15 @@ jobs:
         export DEVICE="onyx"
         export ANDROID_ROOT=/home/runner/work/halium
         export PATH=$PATH:~/bin/
-        git clone https://github.com/CicadaOS/device_oneplus_onyx.git  -b ut-7.1  $ANDROID_ROOT/device/oneplus/onyx --depth=1
-        git clone https://github.com/CicadaOS/android_device_oppo_common.git  -b ut-7.1   $ANDROID_ROOT/device/oppo/common --depth=1
-        git clone https://github.com/CicadaOS/kernel_oneplus_onyx.git  -b ut-7.1 $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
-        git clone https://github.com/CicadaOS/proprietary_vendor_oneplus.git  -b ut-7.1  $ANDROID_ROOT/vendor/oneplus --depth=1
+        git clone https://github.com/CicadaOS/device_oneplus_onyx.git  -b ut-5.1  $ANDROID_ROOT/device/oneplus/onyx --depth=1
+        git clone https://github.com/CicadaOS/android_device_oppo_common.git  -b ut-5.1   $ANDROID_ROOT/device/oppo/common --depth=1
+        git clone https://github.com/CicadaOS/kernel_oneplus_onyx.git  -b ut-5.1 $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
+        git clone https://github.com/CicadaOS/proprietary_vendor_oneplus.git  -b ut-5.1  $ANDROID_ROOT/vendor/oneplus --depth=1
+
+        git clone https://github.com/CyanogenMod/android_device_qcom_common.git  -b cm-12.1   $ANDROID_ROOT/device/qcom/common --depth=1
+        git clone https://github.com/CyanogenMod/android_device_qcom_sepolicy.git   -b cm-12.1   $ANDROID_ROOT/device/qcom/sepolicy --depth=1
+        git clone https://github.com/CyanogenMod/android_external_ant-wireless_antradio-library.git  -b cm-12.1  $ANDROID_ROOT/external/ant-wireless/antradio-library --depth=1
+        
 
     - name: SSH connection to Actions
       uses: P3TERX/debugger-action@master
