@@ -78,7 +78,6 @@ jobs:
         export DEVICE="onyx"
         export ANDROID_ROOT=/home/runner/work/halium
         export PATH=$PATH:~/bin/
-        source halium.env
         cd $ANDROID_ROOT
         # replace something
         sed -i 's/external\/selinux/external\/selinux external\/libcurl/g' build/core/main.mk
