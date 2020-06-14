@@ -48,7 +48,7 @@ jobs:
       run: |
         df -h
         cd /Volumes/android/gecko-b2g
-        ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
+        #./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
         ./mach bootstrap --no-interactive  --application-choice 'Firefox for Desktop'
         brew reinstall nasm 
         brew reinstall yasm
