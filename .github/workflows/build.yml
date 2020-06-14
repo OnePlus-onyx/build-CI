@@ -3,15 +3,13 @@
 # Lisence: MIT
 #=================================================
 
-name: Build System Image
-
+name: Build Ubport 7.1
 on: 
   push:
     branches:
       - ut-7.1
   schedule:
     - cron: 0 8  1 * ?
-
 env:
   SSH_ACTIONS: false
 
