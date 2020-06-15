@@ -47,44 +47,22 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        git clone https://github.com/ReB2GOS/B2G -b exp  --depth=1 
+        git clone https://github.com/OnePlus-onyx/B2G -b tmp  --depth=1 
         cd ./B2G
-        #curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
-        #curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo
-        #chmod +x repo
         echo Download ...
         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
-        #REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh sargo
         df -h
     displayName: 'Fetch source'
 
   - script: |
-        cd /Volumes/android
-        # gecko
-        # cd ./B2G/gecko
-        # export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        # ./mach bootstrap --no-interactive --no-system-changes --application-choice 'GeckoView/Firefox for Android'
-        # cd ../
-        # touch ./boot.exp
-        # echo "spawn ./mach bootstrap" >> boot.exp  
-        # echo "expect  \"Your choice:\" " >> boot.exp
-        # echo "send \"4\r\" " >> boot.exp
-        # echo "expect  \"(Yn):\" " >> boot.exp
-        # echo "send \"Y\r\" " >> boot.exp
-        # #        echo "expect  \"(Yn):\" " >> boot.exp
-        # #        echo "send \"Y\r\" " >> boot.exp
-        # echo "interact " >> boot.exp
-        # cat ./boot.exp
-        # expect ./boot.exp
-        # cd ../../
-        #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-        #cat ./build/soong/cc/config/x86_darwin_host.go 
+        cd /Volumes/android/B2G
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         cat system/sepolicy/tests/Android.bp
         # Bootstrap gekco build
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        chmod +x ./patcher/patcher.sh
+        ./patcher/patcher.sh
         df -h
-        #sudo rm -r ./.repo
     displayName: 'fix source'
 
 
