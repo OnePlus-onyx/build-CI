@@ -47,7 +47,7 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        git clone https://github.com/OnePlus-onyx/B2G -b tmp  --depth=1 
+        git clone https://github.com/OnePlus-onyx/B2G -b test-ci  --depth=1 
         cd ./B2G
         echo Download ...
         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
