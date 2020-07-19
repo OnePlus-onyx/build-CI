@@ -1,0 +1,116 @@
+# Build Boot2Gecko
+ac_add_options --enable-application=b2g
+
+# Android
+ac_add_options --with-android-version=29
+ac_add_options --target=x86_64-linux-android
+ac_add_options --with-target-arch-name=x86_64
+
+# Compiler options
+CC="$HOME/.mozbuild/clang/bin/clang"
+CXX="$HOME/.mozbuild/clang/bin/clang++"
+ac_add_options --with-android-ndk="$HOME/.mozbuild/android-ndk-r20b-canary"
+mk_add_options "export LD_LIBRARY_PATH=$HOME/.mozbuild/clang/lib"
+
+# Use sccache
+ac_add_options --with-ccache=sccache
+
+# B2G-specific options
+ac_add_options --with-gonk-gfx
+ac_add_options --with-gonk="$HOME/.mozbuild/b2g-sysroot/"
+ac_add_options --enable-b2g-camera
+ac_add_options --enable-b2g-ril
+ac_add_options --enable-b2g-fm
+ac_add_options --enable-forkserver
+
+# We don't use the profiler
+ac_add_options --disable-profiling
+
+# Only for x86-64
+ac_add_options --enable-wasm-simd
+
+# sandbox includes non existent arm64 files
+ac_add_options --disable-sandbox
+
+# Compiler/Linker options
+
+# Since we use lld we need to disable elf-hack
+ac_add_options --enable-linker=lld
+ac_add_options --disable-elf-hack
+
+# Android libraries
+ac_add_options --with-binder-b2g-connectivity-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/binder_b2g_connectivity_interface-cpp.so"
+ac_add_options --with-binder-b2g-telephony-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/binder_b2g_telephony_interface-cpp.so"
+ac_add_options --with-dnsresolver-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/dnsresolver_aidl_interface-V2-cpp.so"
+ac_add_options --with-gnss1.0-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.gnss@1.0.so"
+ac_add_options --with-gnss1.1-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.gnss@1.1.so"
+ac_add_options --with-gnss2.0-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.gnss@2.0.so"
+ac_add_options --with-hostapd-1.0-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi.hostapd@1.0.so"
+ac_add_options --with-hostapd-1.1-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi.hostapd@1.1.so"
+ac_add_options --with-netd-aidl-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/netd_event_listener_interface-V1-cpp.so"
+ac_add_options --with-netd-event-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/netd_aidl_interface-V2-cpp.so"
+ac_add_options --with-radio-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.radio@1.0.so"
+ac_add_options --with-sensors-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.sensors@1.0.so"
+ac_add_options --with-supplicant-1.0-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi.supplicant@1.0.so"
+ac_add_options --with-supplicant-1.1-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi.supplicant@1.1.so"
+ac_add_options --with-supplicant-1.2-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi.supplicant@1.2.so"
+ac_add_options --with-vibrator-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.vibrator@1.0.so"
+ac_add_options --with-vold-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/libvold_binder_shared.so"
+ac_add_options --with-wifi-1.0-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi@1.0.so"
+ac_add_options --with-wifi-1.1-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi@1.1.so"
+ac_add_options --with-wifi-1.2-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi@1.2.so"
+ac_add_options --with-wifi-1.3-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi@1.3.so"
+ac_add_options --with-wificond-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/libwificond_ipc_shared.so"
+
+export CFLAGS="-DANDROID -DTARGET_OS_GONK \
+-DJE_FORCE_SYNC_COMPARE_AND_SWAP_4=1 \
+-D_USING_LIBCXX \
+-Wno-nullability-completeness \
+-DGR_GL_USE_NEW_SHADER_SOURCE_SIGNATURE=1 \
+-isystem $HOME/.mozbuild/b2g-sysroot/bionic \
+-isystem $HOME/.mozbuild/b2g-sysroot/bionic/libc/$ARCH_DIR/include \
+-isystem $ANDROID_NDK/platforms/$ANDROID_PLATFORM/$ARCH_DIR/usr/include \
+-isystem $HOME/.mozbuild/b2g-sysroot/bionic/libc/include/ \
+-isystem $HOME/.mozbuild/b2g-sysroot/bionic/libc/kernel/common \
+-isystem $HOME/.mozbuild/b2g-sysroot/bionic/libc/kernel/$ARCH_DIR \
+-isystem $HOME/.mozbuild/b2g-sysroot/bionic/libc/kernel/uapi/ \
+-isystem $HOME/.mozbuild/b2g-sysroot/bionic/libc/kernel/uapi/asm-$ARCH_NAME/ \
+-isystem $HOME/.mozbuild/b2g-sysroot/bionic/libm/include \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/av/include \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/headers/media_plugin \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/include \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/include/android \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/libs/binder/include \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/libs/gui/include \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/libs/nativewindow/include \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/libs/nativebase/include \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/libs/nativebase \
+-I$HOME/.mozbuild/b2g-sysroot/frameworks/native/libs/ui/include \
+-I$HOME/.mozbuild/b2g-sysroot/system \
+-I$(pwd)/modules/freetype2/include \
+-I$HOME/.mozbuild/b2g-sysroot/system/core/include \
+-I$HOME/.mozbuild/b2g-sysroot/system/core/base/include \
+-I$HOME/.mozbuild/b2g-sysroot/hardware/libhardware/include/ \
+-I$HOME/.mozbuild/b2g-sysroot/system/libhidl/base/include \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/system/libhidl/transport/base/1.0/android.hidl.base@1.0_genc++_headers/gen \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/system/libhidl/transport/manager/1.0/android.hidl.manager@1.0_genc++_headers/gen \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/hardware/interfaces/gnss/1.0/android.hardware.gnss@1.0_genc++_headers/gen \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/hardware/interfaces/gnss/1.1/android.hardware.gnss@1.1_genc++_headers/gen \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/hardware/interfaces/gnss/2.0/android.hardware.gnss@2.0_genc++_headers/gen \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/hardware/interfaces/gnss/measurement_corrections/1.0/android.hardware.gnss.measurement_corrections@1.0_genc++_headers/gen \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/hardware/interfaces/gnss/visibility_control/1.0/android.hardware.gnss.visibility_control@1.0_genc++_headers/gen \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/hardware/interfaces/radio/1.0/android.hardware.radio@1.0_genc++_headers/gen/ \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/hardware/interfaces/radio/1.1/android.hardware.radio@1.1_genc++_headers/gen/ \
+-I$HOME/.mozbuild/b2g-sysroot/out/soong/.intermediates/hardware/interfaces/vibrator/1.0/android.hardware.vibrator@1.0_genc++_headers/gen"
+
+export CPPFLAGS="-isystem $HOME/.mozbuild/b2g-sysroot/api/cpp/include \
+$CFLAGS"
+
+export LDFLAGS="-L$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64 -Wl,-rpath-link=$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/obj/lib64 \
+--sysroot=$HOME/.mozbuild/android-ndk-r20b-canary/platforms/android-29/arch-x86_64/ -L$HOME/.mozbuild/b2g-sysroot/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9/lib/gcc/x86_64-linux-android/4.9.x/ -ldl -lstdc++ \
+-llog -landroid -lnativewindow -lbinder \
+-lui -lgui \
+-lutils -lcutils -lsysutils \
+-lhardware_legacy -lhardware -lsuspend \
+-lhidltransport \
+-lhidlbase -lbase -lhidlmemory -lhwbinder -laudioclient"
