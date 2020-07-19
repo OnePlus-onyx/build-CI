@@ -17,7 +17,17 @@ jobs:
 
   - script: |
         df -h
-        sudo apt install git make mercurial nasm yasm  libncurses5
+        sudo apt install git make mercurial  yasm  libncurses5
+        wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
+        tar xfj nasm-2.14.02.tar.bz2
+        cd nasm-2.14.02/
+        ./autogen.sh
+        ./configure --prefix=/usr/local/ 
+        make 
+        sudo make install
+        hash -d nasm
+        nasm -v
+        cd ~
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
