@@ -17,7 +17,7 @@ jobs:
 
   - script: |
         df -h
-        sudo apt install git make mercurial nasm yasm autoconf@2.13  libncurses5
+        sudo apt install git make mercurial nasm yasm autoconf-2.13  libncurses5
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
