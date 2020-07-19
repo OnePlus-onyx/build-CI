@@ -17,7 +17,7 @@ jobs:
 
   - script: |
         df -h
-        sudo apt install git make hg
+        sudo apt install git make mercurial
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
     displayName: ' Initialization environment'
@@ -32,10 +32,10 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         ls
         cd ~
-        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        #hg clone https://hg.mozilla.org/projects/kaios
+        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        hg clone https://hg.mozilla.org/projects/kaios
         ls
-        cd  gecko-b2g
+        cd kaios
         ls
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
         ./mach bootstrap --no-interactive  --application-choice mobile 
