@@ -32,11 +32,12 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         ls
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        hg clone https://hg.mozilla.org/projects/kaios
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #hg clone https://hg.mozilla.org/projects/kaios
         ls
-        cd kaios
+        cd gecko-b2g
         ls
+        export SHELL=/bin/bash
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
         ./mach bootstrap --no-interactive  --application-choice mobile 
         df -h
@@ -217,6 +218,7 @@ jobs:
   - script: |
         df -h
         cd ~/gecko-b2g
+        export SHELL=/bin/bash
         ./mach build
         df -h
     displayName: 'build source'
