@@ -17,6 +17,7 @@ jobs:
 
   - script: |
         df -h
+        ls
         sudo apt install git make
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
@@ -84,12 +85,6 @@ jobs:
 
   - script: |
     cd ~/gecko-b2g
-    cat>mozconfig<<EOF \
-      ac_add_options --enable-application=b2g \
-      ac_add_options --with-android-version=29 \
-      ac_add_options --target=x86_64-linux-android \
-      ac_add_options --with-target-arch-name=x86_64 \
-    EOF
     cd ~/gecko-b2g
     ls
     cat ./mozconfig
