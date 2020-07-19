@@ -83,7 +83,8 @@ jobs:
   #   displayName:  tmate
 
   - script: |
-    cat>~/gecko-b2g/mozconfig<<EOF 
+    cd ~/gecko-b2g
+    cat>mozconfig<<EOF 
     ac_add_options --enable-application=b2g
     ac_add_options --with-android-version=29
     ac_add_options --target=x86_64-linux-android
