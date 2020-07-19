@@ -84,9 +84,7 @@ jobs:
 
   - script: |
     cat>~/gecko-b2g/mozconfig<<EOF 
-    # Build Boot2Gecko
     ac_add_options --enable-application=b2g
-    # Android
     ac_add_options --with-android-version=29
     ac_add_options --target=x86_64-linux-android
     ac_add_options --with-target-arch-name=x86_64
