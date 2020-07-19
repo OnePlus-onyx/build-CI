@@ -27,12 +27,15 @@ jobs:
         df -h
         cd ~
         wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
+        ls
         tar -C "$HOME/.mozbuild" -x -a -f b2g-sysroot.tar.zst
         sudo rm b2g-sysroot.tar.zst
         ls
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        ls
         cd  gecko-b2g
+        ls
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk' ./mach bootstrap --no-interactive  --application-choice mobile 
         df -h
     displayName: 'Fetch source'
