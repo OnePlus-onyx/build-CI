@@ -20,6 +20,8 @@ jobs:
         sudo apt install git make mercurial
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        cargo install sccache
     displayName: ' Initialization environment'
 
 
@@ -208,8 +210,6 @@ jobs:
           cat ./mozconfig
     displayName: 'fix source'
 
-
-
   - script: |
         df -h
         cd ~/gecko-b2g
@@ -217,6 +217,14 @@ jobs:
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
         ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
         #./mach bootstrap --no-system-changes --no-interactive --application-choice mobile
+        df -h
+    displayName: 'bootstrap source'
+
+
+  - script: |
+        df -h
+        cd ~/gecko-b2g
+        export SHELL=/bin/bash
         ./mach build
         df -h
     displayName: 'build source'
