@@ -72,7 +72,7 @@ jobs:
         git clone https://github.com/OnePlus-onyx/device_oneplus_onyx.git  -b ut-9.0  $ANDROID_ROOT/device/oneplus/onyx --depth=1
         git clone https://github.com/LineageOS/android_device_oppo_common.git  -b lineage-16.0   $ANDROID_ROOT/device/oppo/common --depth=1
         git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx.git  -b ut-9.0 $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
-        git clone https://github.com/YumeMichi/vendor_oneplus_onyx.git  -b pie  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1
+        git clone https://github.com/YumeMichi/vendor_oneplus_onyx.git  -b lineage-16.0-sultan  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1
 
     - name: SSH connection to Actions
       uses: P3TERX/debugger-action@master
