@@ -66,8 +66,7 @@ jobs:
         git clone https://github.com/OnePlus-onyx/device_oneplus_onyx.git  -b ut9-test  $ANDROID_ROOT/device/oneplus/onyx --depth=1
         git clone https://github.com/LineageOS/android_device_oppo_common.git  -b lineage-16.0   $ANDROID_ROOT/device/oppo/common --depth=1
         git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx.git  -b ut9-test $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
-        git clone https://github.com/OnePlus-onyx/proprietary_vendor_oneplus.git  -b ut9-test  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1
-        ./hybris-patches/apply-patches.sh --mb
+        git clone https://github.com/OnePlus-onyx/proprietary_vendor_oneplus.git  -b ut9-test  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1    
         df -h
         
 
@@ -78,6 +77,7 @@ jobs:
         export PATH=$PATH:~/bin/
         #patch
         cd $ANDROID_ROOT
+        ./hybris-patches/apply-patches.sh --mb
         # replace something
         #sed -i 's/external\/selinux/external\/selinux external\/libcurl/g' build/core/main.mk
         export LC_ALL=C
