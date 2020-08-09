@@ -58,7 +58,7 @@ jobs:
         cd $ANDROID_ROOT
         repo init -u https://github.com/Halium/android -b halium-9.0 --depth=1
         repo sync -j16 -c --no-clone-bundle --no-tags
-        sudo rm -r ./.repo
+        #sudo rm -r ./.repo
         #source for onyx
         sudo rm -r $ANDROID_ROOT/frameworks/base
         git clone https://github.com/YumeMichi/android_frameworks_base.git  -b lineage-16.0   $ANDROID_ROOT/frameworks/base --depth=1
