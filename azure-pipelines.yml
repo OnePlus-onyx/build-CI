@@ -48,7 +48,7 @@ jobs:
 
   - script: |
         export DEVICE="onyx"
-        export ANDROID_ROOT=/home/runner/work/halium
+        export ANDROID_ROOT=~/work/halium
         export PATH=$PATH:~/bin/
         mkdir -p $ANDROID_ROOT
         cd $ANDROID_ROOT
