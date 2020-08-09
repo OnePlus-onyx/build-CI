@@ -91,7 +91,7 @@ jobs:
     - name : Upload hybris boot image
       uses: actions/upload-artifact@master
       with:
-        name: halium-boot.img
+        name: hybris-boot.img
         path: ~/work/halium/out/target/product/onyx/hybris-boot.img
 
     - name : Upload system image
