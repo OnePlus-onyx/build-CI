@@ -52,40 +52,34 @@ jobs:
     - name: Downloading source code
       run: |
         export DEVICE="onyx"
-        export ANDROID_ROOT=/home/runner/work/halium
+        export ANDROID_ROOT=~/work/halium
         export PATH=$PATH:~/bin/
         mkdir -p $ANDROID_ROOT
         cd $ANDROID_ROOT
         repo init -u https://github.com/Halium/android -b halium-9.0 --depth=1
-        repo sync -j8 -c --no-clone-bundle --no-tags
-        df -h
-        
-    - name: Clone device spec source
-      run: |
-        export DEVICE="onyx"
-        export ANDROID_ROOT=/home/runner/work/halium
-        export PATH=$PATH:~/bin/
-        
+        repo sync -j16 -c --no-clone-bundle --no-tags
+        sudo rm -r ./.repo
+        #source for onyx
         sudo rm -r $ANDROID_ROOT/frameworks/base
         git clone https://github.com/YumeMichi/android_frameworks_base.git  -b lineage-16.0   $ANDROID_ROOT/frameworks/base --depth=1
         git clone https://github.com/YumeMichi/patcher.git  -b lineage-16.0   $ANDROID_ROOT/patcher --depth=1
-        git clone https://github.com/OnePlus-onyx/device_oneplus_onyx.git  -b ut-9.0  $ANDROID_ROOT/device/oneplus/onyx --depth=1
+        git clone https://github.com/OnePlus-onyx/device_oneplus_onyx.git  -b ut9-test  $ANDROID_ROOT/device/oneplus/onyx --depth=1
         git clone https://github.com/LineageOS/android_device_oppo_common.git  -b lineage-16.0   $ANDROID_ROOT/device/oppo/common --depth=1
-        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx.git  -b ut-9.0 $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
-        git clone https://github.com/YumeMichi/vendor_oneplus_onyx.git  -b lineage-16.0-sultan  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1
+        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx.git  -b ut9-test $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
+        git clone https://github.com/OnePlus-onyx/proprietary_vendor_oneplus.git  -b ut9-test  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1
+        ./hybris-patches/apply-patches.sh --mb
+        df -h
+        
 
-    - name: SSH connection to Actions
-      uses: P3TERX/debugger-action@master
-      if: env.SSH_ACTIONS == 'true'
-
-    - name: Build HAL
+    - name: Build halium-boot&hybris-boot
       run: |
         export DEVICE="onyx"
-        export ANDROID_ROOT=/home/runner/work/halium
+        export ANDROID_ROOT=~/work/halium
         export PATH=$PATH:~/bin/
+        #patch
         cd $ANDROID_ROOT
         # replace something
-        sed -i 's/external\/selinux/external\/selinux external\/libcurl/g' build/core/main.mk
+        #sed -i 's/external\/selinux/external\/selinux external\/libcurl/g' build/core/main.mk
         export LC_ALL=C
         chmod +x $ANDROID_ROOT/kernel/oneplus/onyx/scripts/gcc-wrapper.py
         source build/envsetup.sh
@@ -93,19 +87,45 @@ jobs:
         breakfast $DEVICE
         make -j$(nproc) mkbootimg
         make -j$(nproc) halium-boot
+        make -j$(nproc) hybris-boot
+        
+    - name: Build HAL
+      run: |
+        export DEVICE="onyx"
+        export ANDROID_ROOT=~/work/halium
+        export PATH=$PATH:~/bin/
+        #patch
+        cd $ANDROID_ROOT
+        # replace something
+        #sed -i 's/external\/selinux/external\/selinux external\/libcurl/g' build/core/main.mk
+        export LC_ALL=C
+        chmod +x $ANDROID_ROOT/kernel/oneplus/onyx/scripts/gcc-wrapper.py
+        source build/envsetup.sh
+        export USE_CCACHE=1
+        breakfast $DEVICE
         make -j$(nproc) systemimage 
-        echo "md5sum halium-boot.img and system.img"
+        
+    - name: Check artifact
+      run: |
+        echo "md5sum halium-boot.img, hybris-boot.img and system.img"
         md5sum $ANDROID_ROOT/out/target/product/onyx/halium-boot.img
-        md5sum $ANDROID_ROOT/out/target/product/onyx/system.img
+        md5sum $ANDROID_ROOT/out/target/product/onyx/hybris-boot.img
+        md5sum $ANDROID_ROOT/out/target/product/onyx/system.img 
 
-    - name : Upload boot image
+    - name : Upload halium boot image
       uses: actions/upload-artifact@master
       with:
-        name: halium-boot image
-        path: /home/runner/work/halium/out/target/product/onyx/halium-boot.img
+        name: halium-boot.img
+        path: ~/work/halium/out/target/product/onyx/halium-boot.img
+
+    - name : Upload hybris boot image
+      uses: actions/upload-artifact@master
+      with:
+        name: halium-boot.img
+        path: ~/work/halium/out/target/product/onyx/hybris-boot.img
 
     - name : Upload system image
       uses: actions/upload-artifact@master
       with:
         name: System image
-        path: /home/runner/work/halium/out/target/product/onyx/system.img 
+        path: ~/work/halium/out/target/product/onyx/system.img 
