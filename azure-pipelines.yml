@@ -59,7 +59,7 @@ jobs:
 
   - script: |
         export DEVICE="onyx"
-        export ANDROID_ROOT=/home/runner/work/halium
+        export ANDROID_ROOT=~/work/halium
         export PATH=$PATH:~/bin/
         sudo rm -r $ANDROID_ROOT/frameworks/base
         git clone https://github.com/YumeMichi/android_frameworks_base.git  -b lineage-16.0   $ANDROID_ROOT/frameworks/base --depth=1
@@ -72,7 +72,7 @@ jobs:
 
   - script: |
         export DEVICE="onyx"
-        export ANDROID_ROOT=/home/runner/work/halium
+        export ANDROID_ROOT=~/work/halium
         export PATH=$PATH:~/bin/
         cd $ANDROID_ROOT
         # replace something
