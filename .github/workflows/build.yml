@@ -84,7 +84,7 @@ jobs:
         chmod +x $ANDROID_ROOT/kernel/oneplus/onyx/scripts/gcc-wrapper.py
         source build/envsetup.sh
         export USE_CCACHE=1
-        breakfast $DEVICE
+        breakfast onyx
         make -j$(nproc) mkbootimg
         make -j$(nproc) halium-boot
         make -j$(nproc) hybris-boot
