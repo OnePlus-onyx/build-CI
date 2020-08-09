@@ -53,7 +53,7 @@ jobs:
         mkdir -p $ANDROID_ROOT
         cd $ANDROID_ROOT
         repo init -u https://github.com/Halium/android -b halium-9.0 --depth=1
-        repo sync -j8 -c --no-clone-bundle --no-tags
+        repo sync -j16 -c --no-clone-bundle --no-tags
         df -h
     displayName: 'Fetch source'
 
