@@ -97,5 +97,5 @@ jobs:
     - name : Upload system image
       uses: actions/upload-artifact@master
       with:
-        name: System image
+        name: system.img 
         path: ~/work/halium/out/target/product/onyx/system.img 
