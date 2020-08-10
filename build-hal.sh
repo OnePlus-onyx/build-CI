@@ -5,7 +5,6 @@ export ANDROID_ROOT=~/work/halium
 export PATH=$PATH:~/bin/
 #patch
 cd $ANDROID_ROOT
-./hybris-patches/apply-patches.sh --mb
 # replace something
 #sed -i 's/external\/selinux/external\/selinux external\/libcurl/g' build/core/main.mk
 export LC_ALL=C
