@@ -80,7 +80,7 @@ jobs:
         echo "md5sum halium-boot.img, hybris-boot.img and system.img"
         md5sum $ANDROID_ROOT/out/target/product/onyx/halium-boot.img
         md5sum $ANDROID_ROOT/out/target/product/onyx/hybris-boot.img
-        md5sum $ANDROID_ROOT/out/target/product/onyx/system.img 
+        #md5sum $ANDROID_ROOT/out/target/product/onyx/system.img 
 
     - name : Upload halium boot image
       uses: actions/upload-artifact@master
@@ -94,8 +94,8 @@ jobs:
         name: hybris-boot.img
         path: ~/work/halium/out/target/product/onyx/hybris-boot.img
 
-    - name : Upload system image
-      uses: actions/upload-artifact@master
-      with:
-        name: system.img 
-        path: ~/work/halium/out/target/product/onyx/system.img 
+#     - name : Upload system image
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: system.img 
+#         path: ~/work/halium/out/target/product/onyx/system.img 
