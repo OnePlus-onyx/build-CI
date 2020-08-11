@@ -63,7 +63,7 @@ jobs:
         sudo rm -r $ANDROID_ROOT/frameworks/base
         git clone https://github.com/YumeMichi/android_frameworks_base.git  -b lineage-16.0   $ANDROID_ROOT/frameworks/base --depth=1
         git clone https://github.com/YumeMichi/patcher.git  -b lineage-16.0   $ANDROID_ROOT/patcher --depth=1
-        git clone https://github.com/OnePlus-onyx/device_oneplus_onyx.git  -b ut9-test  $ANDROID_ROOT/device/oneplus/onyx --depth=1
+        git clone https://github.com/OnePlus-onyx/device_oneplus_onyx.git  -b ut9-test1  $ANDROID_ROOT/device/oneplus/onyx --depth=1
         git clone https://github.com/LineageOS/android_device_oppo_common.git  -b lineage-16.0   $ANDROID_ROOT/device/oppo/common --depth=1
         git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx.git  -b ut9-test $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
         git clone https://github.com/OnePlus-onyx/proprietary_vendor_oneplus.git  -b ut9-test  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1    
@@ -80,7 +80,7 @@ jobs:
         echo "md5sum halium-boot.img, hybris-boot.img and system.img"
         md5sum $ANDROID_ROOT/out/target/product/onyx/halium-boot.img
         md5sum $ANDROID_ROOT/out/target/product/onyx/hybris-boot.img
-        #md5sum $ANDROID_ROOT/out/target/product/onyx/system.img 
+        md5sum $ANDROID_ROOT/out/target/product/onyx/system.img 
 
     - name : Upload halium boot image
       uses: actions/upload-artifact@master
@@ -94,8 +94,8 @@ jobs:
         name: hybris-boot.img
         path: ~/work/halium/out/target/product/onyx/hybris-boot.img
 
-#     - name : Upload system image
-#       uses: actions/upload-artifact@master
-#       with:
-#         name: system.img 
-#         path: ~/work/halium/out/target/product/onyx/system.img 
+     - name : Upload system image
+       uses: actions/upload-artifact@master
+       with:
+         name: system.img 
+         path: ~/work/halium/out/target/product/onyx/system.img 
