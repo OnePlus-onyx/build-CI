@@ -94,8 +94,8 @@ jobs:
         name: hybris-boot.img
         path: ~/work/halium/out/target/product/onyx/hybris-boot.img
 
-     - name : Upload system image
-       uses: actions/upload-artifact@master
-       with:
-         name: system.img 
-         path: ~/work/halium/out/target/product/onyx/system.img 
+    - name : Upload system image
+      uses: actions/upload-artifact@master
+      with:
+        name: system.img 
+        path: ~/work/halium/out/target/product/onyx/system.img 
