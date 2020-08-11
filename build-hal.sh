@@ -17,4 +17,4 @@ breakfast $DEVICE
 make -j$(nproc) mkbootimg
 make -j$(nproc) halium-boot
 make -j$(nproc) hybris-boot
-make -j$(nproc) systemimage 
+#make -j$(nproc) systemimage 
