@@ -65,7 +65,7 @@ jobs:
         git clone https://github.com/YumeMichi/patcher.git  -b lineage-16.0   $ANDROID_ROOT/patcher --depth=1
         git clone https://github.com/OnePlus-onyx/device_oneplus_onyx.git  -b ut9-test1  $ANDROID_ROOT/device/oneplus/onyx --depth=1
         git clone https://github.com/LineageOS/android_device_oppo_common.git  -b lineage-16.0   $ANDROID_ROOT/device/oppo/common --depth=1
-        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx.git  -b ut9-test $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
+        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx.git  -b test2 $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
         git clone https://github.com/OnePlus-onyx/proprietary_vendor_oneplus.git  -b ut9-test  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1    
         df -h
         
