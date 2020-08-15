@@ -122,6 +122,7 @@ jobs:
         export TARGET_ARCH_VARIANT=x86_64
         export TARGET_CPU_VARIANT=generic
         export BINSUFFIX=64
+        export MOZ_DISABLE_LTO=1
         ./build-b2g.sh
         ./build-b2g.sh package
         df -h
