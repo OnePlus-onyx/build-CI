@@ -9,8 +9,7 @@ on:
      - cron: 0 8 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29 * ?
 
 jobs:
-  build:
-
+  build1:
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
@@ -63,4 +62,73 @@ jobs:
       with:
         name: B2Gdebug.app
         path: /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
+        
+  build2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Initialization system environment
+      run: |
+        df -h
+        sudo apt install git make mercurial  yasm  libncurses5
+        wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
+        tar xfj nasm-2.14.02.tar.bz2
+        cd nasm-2.14.02/
+        ./autogen.sh
+        ./configure --prefix=/usr/local/ 
+        make 
+        sudo make install
+        hash -d nasm
+        nasm -v
+        cd ~
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        cargo install sccache
+        
+    - name: Fetch source
+      run: |
+        df -h
+        cd ~
+        wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
+        curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        tar -xvf mozbuild.tar.bz2
+        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        sudo rm b2g-sysroot.tar.zst
+        sudo rm mozbuild.tar.bz2
+        cd ~
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        df -h
+        
+    - name: bootstrap source
+      run: |
+        df -h
+        cd ~/gecko-b2g
+        export SHELL=/bin/bash
+        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
+        df -h
+        
+    - name: Building X86_64
+      run: |
+        df -h
+        cd ~/gecko-b2g
+        export SHELL=/bin/bash
+        export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
+        export GONK_PRODUCT_NAME=generic_x86_64
+        export GECKO_OBJDIR=${GONK_PATH}/objdir-emulator-gecko
+        export PLATFORM_VERSION=29
+        export TARGET_ARCH=x86_64
+        export TARGET_ARCH_VARIANT=x86_64
+        export TARGET_CPU_VARIANT=generic
+        export BINSUFFIX=64
+        export MOZ_DISABLE_LTO=1
+        ./build-b2g.sh
+        ./build-b2g.sh package
+        df -h
+        ls GECKO_OBJDIR/dist
+        
         
