@@ -1,5 +1,6 @@
 # Build Boot2Gecko
 ac_add_options --enable-application=b2g
+ac_add_options --with-app-basename=b2g
 
 # Android
 ac_add_options --with-android-version=29
@@ -62,6 +63,7 @@ ac_add_options --with-wifi-1.2-so="$HOME/.mozbuild/b2g-sysroot/out/target/produc
 ac_add_options --with-wifi-1.3-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/android.hardware.wifi@1.3.so"
 ac_add_options --with-wificond-so="$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/system/lib64/libwificond_ipc_shared.so"
 
+
 export CFLAGS="-DANDROID -DTARGET_OS_GONK \
 -DJE_FORCE_SYNC_COMPARE_AND_SWAP_4=1 \
 -D_USING_LIBCXX \
@@ -114,3 +116,12 @@ export LDFLAGS="-L$HOME/.mozbuild/b2g-sysroot/out/target/product/generic_x86_64/
 -lhardware_legacy -lhardware -lsuspend \
 -lhidltransport \
 -lhidlbase -lbase -lhidlmemory -lhwbinder -laudioclient"
+
+if [ "$IME_ENGINE" = "touchpal" ]; then
+  ac_add_options --enable-touchpal
+fi
+
+
+if [ "$HOST_OS" != "linux" ]; then
+  ac_add_options --disable-crashreporter
+fi
