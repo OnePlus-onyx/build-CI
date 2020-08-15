@@ -86,9 +86,18 @@ jobs:
         cd ~
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        #curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         #cargo install sccache
         
+
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: stable
+    - uses: actions/checkout@master
+    - name: Run tests
+      run: cargo install sccache
+
+
     - name: Fetch source
       run: |
         df -h
