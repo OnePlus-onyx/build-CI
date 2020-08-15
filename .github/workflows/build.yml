@@ -87,7 +87,7 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-        cargo install sccache
+        #cargo install sccache
         
     - name: Fetch source
       run: |
