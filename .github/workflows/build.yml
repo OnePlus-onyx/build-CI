@@ -81,7 +81,7 @@ jobs:
         ./configure --prefix=/usr/local/ 
         make 
         sudo make install
-        hash -d nasm
+        #hash -d nasm
         nasm -v
         cd ~
         git config --global user.name "ittat"
