@@ -53,7 +53,7 @@ jobs:
 
     - name: Dispatch "deploy"
       run: |
-          curl -X POST https://api.github.com/repos/:org/:repo/dispatches \
+          curl -X POST https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches \
             -H 'Accept: application/vnd.github.everest-preview+json' \
             -H 'Authorization: token ${{ secrets.WEB_SERT }}' \
             --data '{"event_type": "deploy"}'
