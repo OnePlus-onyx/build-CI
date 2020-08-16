@@ -20,13 +20,15 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        sudo apt install ccache
+        #sudo apt install ccache
         touch ~/123.txt
+        cd ~
+        pwd
 
     - name: Upload README.md to Google Drive
       uses: Jodebu/upload-to-drive@master
       with:
-          target: ~/123.txt
+          target: 123.txt
           credentials: ${{secrets.DRIVE_CREDENTIALS}}
           folder: ${{secrets.DRIVE_FOLDER_ID}}
         
