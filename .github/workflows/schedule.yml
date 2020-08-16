@@ -6,6 +6,7 @@ on:
 #  schedule:
 #    - cron: 0 8  1 * ?
 
+
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
   WEB_SERT:  ${{secrets.WEB_SERT}} 
