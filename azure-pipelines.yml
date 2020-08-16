@@ -72,6 +72,8 @@ jobs:
         cd  /Volumes/android
         tar -cvf ./B2G.tar ./B2G
         zstd ./B2G.tar
+        sudo rm ./B2G.tar
+        sudo rm -r ./B2G
         ls -al -h ./
         df -h
     displayName: 'fix source'
