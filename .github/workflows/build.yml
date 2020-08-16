@@ -141,3 +141,12 @@ jobs:
         ls ${GECKO_OBJDIR}/dist
         
         
+    - name : Upload 
+      uses: actions/upload-artifact@master
+      with:
+        name: b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
+        path: ${GECKO_OBJDIR}/dist/b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
+        
+        
+        
+
