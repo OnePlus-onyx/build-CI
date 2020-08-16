@@ -5,11 +5,14 @@
 
 name: Build Ubport 9.0
 on: 
-  push:
-    branches:
-      - ut-9.0
-  schedule:
-    - cron: 0 8  1 * ?
+  workflow_dispatch:
+    types: 
+        - ut9
+  #push:
+ #  branches:
+ #    - ut-9.0
+ # schedule:
+ #   - cron: 0 8  1 * ?
 env:
   SSH_ACTIONS: false
 
