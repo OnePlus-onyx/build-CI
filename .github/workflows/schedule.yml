@@ -8,6 +8,7 @@ on:
 
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
+  WEB_SERT:  ${{secrets.WEB_SERT}} 
 
 jobs:
 
@@ -41,7 +42,10 @@ jobs:
         echo $ut9_new
         if [ $ut9_new == 0 ]
         then
-           echo "a is equal to b"
+           curl -H "Authorization: token ${WEB_SERT}" \
+          --request POST \
+          --data '{"event_type": "ut9"}' \
+          https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
         else
            echo "a is not equal to b"
         fi
