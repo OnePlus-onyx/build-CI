@@ -47,10 +47,10 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        git clone https://github.com/OnePlus-onyx/B2G -b test-ci  --depth=1 
+        git clone https://github.com/kaiostech/B2G -b master  --depth=1 
         cd ./B2G
         echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10-x86_64
         df -h
     displayName: 'Fetch source'
 
@@ -58,24 +58,32 @@ jobs:
         cd /Volumes/android/B2G
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         cat system/sepolicy/tests/Android.bp
-        # Bootstrap gekco build
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        chmod +x ./patcher/patcher.sh
-        ./patcher/patcher.sh
+        rm -rf .repo
+        patch -d gonk-misc -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/gonk-misc.patch
+        patch -d build/soong -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/build_soong.patch
+        tar cv -C /Volumes/android/B2G | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > /Volumes/android/B2G.zst
         df -h
     displayName: 'fix source'
 
-
-
   - script: |
-        df -h
         cd /Volumes/android/B2G
-        export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
-        #export ALLOW_MISSING_DEPENDENCIES=true
-        echo buiding....
-        ./build.sh 
+        tar cv -C /Volumes/android/B2G | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > /Volumes/android/B2G.zst
+        ls -al -h ./
         df -h
-    displayName: 'build source'
+    displayName: 'pack B2G.zst'
+  
+
+
+  # - script: |
+  #       df -h
+  #       cd /Volumes/android/B2G
+  #       export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx7G" 
+  #       #export ALLOW_MISSING_DEPENDENCIES=true
+  #       echo buiding....
+  #       ./build.sh 
+  #       df -h
+  #   displayName: 'build source'
 
 
 
