@@ -62,7 +62,6 @@ jobs:
         rm -rf .repo
         patch -d gonk-misc -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/gonk-misc.patch
         patch -d build/soong -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/build_soong.patch
-        tar cv -C /Volumes/android/B2G | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > /Volumes/android/B2G.zst
         df -h
     displayName: 'fix source'
 
