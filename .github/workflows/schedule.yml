@@ -26,10 +26,10 @@ jobs:
         sudo apt-get update
         sudo git lfs install 
 
-    - name: Check ut9.0
+    - name: Checkout build-CI
       run: |
         cd ~ 
-        git  git@github.com:OnePlus-onyx/build-CI.git -b master
+        git clone  git@github.com:OnePlus-onyx/build-CI.git -b master
         
     - name: Check ut9.0
       run: |
