@@ -6,7 +6,7 @@
 name: Build Ubport 9.0
 on: 
   repository_dispatch: 
-    types: do-something
+    types: ut9
   #push:
  #  branches:
  #    - ut-9.0
