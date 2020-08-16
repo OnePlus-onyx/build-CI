@@ -22,13 +22,13 @@ jobs:
         df -h
         #sudo apt install ccache
         touch /home/runner/123.txt
-        cd ~
+        
         pwd
 
     - name: Upload README.md to Google Drive
       uses: Jodebu/upload-to-drive@master
       with:
-          target: 123.txt
+          target: /home/runner/123.txt
           credentials: ${{secrets.DRIVE_CREDENTIALS}}
           folder: ${{secrets.DRIVE_FOLDER_ID}}
         
