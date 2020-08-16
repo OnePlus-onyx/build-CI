@@ -117,11 +117,6 @@ jobs:
           fi
         fi
       done
-      while [ -S /tmp/tmate.sock ]; do
-        sleep 1
-        timeout=$(($timeout-1))
-        echo Waiting
-      done
     displayName:  tmate
 
   # - script: |
