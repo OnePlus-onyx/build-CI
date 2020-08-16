@@ -32,25 +32,31 @@ jobs:
         cd ~ 
         git clone  git@github.com:OnePlus-onyx/build-CI.git -b master
         
-    - name: Check ut9.0
-      run: |
-        cd ~/build-CI
-        export ut9_schedule=30
-        export ut9_new=`cat schedule/ut-9.0`
-        echo $ut9_new
-        export ut9_new=`expr $ut9_new - 1` 
-        echo $ut9_new
-        if [ $ut9_new == 0 ]
-        then
-           curl -H "Authorization: token ${WEB_SERT}" \
-          --request POST \
-          --data '{"event_type": "ut9"}' \
-          https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
-        else
-           echo "a is not equal to b"
-        fi
-        
-        
+#     - name: Check ut9.0
+#       run: |
+#         cd ~/build-CI
+#         export ut9_schedule=30
+#         export ut9_new=`cat schedule/ut-9.0`
+#         echo $ut9_new
+#         export ut9_new=`expr $ut9_new - 1` 
+#         echo $ut9_new
+#         if [ $ut9_new == 0 ]
+#         then
+#            curl -H "Authorization: token ${WEB_SERT}" \
+#           --request POST \
+#           --data '{"event_type": "ut9"}' \
+#           https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+#         else
+#            echo "a is not equal to b"
+#         fi
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.WEB_SERT }}
+          repository: OnePlus-onyx/build-CI
+          event-type: ut9
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+                
     - name: Update Schedule  
       run: |
         cd ~/build-CI     
