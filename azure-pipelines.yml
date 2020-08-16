@@ -33,6 +33,11 @@ jobs:
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 210g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
+        cd  /Volumes/android
+        git clone https://github.com/facebook/zstd.git
+        cd zstd
+        make
+        sudo make install 
         df -h
     displayName: ' Initialization environment'
 
@@ -54,7 +59,21 @@ jobs:
         df -h
     displayName: 'Fetch source'
 
-
+  - script: |
+        cd /Volumes/android/B2G
+        sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        cat system/sepolicy/tests/Android.bp
+        #sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        sudo rm -rf .repo
+        sudo rm -r ./gecko
+        #patch -d gonk-misc -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/gonk-misc.patch
+        #patch -d build/soong -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/build_soong.patch
+        cd  /Volumes/android
+        tar -cvf ./B2G.tar ./B2G
+        zstd ./B2G.tar
+        ls -al -h ./
+        df -h
+    displayName: 'fix source'
 
 
   - script: |
@@ -98,6 +117,11 @@ jobs:
           fi
         fi
       done
+      while [ -S /tmp/tmate.sock ]; do
+        sleep 1
+        timeout=$(($timeout-1))
+        echo Waiting
+      done
     displayName:  tmate
 
   # - script: |
@@ -111,13 +135,7 @@ jobs:
   #       df -h
   #   displayName: 'fix source'
 
-  - script: |
-        cd /Volumes/android/B2G
-        tar cv -C /Volumes/android/B2G | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > /Volumes/android/B2G.zst
-        ls -al -h ./
-        df -h
-    displayName: 'pack B2G.zst'
-  
+
 
 
 
