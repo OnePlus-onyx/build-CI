@@ -138,6 +138,6 @@ jobs:
         ./build-b2g.sh
         ./build-b2g.sh package
         df -h
-        ls GECKO_OBJDIR/dist
+        ls ${GECKO_OBJDIR}/dist
         
         
