@@ -5,7 +5,7 @@
 
 name: Build Ubport 9.0
 on: 
-  workflow_dispatch: 
+  repository_dispatch: 
     types: do-something
   #push:
  #  branches:
