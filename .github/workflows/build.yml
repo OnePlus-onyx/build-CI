@@ -21,26 +21,12 @@ jobs:
       run: |
         df -h
         sudo apt install ccache
+        touch ~/123.txt
 
-    - name: Fetch source
-      run: |
-        df -h
-        git config --global user.name "ittat"
-        git config --global user.email "ittat@github.com"
-        mkdir ~/android
-        cd ~/android
-        git clone  https://github.com/ReB2GOS/gecko-b2g -b test4 --depth=1
-        #git clone https://github.com/mozilla/gecko-dev -b master --depth=1
-        
-    - name: Build B2G
-      run: |
-        df -h
-        cd ~/android/gecko-b2g
-        ./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
-        ./mach bootstrap --no-interactive  --application-choice 'Firefox for Desktop'
-        MOZCONFIG=./mozconfig-b2g-desktop ./mach build
-        #and run it with ./mach run
-        #tar -zcvf /Volumes/android/b2gdebug.tar.gz /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
-        df -h
-        
+    - name: Upload README.md to Google Drive
+      uses: Jodebu/upload-to-drive@master
+      with:
+          target: ~/123.txt
+          credentials: ${{secrets.DRIVE_CREDENTIALS}}
+          folder: ${{secrets.DRIVE_FOLDER_ID}}
         
