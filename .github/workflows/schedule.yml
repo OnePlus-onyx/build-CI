@@ -6,20 +6,50 @@ on:
 #  schedule:
 #    - cron: 0 8  1 * ?
 
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
 
 jobs:
 
   Schedule:
     runs-on: ubuntu-16.04
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
-    
+    - name: Initializing environment
+      run: |
+        cd ~
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        export GIT_SSH_COMMAND="ssh -v -i ~/.ssh/id_rsa -l kai-dev"
+        git config --global user.email "you@example.com"
+        git config --global user.name "CI-artifact"
+        sudo apt-get update
+        sudo git lfs install 
+
     - name: Check ut9.0
       run: |
-        export ut9=`cat schedule/ut-9.0`
-        echo $ut9
-        touch schedule/test
-        echo 3 > schedule/test
-        echo 4 > schedule/test
-        echo `cat schedule/test`
+        cd ~ 
+        git  git@github.com:OnePlus-onyx/build-CI.git -b master
+        
+    - name: Check ut9.0
+      run: |
+        cd ~/build-CI
+        export ut9_schedule=30
+        export ut9_new=`cat schedule/ut-9.0`
+        echo $ut9_new
+        export ut9_new=`expr $ut9_new - 1` 
+        echo $ut9_new
+        if [ $ut9_new == 0 ]
+        then
+           echo "a is equal to b"
+        else
+           echo "a is not equal to b"
+        fi
+        
+        
+    - name: Update Schedule  
+        cd ~/build-CI     
+        git add ./*
+        git commit -m "Update Schedule"
+        git push origin master
+        
