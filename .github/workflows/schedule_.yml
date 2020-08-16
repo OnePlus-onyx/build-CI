@@ -1,0 +1,27 @@
+name: Schedule
+on: 
+  push:
+    branches:
+      - master
+#  schedule:
+#    - cron: 0 8  1 * ?
+
+
+jobs:
+
+  Schedule:
+    runs-on: ubuntu-16.04
+    env:
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    
+    - name: Check ut9.0
+      run: |
+        export ut9=`cat schedule/ut-9.0`
+        echo $ut9
+        touch schedule/test
+        echo 3 > schedule/test
+        echo 4 > schedule/test
+        echo `cat schedule/test`
