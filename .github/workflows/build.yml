@@ -21,7 +21,7 @@ jobs:
       run: |
         df -h
         #sudo apt install ccache
-        touch ~/123.txt
+        touch /home/runner/123.txt
         cd ~
         pwd
 
