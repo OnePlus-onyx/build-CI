@@ -48,6 +48,7 @@ jobs:
         
         
     - name: Update Schedule  
+      run: |
         cd ~/build-CI     
         git add ./*
         git commit -m "Update Schedule"
