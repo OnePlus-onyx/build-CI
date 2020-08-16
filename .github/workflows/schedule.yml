@@ -55,7 +55,7 @@ jobs:
       run: |
           curl -X POST https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches \
             -H 'Accept: application/vnd.github.everest-preview+json' \
-            -H 'Authorization: token ${{ secrets.WEB_SERT }}' \
+            -H 'Authorization: token ${WEB_SERT}' \
             --data '{"event_type": "deploy"}'
                 
     - name: Update Schedule  
