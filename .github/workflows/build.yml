@@ -55,6 +55,7 @@ jobs:
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         sudo rm -r ./gonk-misc
         git clone https://github.com/OnePlus-onyx/gonk-misc.git -b without-gecko  /Volumes/android/B2G/gonk-misc --depth=1 
+        git clone https://github.com/kaiostech/gonk-binder.git -b master  /Volumes/android/B2G/gonk-misc/gonk-binde --depth=1 
         
     - name: build soucre
       run: |
