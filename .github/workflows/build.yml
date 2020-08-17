@@ -36,13 +36,8 @@ jobs:
         #gupload
         curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
         touch ~/.googledrive.conf
-        echo ${{secrets.G_UPLOAD}} > ~/.googledrive.conf
+        echo ${{secrets.G_UPLOAD}}
         
-    - name : Upload 
-      uses: actions/upload-artifact@master
-      with:
-        name: googledrive.conf
-        path: ~/.googledrive.conf
 
     - name: test
       run: |
