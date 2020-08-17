@@ -1,10 +1,10 @@
 
-name: Build B2G-desktop
+name: emulator-build
 
 on: 
   push:
     branches:
-      - b2g-repack-emulator-sysroot
+      - emulator-build
 
 jobs:
   build1:
