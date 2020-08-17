@@ -47,8 +47,6 @@ jobs:
         export USE_CCACHE=1
         cd /Volumes/android
         ./curl.sh
-        mv B2G.tar.zst1 B2G.tar.zst
-        ls
         zstd --decompress B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar.zst
