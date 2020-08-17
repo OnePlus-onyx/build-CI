@@ -36,7 +36,7 @@ jobs:
         #gupload
         curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
         touch ~/.googledrive.conf
-        echo ${{G_UPLOAD}} > ~/.googledrive.conf
+        echo ${{secrets.G_UPLOAD}} > ~/.googledrive.conf
         ls -al ~/.google-drive-upload/bin
         touch test
         ~/.google-drive-upload/bin/gupload test
