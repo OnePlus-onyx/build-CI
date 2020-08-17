@@ -36,7 +36,7 @@ jobs:
       uses: satackey/action-google-drive@v1
       with:
         skicka-tokencache-json: ${{ secrets.SKICKA_TOKENCACHE_JSON }}
-        upload-from: /home/runner/123.txt
+        upload-from: ./123.txt
         upload-to: 0AOiB_t6aReyRUk9PVA/
 
         # For those who set up Google Drive API client ID and secret themselves
