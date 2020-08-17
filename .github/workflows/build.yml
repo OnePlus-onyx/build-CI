@@ -83,13 +83,12 @@ jobs:
         zstd ./out.tar
         sudo rm ./out.tar
         sudo rm -r ./out
-        ~/.google-drive-upload/bin/gupload ./out.tar.zst2
         df -h
 
     - name: update 
       run: |
         cd /Volumes/android/B2G
-        ~/.google-drive-upload/bin/gupload ./out.tar.zst2
+        ~/.google-drive-upload/bin/gupload ./out.tar.zst
        
 
 
