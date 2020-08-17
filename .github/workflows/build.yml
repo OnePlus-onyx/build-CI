@@ -17,8 +17,6 @@ jobs:
 
     - name: test
       run: |
-        touch test
-        ~/.google-drive-upload/bin/gupload test
         #gupload
         curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
         touch ~/.googledrive.conf
@@ -29,6 +27,8 @@ jobs:
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf
         cat  ~/.googledrive.conf
+        touch test
+        ~/.google-drive-upload/bin/gupload test
         df -h
         
     - name: Initialization system environment
