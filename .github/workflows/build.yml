@@ -14,10 +14,26 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
+
+    - name: test
+      run: |
+        touch test
+        ~/.google-drive-upload/bin/gupload test
+        #gupload
+        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
+        touch ~/.googledrive.conf
+        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf
+        cat  ~/.googledrive.conf
+        df -h
+        
     - name: Initialization system environment
       run: |
         df -h
-        cat ${{secrets.G_UPLOAD}}
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -34,17 +50,8 @@ jobs:
         cd zstd
         make
         sudo make install 
-        #gupload
-        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
-        touch ~/.googledrive.conf
-        echo ${{secrets.G_UPLOAD}}
         
-
-    - name: test
-      run: |
-        touch test
-        ~/.google-drive-upload/bin/gupload test
-        df -h
+        
         
     - name: Fetch source
       run: |
