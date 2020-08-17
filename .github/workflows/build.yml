@@ -37,6 +37,15 @@ jobs:
         cd zstd
         make
         sudo make install 
+        #gupload
+        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
+        touch ~/.googledrive.conf
+        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf    
         
     - name: Fetch source
       run: |
@@ -60,11 +69,17 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd /Volumes/android/B2G
         export DISABLE_SOURCES_XML=true
-        ./build.sh -j4
+        timeout 3m ./build.sh -j4
         df -h
         
-    - name: Done
+    - name: repack update 
       run: |
+        cd /Volumes/android/B2G
+        tar -cvf ./out.tar ./out
+        zstd ./out.tar
+        sudo rm ./out.tar
+        sudo rm -r ./out
+        ~/.google-drive-upload/bin/gupload ./out.tar.zst2
         df -h
 
 
