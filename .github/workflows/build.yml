@@ -23,9 +23,11 @@ jobs:
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache
+        brew install expect  gnu-sed ccache coreutils
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        #gtimeout
+        gtimeout 4s ping 127.0.0.1
         #mount
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 210g ~/android.dmg
@@ -69,7 +71,7 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd /Volumes/android/B2G
         export DISABLE_SOURCES_XML=true
-        timeout 3m ./build.sh -j4
+        gtimeout 275m ./build.sh -j4
         df -h
         
     - name: repack update 
