@@ -9,7 +9,6 @@ on:
 jobs:
   build1:
     runs-on: macos-latest
-    continue-on-error: true
     timeout-minutes: 720
     steps:
     - name: Checkout
@@ -17,6 +16,7 @@ jobs:
 
         
     - name: Initialization system environment
+      continue-on-error: true
       run: |
         df -h
         cp curl.sh ~/
@@ -67,6 +67,7 @@ jobs:
         df -h
         
     - name: build soucre
+      continue-on-error: true
       run: |
         df -h
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
