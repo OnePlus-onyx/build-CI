@@ -28,7 +28,7 @@ jobs:
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         #gtimeout
-        gtimeout 4s ping 127.0.0.1
+        #gtimeout 4s ping 127.0.0.1
         #mount
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 210g ~/android.dmg
