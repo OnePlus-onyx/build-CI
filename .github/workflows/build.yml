@@ -9,6 +9,7 @@ on:
 jobs:
   build1:
     runs-on: macos-latest
+    continue-on-error: true
     timeout-minutes: 720
     steps:
     - name: Checkout
