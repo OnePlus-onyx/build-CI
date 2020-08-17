@@ -9,7 +9,7 @@ on:
 jobs:
   build1:
     runs-on: macos-latest
-    timeout-minutes: 720
+    timeout-minutes: 420
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -85,6 +85,12 @@ jobs:
         sudo rm -r ./out
         ~/.google-drive-upload/bin/gupload ./out.tar.zst2
         df -h
+
+    - name: update 
+      run: |
+        cd /Volumes/android/B2G
+        ~/.google-drive-upload/bin/gupload ./out.tar.zst2
+       
 
 
         
