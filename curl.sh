@@ -1,6 +1,6 @@
-filename="B2G.tar.zst1"
+filename="B2G.tar.zst"
 
-file_id="1WO40RS1dkMgncexmJg81aMZsVv40UKx2"
+file_id="10cIH4SOP8QO1HthyK2MToFHP1u5T9hM"
 
 query=`curl -c ./cookie.txt -s -L "https://drive.google.com/uc?export=download&id=${file_id}" \
 | perl -nE'say/uc-download-link.*? href="(.*?)\">/' \
