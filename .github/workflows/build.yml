@@ -17,18 +17,7 @@ jobs:
 
     - name: test
       run: |
-        #gupload
-        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
-        touch ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf
-        cat  ~/.googledrive.conf
-        touch test
-        ~/.google-drive-upload/bin/gupload test
+
         df -h
         
     - name: Initialization system environment
@@ -50,8 +39,15 @@ jobs:
         cd zstd
         make
         sudo make install 
-        
-        
+        #gupload
+        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
+        touch ~/.googledrive.conf
+        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf    
         
     - name: Fetch source
       run: |
