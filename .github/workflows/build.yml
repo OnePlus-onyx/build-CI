@@ -14,15 +14,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
-
-    - name: test
-      run: |
-
-        df -h
         
     - name: Initialization system environment
       run: |
         df -h
+        cp curl.sh ~/
+        chmod +x ~/curl.sh
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -31,23 +28,15 @@ jobs:
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         #mount
         cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 150g ~/android.dmg
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 210g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
+        mv ~/curl.sh /Volumes/android/
         #zstd
         cd  /Volumes/android
         git clone https://github.com/facebook/zstd.git
         cd zstd
         make
         sudo make install 
-        #gupload
-        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
-        touch ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf    
         
     - name: Fetch source
       run: |
@@ -55,42 +44,31 @@ jobs:
         export CCACHE_DIR=~/.ccache
         /usr/local/bin/ccache  -M 70G
         /usr/local/bin/ccache -s
-        #export CCACHE_COMPRESS=1
         export USE_CCACHE=1
-        git config --global user.name "ittat"
-        git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        git clone https://github.com/kaiostech/B2G -b master  --depth=1 
-        cd ./B2G
-        echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10-x86_64
+        ./curl.sh
+        mv B2G.tar.zst1 B2G.tar.zst
+        ls
+        zstd --decompress B2G.tar.zst
+        tar -xvf ./B2G.tar ./B2G
+        sudo rm -r ./B2G.tar.zst
+        sudo rm -r ./B2G.tar
+        ls
         df -h
         
-    - name: repack soucre
+    - name: build soucre
       run: |
         df -h
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd /Volumes/android/B2G
-        sed -i '' '14d'  system/sepolicy/tests/Android.bp
-        cat system/sepolicy/tests/Android.bp
-        #sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        sudo rm -rf .repo
-        sudo rm -r ./gecko
-        #patch -d gonk-misc -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/gonk-misc.patch
-        #patch -d build/soong -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/build_soong.patch
-        cd  /Volumes/android
-        tar -cvf ./B2G.tar ./B2G
-        zstd ./B2G.tar
-        sudo rm ./B2G.tar
-        sudo rm -r ./B2G
-        ls -al -h ./
+        export DISABLE_SOURCES_XML=true
+        ./build.sh -j4
         df -h
         
-    - name: update 
+    - name: Done
       run: |
         df -h
-        cd /Volumes/android/
-        ~/.google-drive-upload/bin/gupload ./B2G.tar.zst
-        df -h
+
 
         
         
