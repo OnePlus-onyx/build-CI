@@ -4,67 +4,11 @@ name: Build B2G-desktop
 on: 
   push:
     branches:
-      - b2g-desktop-ci
-  schedule:
-     - cron: 0 8 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29 * ?
+      - b2g-repack-emulator-sysroot
 
 jobs:
-#   build1:
-#     runs-on: macos-latest
-#     timeout-minutes: 360
-#     steps:
-#     - name: Checkout
-#       uses: actions/checkout@v1
-
-#     - name: Initialization system environment
-#       run: |
-#         df -h
-#         more /System/Library/CoreServices/SystemVersion.plist
-#         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
-#         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-#         brew install expect  gnu-sed ccache mercurial
-#         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-#         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-#         cd /Users/runner
-#         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 70g ~/android.dmg
-#         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
-#         df -h
-        
-#     - name: Fetch source
-#       run: |
-#         df -h
-#         export CCACHE_DIR=~/.ccache
-#         /usr/local/bin/ccache  -M 20G
-#         /usr/local/bin/ccache -s
-#         #export CCACHE_COMPRESS=1
-#         export USE_CCACHE=1
-#         git config --global user.name "ittat"
-#         git config --global user.email "ittat@github.com"
-#         cd /Volumes/android
-#         git clone  https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        
-#     - name: Build B2G
-#       run: |
-#         df -h
-#         cd /Volumes/android/gecko-b2g
-#         #./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
-#         ./mach bootstrap --no-interactive  --application-choice 'Firefox for Desktop'
-#         brew reinstall nasm 
-#         brew reinstall yasm
-#         brew install autoconf@2.13
-#         MOZCONFIG=./mozconfig-b2g-desktop ./mach build
-#         #and run it with ./mach run
-#         tar -zcvf /Volumes/android/b2gdebug.tar.gz /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
-#         df -h
-        
-#     - name : B2Gdebug.app 
-#       uses: actions/upload-artifact@master
-#       with:
-#         name: B2Gdebug.app
-#         path: /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
-        
-  build2:
-    runs-on: ubuntu-latest
+  build1:
+    runs-on: macos-latest
     timeout-minutes: 360
     steps:
     - name: Checkout
@@ -73,79 +17,74 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        sudo apt install git make mercurial  yasm  libncurses5
-        wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
-        tar xfj nasm-2.14.02.tar.bz2
-        cd nasm-2.14.02/
-        ./autogen.sh
-        ./configure --prefix=/usr/local/ 
-        make 
-        sudo make install
-        #hash -d nasm
-        nasm -v
-        cd ~
-        git config --global user.name "ittat"
-        git config --global user.email "ittat@github.com"
-        #curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-        #cargo install sccache
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        brew install expect  gnu-sed ccache
+        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        #mount
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 150g ~/android.dmg
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
+        #zstd
+        cd  /Volumes/android
+        git clone https://github.com/facebook/zstd.git
+        cd zstd
+        make
+        sudo make install 
+        #gupload
+        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
+        touch ~/.googledrive.conf
+        echo ${{G_UPLOAD}} > ~/.googledrive.conf
+        ls -al ~/.google-drive-upload/bin
+        touch test
+        ~/.google-drive-upload/bin/gupload test
+        df -h
         
-
-    - uses: hecrj/setup-rust-action@v1
-      with:
-        rust-version: stable
-    - uses: actions/checkout@master
-    - name: Run tests
-      run: cargo install sccache
-
-
     - name: Fetch source
       run: |
         df -h
-        cd ~
-        wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
-        curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
-        tar -xvf mozbuild.tar.bz2
-        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
-        sudo rm b2g-sysroot.tar.zst
-        sudo rm mozbuild.tar.bz2
-        cd ~
-        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        #export CCACHE_COMPRESS=1
+        export USE_CCACHE=1
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        cd /Volumes/android
+        git clone https://github.com/kaiostech/B2G -b master  --depth=1 
+        cd ./B2G
+        echo Download ...
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10-x86_64
         df -h
         
-    - name: bootstrap source
+    - name: repack soucre
       run: |
         df -h
-        cd ~/gecko-b2g
-        export SHELL=/bin/bash
-        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
+        cd /Volumes/android/B2G
+        sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        cat system/sepolicy/tests/Android.bp
+        #sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        sudo rm -rf .repo
+        sudo rm -r ./gecko
+        #patch -d gonk-misc -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/gonk-misc.patch
+        #patch -d build/soong -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/build_soong.patch
+        cd  /Volumes/android
+        tar -cvf ./B2G.tar ./B2G
+        zstd ./B2G.tar
+        sudo rm ./B2G.tar
+        sudo rm -r ./B2G
+        ls -al -h ./
         df -h
         
-    - name: Building X86_64
+    - name: update 
       run: |
         df -h
-        cd ~/gecko-b2g
-        export SHELL=/bin/bash
-        export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
-        export GONK_PRODUCT_NAME=generic_x86_64
-        export GECKO_OBJDIR=${GONK_PATH}/objdir-emulator-gecko
-        export PLATFORM_VERSION=29
-        export TARGET_ARCH=x86_64
-        export TARGET_ARCH_VARIANT=x86_64
-        export TARGET_CPU_VARIANT=generic
-        export BINSUFFIX=64
-        export MOZ_DISABLE_LTO=1
-        ./build-b2g.sh
-        ./build-b2g.sh package
+        cd /Volumes/android/B2G
+        ~/.google-drive-upload/bin/gupload ./B2G.tar.zst
         df -h
-        ls ${GECKO_OBJDIR}/dist
-        
-        
-    - name : Upload 
-      uses: actions/upload-artifact@master
-      with:
-        name: b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
-        path: ~/.mozbuild/b2g-sysroot/objdir-emulator-gecko/dist/b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
+
         
         
         
