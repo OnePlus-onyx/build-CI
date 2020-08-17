@@ -22,61 +22,61 @@ jobs:
 
   steps:
 
-#   - script: |
-#         df -h
-#         more /System/Library/CoreServices/SystemVersion.plist
-#         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
-#         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-#         brew install expect  gnu-sed ccache
-#         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-#         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-#         cd /Users/runner
-#         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 150g ~/android.dmg
-#         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
-#         cd  /Volumes/android
-#         git clone https://github.com/facebook/zstd.git
-#         cd zstd
-#         make
-#         sudo make install 
-#         df -h
-#     displayName: ' Initialization environment'
+  - script: |
+        df -h
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        brew install expect  gnu-sed ccache
+        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 150g ~/android.dmg
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
+        cd  /Volumes/android
+        git clone https://github.com/facebook/zstd.git
+        cd zstd
+        make
+        sudo make install 
+        df -h
+    displayName: ' Initialization environment'
 
 
 
-#   - script: |
-#         df -h
-#         export CCACHE_DIR=~/.ccache
-#         /usr/local/bin/ccache  -M 70G
-#         /usr/local/bin/ccache -s
-#         #export CCACHE_COMPRESS=1
-#         export USE_CCACHE=1
-#         git config --global user.name "ittat"
-#         git config --global user.email "ittat@github.com"
-#         cd /Volumes/android
-#         git clone https://github.com/kaiostech/B2G -b master  --depth=1 
-#         cd ./B2G
-#         echo Download ...
-#         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10-x86_64
-#         df -h
-#     displayName: 'Fetch source'
+  - script: |
+        df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        #export CCACHE_COMPRESS=1
+        export USE_CCACHE=1
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        cd /Volumes/android
+        git clone https://github.com/kaiostech/B2G -b master  --depth=1 
+        cd ./B2G
+        echo Download ...
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10-x86_64
+        df -h
+    displayName: 'Fetch source'
 
-#   - script: |
-#         cd /Volumes/android/B2G
-#         sed -i '' '14d'  system/sepolicy/tests/Android.bp
-#         cat system/sepolicy/tests/Android.bp
-#         #sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-#         sudo rm -rf .repo
-#         sudo rm -r ./gecko
-#         #patch -d gonk-misc -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/gonk-misc.patch
-#         #patch -d build/soong -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/build_soong.patch
-#         cd  /Volumes/android
-#         tar -cvf ./B2G.tar ./B2G
-#         zstd ./B2G.tar
-#         sudo rm ./B2G.tar
-#         sudo rm -r ./B2G
-#         ls -al -h ./
-#         df -h
-#     displayName: 'fix source'
+  - script: |
+        cd /Volumes/android/B2G
+        sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        cat system/sepolicy/tests/Android.bp
+        #sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        sudo rm -rf .repo
+        sudo rm -r ./gecko
+        #patch -d gonk-misc -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/gonk-misc.patch
+        #patch -d build/soong -p1 /Volumes/android/B2G/gecko/taskcluster/scripts/misc/build_soong.patch
+        cd  /Volumes/android
+        tar -cvf ./B2G.tar ./B2G
+        zstd ./B2G.tar
+        sudo rm ./B2G.tar
+        sudo rm -r ./B2G
+        ls -al -h ./
+        df -h
+    displayName: 'fix source'
 
 # # Publish per task NuGet package artifact
 #   - task: PublishBuildArtifacts@1
