@@ -9,10 +9,8 @@ on:
 jobs:
   build1:
     runs-on: macos-latest
-    timeout-minutes: 360
+    timeout-minutes: 720
     steps:
-    - timeout-minutes:
-      
     - name: Checkout
       uses: actions/checkout@v1
 
