@@ -118,8 +118,8 @@ jobs:
         df -h
         cd ~/gecko-b2g
         export SHELL=/bin/bash
-        #export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-        #./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
+        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
         df -h
         
     - name: Building X86_64
