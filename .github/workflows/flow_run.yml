@@ -1,7 +1,8 @@
 name: flow_run
 on:
   workflow_run:
-    workflows: ["auto2"]
+    workflows: ["webhook"]
+    branches: [master]
     types:
       - completed
 
