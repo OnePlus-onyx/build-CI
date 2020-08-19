@@ -13,7 +13,7 @@ jobs:
     - name: Check Commit
       run: |
         cd ~
-        git clone https://github.com/kaiostech/gecko-b2g 
+        git clone https://github.com/kaiostech/gecko-b2g  -b gonk
         cd gecko-b2g
         git log --since ==`date +%Y-%m-%d` >> log
         cat log
