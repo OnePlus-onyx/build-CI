@@ -1,6 +1,6 @@
 name: auto1
 on: 
-  push:
+#  push:
 #    branches:
 #      - master
   schedule:
