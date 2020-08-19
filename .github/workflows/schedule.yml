@@ -1,6 +1,6 @@
 name: Schedule
 on: 
-  push:
+#  push:
 #    branches:
 #      - master
 #  schedule:
