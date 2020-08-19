@@ -52,8 +52,16 @@ jobs:
         echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf 
-        #gdl -h 
-        ~/.gdrive-downloader/gdl -h  
+        #test
+        #~/.gdrive-downloader/gdl -h  
+        touch qwerdfs
+        ~/.google-drive-upload/bin/gupload ./qwerdfs > log.txt
+        export link=`cat log.txt  |  grep  'id='`
+        export fileid=${link#*=}
+        cat  log.txt
+        echo $fileid
+        sudo rm -rf qwerdfs
+        ~/.gdrive-downloader/gdl ${fileid}
         
     - name: Fetch source
       run: |
