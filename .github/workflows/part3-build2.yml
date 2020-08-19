@@ -55,7 +55,7 @@ jobs:
         echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf 
-        gdl -h   
+        #gdl -h   
         
     - name: Fetch source
       run: |
