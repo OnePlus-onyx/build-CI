@@ -4,7 +4,7 @@ on:
 #     types: 
 #       - commit
    schedule:
-    - cron: '0 7 * * *'
+    - cron: '0 23 * * *'
 
 jobs:
   commit-send:
