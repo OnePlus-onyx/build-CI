@@ -1,0 +1,109 @@
+name: b2g-repack-emulator-sysroot
+
+on: 
+#  workflow_run:
+#    workflows: ["emulator-build2"]
+#    branches: [master]
+#    types:
+#      - completed
+
+jobs:
+  build1:
+    runs-on: macos-latest
+    timeout-minutes: 360
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+
+    - name: cp
+      run: |
+        cp ./package_sysroot.sh ~/
+        df -h
+        
+    - name: Initialization system environment
+      run: |
+        df -h
+        cp curl.sh ~/
+        chmod +x ~/curl.sh
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        brew install expect  gnu-sed ccache coreutils
+        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        #gtimeout
+        #gtimeout 4s ping 127.0.0.1
+        #mount
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 250g ~/android.dmg
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
+        mv ~/curl.sh /Volumes/android/
+        #zstd
+        cd  /Volumes/android
+        git clone https://github.com/facebook/zstd.git
+        cd zstd
+        make
+        sudo make install 
+        #gupload
+        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
+        touch ~/.googledrive.conf
+        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
+        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf    
+        
+    - name: Fetch B2G source
+      run: |
+        df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        export USE_CCACHE=1
+        cd /Volumes/android
+        ./curl.sh B2G.tar.zst  1AK6T9Ji9h1jJ8Qok0GlOY94msO-7UJou
+        zstd --decompress B2G.tar.zst
+        tar -xvf ./B2G.tar ./B2G
+        sudo rm -r ./B2G.tar.zst
+        sudo rm -r ./B2G.tar
+        cp ./curl.sh ./B2G
+        
+    - name: Fetch pre-build-out source
+      run: |     
+        cd /Volumes/android/B2G
+        ./curl.sh out2.tar.zst  11iN0XY4eyGrDWJhB6wqXNb2kNOsmb18M
+        zstd --decompress out2.tar.zst
+        tar -xvf ./out2.tar ./out
+        sudo rm -r ./out2.tar
+        sudo rm -r ./out2.tar.zst
+        ls ./out
+        df -h
+        
+    - name: build soucre
+      run: |
+        df -h
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        cd /Volumes/android/B2G
+        export DISABLE_SOURCES_XML=true
+        ./build.sh -j4
+        df -h
+        
+    - name: repack sysroot 
+      run: |
+        df -h
+        cd /Volumes/android/B2G
+        cp ~/package_sysroot.sh ./
+        chmod +x ./package_sysroot.sh
+        ./package_sysroot.sh
+        ls -al -h b2g-sysroot.tar.zst
+        ls
+        df -h
+        
+    - name: update 
+      run: |
+        df -h
+        cd /Volumes/android/B2G
+        ~/.google-drive-upload/bin/gupload ./b2g-sysroot.tar.zst
+        df -h
