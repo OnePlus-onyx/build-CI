@@ -5,7 +5,11 @@
 
 name: Build Ubport 9.0
 on:
-  repository_dispatch
+  repository_dispatch:
+    types: 
+      - webhook-one
+      - webhook-two
+      - your-custom-event-type
   
   #push:
  #  branches:
