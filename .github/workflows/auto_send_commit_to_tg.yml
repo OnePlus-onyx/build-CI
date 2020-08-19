@@ -1,8 +1,8 @@
 name: auto_send_commit_to_tg
 on: 
-   repository_dispatch:
-     types: 
-       - commit
+#   repository_dispatch:
+#     types: 
+#       - commit
    schedule:
     - cron: '0 7 * * *'
 
