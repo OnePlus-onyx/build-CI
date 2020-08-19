@@ -58,6 +58,7 @@ jobs:
         ~/.google-drive-upload/bin/gupload ./qwerdfs > log.txt
         export link=`cat log.txt  |  grep  'id='`
         export fileid=${link#*=}
+        export fileid=${fileid% *}
         cat  log.txt
         echo $fileid
         sudo rm -rf qwerdfs
