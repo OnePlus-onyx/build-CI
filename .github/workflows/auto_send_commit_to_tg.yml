@@ -27,6 +27,7 @@ jobs:
       run: |
         cd ~/gecko-b2g
         export mess=`cat log`
+        export yesterday=$(date -d "yesterday" +%Y-%m-%d)
         export title="Commits date: $yesterday"
         echo $title
         if [ -s ./log ]; then
