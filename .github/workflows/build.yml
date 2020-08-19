@@ -4,7 +4,8 @@
 #=================================================
 
 name: Build Ubport 9.0
-on: repository_dispatch
+on:
+  repository_dispatch: ut9
   
   #push:
  #  branches:
