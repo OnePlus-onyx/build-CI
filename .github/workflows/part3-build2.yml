@@ -1,5 +1,8 @@
 name: emulator-build2
 on:
+  push:
+    branches: 
+      - master
 #  workflow_run:
 #    workflows: ["emulator-build1"]
 #    branches: [master]
@@ -44,13 +47,15 @@ jobs:
         sudo make install 
         #gupload
         curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
+        curl -Ls --compressed  https://github.com/Akianonymus/gdrive-downloader/raw/master/install.sh | sh -s
         touch ~/.googledrive.conf
         echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf    
+        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf 
+        gdl -h   
         
     - name: Fetch source
       run: |
