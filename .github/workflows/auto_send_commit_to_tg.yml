@@ -1,0 +1,33 @@
+name: auto_send_commit_to_tg
+on: 
+#  push:
+#    branches:
+#      - master
+#  schedule:
+#    - cron: '*/5 * * * *'
+
+
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
+  WEB_SERT:  ${{secrets.WEB_SERT}} 
+
+jobs:
+
+  Schedule:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: Check Commit
+      run: |
+        cd ~
+        git clone https://github.com/kaiostech/gecko-b2g 
+        cd gecko-b2g
+        git log --since ==`date +%Y-%m-%d` >> log
+        cat log
+        
+    - name: Send Commit
+      run: |
+        cd ~/gecko-b2g
+        export mess=`cat log`
+        if [ -s ./log ]; then
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$mess"
+        fi
