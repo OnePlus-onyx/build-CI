@@ -1,0 +1,93 @@
+name: b2g-build-gecko
+
+on: 
+#  workflow_run:
+#    workflows: ["b2g-repack-emulator-sysroot"]
+#    branches: [master]
+#    types:
+#      - completed
+
+jobs:  
+  build2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Initialization system environment
+      run: |
+        df -h
+        sudo apt install git make mercurial  yasm  libncurses5
+        wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
+        tar xfj nasm-2.14.02.tar.bz2
+        cd nasm-2.14.02/
+        ./autogen.sh
+        ./configure --prefix=/usr/local/ 
+        make 
+        sudo make install
+        #hash -d nasm
+        nasm -v
+        cd ~
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        #curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        #cargo install sccache
+        
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: stable
+    - uses: actions/checkout@master
+    - name: Run tests
+      run: cargo install sccache
+
+
+    - name: Fetch source
+      run: |
+        df -h
+        cd ~
+        wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
+        #curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        tar -xvf mozbuild.tar.bz2
+        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        sudo rm b2g-sysroot.tar.zst
+        sudo rm mozbuild.tar.bz2
+        cd ~
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        df -h
+        
+    - name: bootstrap source
+      run: |
+        df -h
+        cd ~/gecko-b2g
+        export SHELL=/bin/bash
+        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
+        df -h
+        
+    - name: Building X86_64
+      run: |
+        df -h
+        cd ~/gecko-b2g
+        export SHELL=/bin/bash
+        export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
+        export GONK_PRODUCT_NAME=generic_x86_64
+        export GECKO_OBJDIR=${GONK_PATH}/objdir-emulator-gecko
+        export PLATFORM_VERSION=29
+        export TARGET_ARCH=x86_64
+        export TARGET_ARCH_VARIANT=x86_64
+        export TARGET_CPU_VARIANT=generic
+        export BINSUFFIX=64
+        export MOZ_DISABLE_LTO=1
+        ./build-b2g.sh
+        ./build-b2g.sh package
+        df -h
+        ls ${GECKO_OBJDIR}/dist
+        
+        
+    - name : Upload 
+      uses: actions/upload-artifact@master
+      with:
+        name: b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
+        path: ~/.mozbuild/b2g-sysroot/objdir-emulator-gecko/dist/b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
