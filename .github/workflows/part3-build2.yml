@@ -1,4 +1,4 @@
-name: emulator-build2
+name: b2g-emulator-build2
 on:
   push:
     branches: 
@@ -24,8 +24,8 @@ jobs:
       continue-on-error: true
       run: |
         df -h
-        cp curl.sh ~/
-        chmod +x ~/curl.sh
+        #cp curl.sh ~/
+        #chmod +x ~/curl.sh
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
