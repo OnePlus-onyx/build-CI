@@ -15,7 +15,11 @@ jobs:
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g  -b gonk
         cd gecko-b2g
-        git log --since ==`date +%Y-%m-%d` >> log
+        #today
+        export today=$(date +%Y-%m-%d)
+        #yesterday 
+        export yesterday=$(date -d "yesterday" +%Y-%m-%d)
+        git log --since ==${yesterday} >> log
         cat log
         
     - name: Send Commit
@@ -23,5 +27,6 @@ jobs:
         cd ~/gecko-b2g
         export mess=`cat log`
         if [ -s ./log ]; then
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=Commits date: $yesterday"
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$mess"
         fi
