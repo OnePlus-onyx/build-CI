@@ -3,8 +3,8 @@ on:
   repository_dispatch:
     types: 
       - commit
-#  schedule:
-#    - cron: '*/5 * * * *'
+# schedule:
+#   - cron: '0 7 * * *'
 
 jobs:
   commit-send:
@@ -23,11 +23,13 @@ jobs:
         cat log
         echo $yesterday
         
-#     - name: Send Commit
-#       run: |
-#         cd ~/gecko-b2g
-#         export mess=`cat log`
-#         if [ -s ./log ]; then
-#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=Commits date: $yesterday"
-#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$mess"
-#         fi
+    - name: Send Commit
+      run: |
+        cd ~/gecko-b2g
+        export mess=`cat log`
+        export title="Commits date: $yesterday"
+        echo $title
+        if [ -s ./log ]; then
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$title"
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$mess"
+        fi
