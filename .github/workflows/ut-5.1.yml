@@ -1,8 +1,8 @@
 name: Build Ubport 5.1
 on: 
-#  push:
-#    branches:
-#      - ut-5.1
+  push:
+    branches:
+      - master
   schedule:
     - cron: 0 8  1 * ?
 env:
@@ -70,23 +70,10 @@ jobs:
 
     - name: Build HAL
       run: |
-        export DEVICE="onyx"
-        export ANDROID_ROOT=/home/runner/work/halium
-        export PATH=$PATH:~/bin/
-        cd $ANDROID_ROOT
-        # replace something
-        sed -i 's/external\/selinux/external\/selinux external\/libcurl/g' build/core/main.mk
-        export LC_ALL=C
-        chmod +x $ANDROID_ROOT/kernel/oneplus/onyx/scripts/gcc-wrapper.py
-        source build/envsetup.sh
-        export USE_CCACHE=1
-        breakfast $DEVICE
-        make -j$(nproc) mkbootimg
-        make -j$(nproc) halium-boot
-        make -j$(nproc) systemimage 
-        echo "md5sum halium-boot.img and system.img"
-        md5sum $ANDROID_ROOT/out/target/product/onyx/halium-boot.img
-        md5sum $ANDROID_ROOT/out/target/product/onyx/system.img
+        git checkout ut-5.1
+        chmod +x build-hal.sh
+        bash -x build-hal.sh
+        
     - name : Upload boot image
       uses: actions/upload-artifact@master
       with:
