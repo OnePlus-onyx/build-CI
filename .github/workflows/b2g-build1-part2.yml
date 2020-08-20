@@ -30,8 +30,7 @@ jobs:
         echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
         echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
         brew install rclone
-        cat ~/.config/rclone/rclone.conf
-        rclone itd:test ls
+        rclone ls itd:test
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
