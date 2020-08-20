@@ -1,11 +1,8 @@
-name: b2g-repack-emulator-sysroot
-
-on: 
-#  workflow_run:
-#    workflows: ["emulator-build2"]
-#    branches: [master]
-#    types:
-#      - completed
+name: b2g-repack-sysroot
+on:
+  repository_dispatch:
+    types: 
+      - b2g-repack-sysroot-part4
 
 jobs:
   build1:
@@ -14,31 +11,22 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-
-
-    - name: cp
-      run: |
-        cp ./package_sysroot.sh ~/
-        df -h
-        
+     
     - name: Initialization system environment
       run: |
         df -h
-        cp curl.sh ~/
-        chmod +x ~/curl.sh
+        cp ./package_sysroot.sh ~/
+        chmod +x ~/package_sysroot.sh
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install expect  gnu-sed ccache coreutils
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        #gtimeout
-        #gtimeout 4s ping 127.0.0.1
         #mount
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 250g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
-        mv ~/curl.sh /Volumes/android/
         #zstd
         cd  /Volumes/android
         git clone https://github.com/facebook/zstd.git
@@ -53,7 +41,20 @@ jobs:
         echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf    
+        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf
+        #rclone
+        mkdir -p ~/.config/rclone
+        touch ~/.config/rclone/rclone.conf
+        echo [itd] >> ~/.config/rclone/rclone.conf
+        echo type = drive >> ~/.config/rclone/rclone.conf
+        echo client_id = ${{secrets.GUP_CLIENT_ID}} >> ~/.config/rclone/rclone.conf
+        echo client_secret = ${{secrets.GUP_CLIENT_SECRET}}  >> ~/.config/rclone/rclone.conf
+        echo scope = drive >> ~/.config/rclone/rclone.conf
+        echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
+        echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
+        brew install rclone
+        cat ~/.config/rclone/rclone.conf
+        rclone itd:test ls
         
     - name: Fetch B2G source
       run: |
@@ -63,7 +64,7 @@ jobs:
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         cd /Volumes/android
-        ./curl.sh B2G.tar.zst  1AK6T9Ji9h1jJ8Qok0GlOY94msO-7UJou
+        rclone copy itd:ci/B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar.zst
@@ -73,11 +74,11 @@ jobs:
     - name: Fetch pre-build-out source
       run: |     
         cd /Volumes/android/B2G
-        ./curl.sh out2.tar.zst  11iN0XY4eyGrDWJhB6wqXNb2kNOsmb18M
+        rclone copy itd:ci/out2.tar.zst ./
         zstd --decompress out2.tar.zst
+        sudo rm -r ./out2.tar.zst
         tar -xvf ./out2.tar ./out
         sudo rm -r ./out2.tar
-        sudo rm -r ./out2.tar.zst
         ls ./out
         df -h
         
@@ -95,7 +96,6 @@ jobs:
         df -h
         cd /Volumes/android/B2G
         cp ~/package_sysroot.sh ./
-        chmod +x ./package_sysroot.sh
         ./package_sysroot.sh
         ls -al -h b2g-sysroot.tar.zst
         ls
@@ -105,5 +105,11 @@ jobs:
       run: |
         df -h
         cd /Volumes/android/B2G
-        ~/.google-drive-upload/bin/gupload ./b2g-sysroot.tar.zst
+        ~/.google-drive-upload/bin/gupload -o ./b2g-sysroot.tar.zst -c ci
         df -h
+
+    - name: send webhook          
+      run: |
+        cd /Volumes/android/
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-build-gecko-part5"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        
