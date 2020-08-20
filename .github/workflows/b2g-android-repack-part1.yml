@@ -1,4 +1,4 @@
-name: part1 repack android source
+name: b2g-android-repack-part1
 on:
   repository_dispatch:
     types: 
