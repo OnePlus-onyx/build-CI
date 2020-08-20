@@ -53,8 +53,7 @@ jobs:
         echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
         echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
         brew install rclone
-        cat ~/.config/rclone/rclone.conf
-        rclone itd:test ls
+        rclone ls itd:test
         
     - name: Fetch B2G source
       run: |
