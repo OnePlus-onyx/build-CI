@@ -17,6 +17,18 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
+        #rclone
+        mkdir -p ~/.config/rclone
+        touch ~/.config/rclone/rclone.conf
+        echo [itd] >> ~/.config/rclone/rclone.conf
+        echo type = drive >> ~/.config/rclone/rclone.conf
+        echo client_id = ${{secrets.GUP_CLIENT_ID}} >> ~/.config/rclone/rclone.conf
+        echo client_secret = ${{secrets.GUP_CLIENT_SECRET}}  >> ~/.config/rclone/rclone.conf
+        echo scope = drive >> ~/.config/rclone/rclone.conf
+        echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
+        brew install rclone
+        cat ~/.config/rclone/rclone.conf
+        rclone itd:test ls
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -44,19 +56,6 @@ jobs:
         echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf   
-        #rclone
-        mkdir -p ~/.config/rclone
-        touch ~/.config/rclone/rclone.conf
-        echo [itd] >> ~/.config/rclone/rclone.conf
-        echo type = drive >> ~/.config/rclone/rclone.conf
-        echo client_id = ${{secrets.GUP_CLIENT_ID}} >> ~/.config/rclone/rclone.conf
-        echo client_secret = ${{secrets.GUP_CLIENT_SECRET}}  >> ~/.config/rclone/rclone.conf
-        echo scope = drive >> ~/.config/rclone/rclone.conf
-        #echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
-        echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
-        brew install rclone
-        cat ~/.config/rclone/rclone.conf
-        rclone itd:test ls
         
     - name: Fetch source
       run: |
