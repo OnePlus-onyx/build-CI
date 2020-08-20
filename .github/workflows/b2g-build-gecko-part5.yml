@@ -1,11 +1,8 @@
 name: b2g-build-gecko
-
-on: 
-#  workflow_run:
-#    workflows: ["b2g-repack-emulator-sysroot"]
-#    branches: [master]
-#    types:
-#      - completed
+on:
+  repository_dispatch:
+    types: 
+      - b2g-build-gecko-part
 
 jobs:  
   build2:
