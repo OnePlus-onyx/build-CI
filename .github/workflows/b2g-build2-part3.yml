@@ -59,8 +59,7 @@ jobs:
         
     - name: Fetch source
       run: |
-        df -h
-        gdl -h   
+        df -h  
         export CCACHE_DIR=~/.ccache
         /usr/local/bin/ccache  -M 70G
         /usr/local/bin/ccache -s
