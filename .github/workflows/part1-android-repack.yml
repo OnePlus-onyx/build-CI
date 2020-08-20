@@ -1,5 +1,11 @@
 name: repack android source
 on: 
+  push:
+    paths: 
+      - ./.github/workflows/part1-android-repack.yml
+    branches: 
+      - master
+    
 #  push:
 #    branches:
 #      - b2g-repack-emulator-sysroot
@@ -81,6 +87,6 @@ jobs:
       run: |
         df -h
         cd /Volumes/android/
-        mv ./B2G.tar.zst ./B2G.tar.zst2
-        ~/.google-drive-upload/bin/gupload ./B2G.tar.zst2
+        mv ./B2G.tar.zst ./B2G.tar.zst
+        ~/.google-drive-upload/bin/gupload ./B2G.tar.zst -c ci
         df -h
