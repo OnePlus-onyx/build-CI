@@ -82,7 +82,7 @@ jobs:
         df -h
         cd /Volumes/android/
         mv ./B2G.tar.zst ./B2G.tar.zst
-        ~/.google-drive-upload/bin/gupload -o ./B2G.tar.zst -c ci
+        ~/.google-drive-upload/bin/gupload -o ./B2G.tar.zst
         df -h
         
     - name: send webhook          
