@@ -1,0 +1,96 @@
+name: Build Ubport 9.0
+on:
+ push:
+  branches:
+     - master
+ # schedule:
+ #   - cron: 0 8  1 * ?
+env:
+  SSH_ACTIONS: false
+
+jobs:
+
+  build:
+    runs-on: ubuntu-16.04
+
+    env:
+      DEVICE: onyx
+      ANDROID_ROOT: /home/runner/work/halium/
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    
+    - name: Initialization environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+        openjdk-8-jdk android-tools-adb bc \
+        bison build-essential curl flex g++-multilib m4 libxml2-utils \
+        gcc-multilib gnupg gperf imagemagick lib32ncurses5-dev \
+        lib32readline-dev lib32z1-dev libesd0-dev liblz4-tool \
+        libncurses5-dev libsdl1.2-dev libssl-dev repo libwxgtk3.0-dev \
+        libxml2 libxml2-utils lzop pngcrush rsync schedtool \
+        squashfs-tools xsltproc yasm zip zlib1g-dev git
+        sudo docker rmi `docker images -q`
+        sudo rm -rf \
+          /usr/share/dotnet \
+          /etc/mysql \
+          /etc/php
+        mkdir -p ~/bin
+        wget 'https://storage.googleapis.com/git-repo-downloads/repo' -P ~/bin
+        chmod +x ~/bin/repo
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        df -h
+        
+    - name: Downloading source code
+      run: |
+        export DEVICE="onyx"
+        export ANDROID_ROOT=~/work/halium
+        export PATH=$PATH:~/bin/
+        mkdir -p $ANDROID_ROOT
+        cd $ANDROID_ROOT
+        repo init -u https://github.com/Halium/android -b halium-9.0 --depth=1
+        repo sync -j16 -c --no-clone-bundle --no-tags
+        #sudo rm -r ./.repo
+        #source for onyx
+        sudo rm -r $ANDROID_ROOT/frameworks/base
+        git clone https://github.com/YumeMichi/android_frameworks_base.git  -b lineage-16.0   $ANDROID_ROOT/frameworks/base --depth=1
+        git clone https://github.com/YumeMichi/patcher.git  -b lineage-16.0   $ANDROID_ROOT/patcher --depth=1
+        git clone https://github.com/OnePlus-onyx/device_oneplus_onyx.git  -b ut9-test1  $ANDROID_ROOT/device/oneplus/onyx --depth=1
+        git clone https://github.com/LineageOS/android_device_oppo_common.git  -b lineage-16.0   $ANDROID_ROOT/device/oppo/common --depth=1
+        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx.git  -b test2 $ANDROID_ROOT/kernel/oneplus/onyx --depth=1
+        git clone https://github.com/OnePlus-onyx/proprietary_vendor_oneplus.git  -b ut9-test  $ANDROID_ROOT/vendor/oneplus/onyx --depth=1    
+        df -h
+        
+        
+    - name: Build HAL
+      run: |
+        checkout ut-9.0
+        chmod +x build-hal.sh
+        bash -x build-hal.sh
+        
+    - name: Check artifact
+      run: |
+        echo "md5sum halium-boot.img, hybris-boot.img and system.img"
+        md5sum $ANDROID_ROOT/out/target/product/onyx/halium-boot.img
+        md5sum $ANDROID_ROOT/out/target/product/onyx/hybris-boot.img
+        md5sum $ANDROID_ROOT/out/target/product/onyx/system.img 
+    - name : Upload halium boot image
+      uses: actions/upload-artifact@master
+      with:
+        name: halium-boot.img
+        path: ~/work/halium/out/target/product/onyx/halium-boot.img
+
+    - name : Upload hybris boot image
+      uses: actions/upload-artifact@master
+      with:
+        name: hybris-boot.img
+        path: ~/work/halium/out/target/product/onyx/hybris-boot.img
+
+    - name : Upload system image
+      uses: actions/upload-artifact@master
+      with:
+        name: system.img 
+        path: ~/work/halium/out/target/product/onyx/system.img 
