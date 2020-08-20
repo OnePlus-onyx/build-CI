@@ -17,8 +17,6 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        #cp curl.sh ~/
-        #chmod +x ~/curl.sh
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -31,7 +29,6 @@ jobs:
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 210g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
-        #mv ~/curl.sh /Volumes/android/
         #zstd
         cd  /Volumes/android
         git clone https://github.com/facebook/zstd.git
@@ -48,18 +45,18 @@ jobs:
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf   
         #rclone
- mkdir -p ~/.config/rclone
- touch ~/.config/rclone/rclone.conf
- echo [itd] >> ~/.config/rclone/rclone.conf
-echo type = drive >> ~/.config/rclone/rclone.conf
-echo client_id = ${{secrets.GUP_CLIENT_ID}} >> ~/.config/rclone/rclone.conf
-echo client_secret = ${{secrets.GUP_CLIENT_SECRET}}  >> ~/.config/rclone/rclone.conf
-echo scope = drive >> ~/.config/rclone/rclone.conf
-echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
-echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
-brew install rclone
-rclone itd:test ls
-
+        mkdir -p ~/.config/rclone
+        touch ~/.config/rclone/rclone.conf
+        echo [itd] >> ~/.config/rclone/rclone.conf
+        echo type = drive >> ~/.config/rclone/rclone.conf
+        echo client_id = ${{secrets.GUP_CLIENT_ID}} >> ~/.config/rclone/rclone.conf
+        echo client_secret = ${{secrets.GUP_CLIENT_SECRET}}  >> ~/.config/rclone/rclone.conf
+        echo scope = drive >> ~/.config/rclone/rclone.conf
+        echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
+        echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
+        brew install rclone
+        cat ~/.config/rclone/rclone.conf
+        rclone itd:test ls
         
     - name: Fetch source
       run: |
@@ -69,7 +66,6 @@ rclone itd:test ls
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         cd /Volumes/android
-        #./curl.sh B2G.tar.zst  1AK6T9Ji9h1jJ8Qok0GlOY94msO-7UJou
         rclone copy itd:ci/B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
@@ -100,4 +96,11 @@ rclone itd:test ls
     - name: update 
       run: |
         cd /Volumes/android/B2G
-        ~/.google-drive-upload/bin/gupload ./out.tar.zst
+        ~/.google-drive-upload/bin/gupload -o ./out.tar.zst -c ci
+        
+    - name: send webhook          
+      run: |
+        cd /Volumes/android/
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-build2-part3"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        
+        
