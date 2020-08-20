@@ -2,7 +2,7 @@ name: Build Ubport 7.1
 on: 
   push:
     branches:
-      - ut-7.1
+      - master
   schedule:
     - cron: 0 8  1 * ?
 env:
