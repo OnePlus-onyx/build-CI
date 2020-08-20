@@ -1,15 +1,9 @@
-name: repack android source
-on: 
-  push:
-    paths: 
-      - ./.github/workflows/part1-android-repack.yml
-    branches: 
-      - master
-    
-#  push:
-#    branches:
-#      - b2g-repack-emulator-sysroot
-
+name: part1 repack android source
+on:
+  repository_dispatch:
+    types: 
+      - b2g-repack-android-part1
+        
 jobs:
   Download:
     runs-on: macos-latest
@@ -88,5 +82,13 @@ jobs:
         df -h
         cd /Volumes/android/
         mv ./B2G.tar.zst ./B2G.tar.zst
-        ~/.google-drive-upload/bin/gupload ./B2G.tar.zst -c ci
+        ~/.google-drive-upload/bin/gupload -o ./B2G.tar.zst -c ci
         df -h
+        
+    - name: send webhook          
+      run: |
+        cd /Volumes/android/
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-build1-part2"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        
+        
+        
