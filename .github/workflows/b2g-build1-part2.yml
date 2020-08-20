@@ -66,7 +66,7 @@ jobs:
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         cd /Volumes/android
-        rclone copy itd:ci/B2G.tar.zst ./
+        rclone copy itd:B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar.zst
@@ -96,7 +96,7 @@ jobs:
     - name: update 
       run: |
         cd /Volumes/android/B2G
-        ~/.google-drive-upload/bin/gupload -o ./out.tar.zst -c ci
+        ~/.google-drive-upload/bin/gupload -o ./out.tar.zst
         
     - name: send webhook          
       run: |
