@@ -1,12 +1,16 @@
-name: emulator-build1
-on: 
-#  workflow_run:
-#    workflows: ["repack android source"]
-#    branches: [master]
-#    types:
-#      - completed
+name: b2g-emulator-build1
 
-# issue file id
+on:
+  repository_dispatch:
+    types: 
+      - b2g-build1-part2
+        
+
+
+
+
+
+
 
 jobs:
   build1:
