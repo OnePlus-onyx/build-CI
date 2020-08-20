@@ -70,7 +70,8 @@ jobs:
 
     - name: Build HAL
       run: |
-        git checkout ut-5.1
+        git clone https://github.com/OnePlus-onyx/build-CI -b ut-5.1
+        cd build-CI
         chmod +x build-hal.sh
         bash -x build-hal.sh
         
