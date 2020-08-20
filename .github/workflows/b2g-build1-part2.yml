@@ -18,7 +18,7 @@ jobs:
       run: |
         df -h
         #rclone
-        echo 123:  ${{secrets.RCLONE_TEKON}} 
+        echo 123:  \{${{secrets.RCLONE_TEKON}}\}
         mkdir -p ~/.config/rclone
         touch ~/.config/rclone/rclone.conf
         echo [itd] >> ~/.config/rclone/rclone.conf
