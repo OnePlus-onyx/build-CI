@@ -1,15 +1,8 @@
 name: b2g-emulator-build2
 on:
-#  push:
-#    branches: 
-#     - master
-#  workflow_run:
-#    workflows: ["emulator-build1"]
-#    branches: [master]
-#    types:
-#      - completed
-
-# issue file id
+  repository_dispatch:
+    types: 
+      - b2g-build2-part3
 
 jobs:
   build1:
@@ -18,10 +11,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-
-        
+ 
     - name: Initialization system environment
-      continue-on-error: true
       run: |
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
@@ -42,9 +33,8 @@ jobs:
         cd zstd
         make
         sudo make install 
-        #gupload & gdl
+        #gupload
         curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
-        curl -Ls --compressed  https://github.com/Akianonymus/gdrive-downloader/raw/master/install.sh | sh -s
         touch ~/.googledrive.conf
         echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
@@ -52,17 +42,20 @@ jobs:
         echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf 
-        #test
-        #~/.gdrive-downloader/gdl -h  
-        touch qwerdfs
-        ~/.google-drive-upload/bin/gupload ./qwerdfs > log.txt
-        export link=`cat log.txt  |  grep  'id='`
-        export fileid=${link#*=}
-        export fileid=${fileid% *}
-        cat  log.txt
-        echo $fileid
-        sudo rm -rf qwerdfs
-        ~/.gdrive-downloader/gdl ${fileid}
+        #rclone
+        mkdir -p ~/.config/rclone
+        touch ~/.config/rclone/rclone.conf
+        echo [itd] >> ~/.config/rclone/rclone.conf
+        echo type = drive >> ~/.config/rclone/rclone.conf
+        echo client_id = ${{secrets.GUP_CLIENT_ID}} >> ~/.config/rclone/rclone.conf
+        echo client_secret = ${{secrets.GUP_CLIENT_SECRET}}  >> ~/.config/rclone/rclone.conf
+        echo scope = drive >> ~/.config/rclone/rclone.conf
+        echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
+        echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
+        brew install rclone
+        cat ~/.config/rclone/rclone.conf
+        rclone itd:test ls
+
         
     - name: Fetch source
       run: |
@@ -73,7 +66,7 @@ jobs:
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         cd /Volumes/android
-        ./curl.sh B2G.tar.zst  1AK6T9Ji9h1jJ8Qok0GlOY94msO-7UJou
+        rclone copy itd:ci/B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar.zst
@@ -83,11 +76,11 @@ jobs:
     - name: Fetch source
       run: |
         cd /Volumes/android/B2G
-        ./curl.sh out.tar.zst  11iN0XY4eyGrDWJhB6wqXNb2kNOsmb18M
+        rclone copy itd:ci/out.tar.zst ./
         zstd --decompress out.tar.zst
+        sudo rm -r ./out.tar.zst
         tar -xvf ./out.tar ./out
         sudo rm -r ./out.tar
-        sudo rm -r ./out.tar.zst
         ls ./out
         df -h
         
@@ -101,17 +94,30 @@ jobs:
         gtimeout 275m ./build.sh -j4
         df -h
         
-    - name: repack update 
+    - name: remove source exclude out filer 
       run: |
-        cd /Volumes/android/B2G
-        sudo rm -rf !(out) 
-        tar -cvf ./out2.tar ./out
-        zstd ./out2.tar
-        sudo rm ./out2.tar
-        #sudo rm -r ./out
+         cd /Volumes/android/B2G
+         sudo rm -rf  `ls | grep -v "out" `
+         df -h
         
-    - name: repack update          
+    - name: repack out
       run: |
-        cd /Volumes/android/B2G
-        ~/.google-drive-upload/bin/gupload ./out2.tar.zst
-        df -h
+         cd /Volumes/android/B2G
+         tar -cvf ./out2.tar ./out
+         sudo rm -rf ./out
+         zstd ./out2.tar
+         sudo rm ./out2.tar
+         df -h
+                
+    - name:  update          
+      run: |
+         df -h
+         cd /Volumes/android/B2G
+         ~/.google-drive-upload/bin/gupload -o ./out2.tar.zst -c ci
+         df -h
+
+    - name: send webhook          
+      run: |
+        cd /Volumes/android/
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-repack-sysroot-part4"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        
