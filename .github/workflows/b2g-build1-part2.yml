@@ -52,7 +52,7 @@ jobs:
         echo client_id = ${{secrets.GUP_CLIENT_ID}} >> ~/.config/rclone/rclone.conf
         echo client_secret = ${{secrets.GUP_CLIENT_SECRET}}  >> ~/.config/rclone/rclone.conf
         echo scope = drive >> ~/.config/rclone/rclone.conf
-        echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
+        #echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
         echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
         brew install rclone
         cat ~/.config/rclone/rclone.conf
