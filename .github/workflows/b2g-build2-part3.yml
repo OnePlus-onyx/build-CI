@@ -25,7 +25,7 @@ jobs:
         #gtimeout 4s ping 127.0.0.1
         #mount
         cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 210g ~/android.dmg
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 350g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         #zstd
         cd  /Volumes/android
