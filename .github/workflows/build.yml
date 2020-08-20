@@ -4,9 +4,9 @@
 #=================================================
 name: Build Ubport 5.1
 on: 
-  push:
-    branches:
-      - ut-5.1
+#  push:
+#    branches:
+#      - ut-5.1
   schedule:
     - cron: 0 8  1 * ?
 env:
