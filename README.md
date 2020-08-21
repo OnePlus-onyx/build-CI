@@ -26,7 +26,8 @@ ut-7.1.yml
 ut-9.0.yml
 
 
-## other test
+## other branches
+
  ut-9.0 : ubuntu touch 9.0
 
  ut-7.1 : ubuntu touch 7.1
