@@ -2,7 +2,7 @@ name: b2g-build-gecko
 on:
   repository_dispatch:
     types: 
-      - b2g-build-gecko-part
+      - b2g-build-gecko-part6
 
 jobs:  
   build2:
