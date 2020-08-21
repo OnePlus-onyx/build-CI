@@ -2,7 +2,7 @@ name: b2g-repack-sysroot
 on:
   repository_dispatch:
     types: 
-      - b2g-repack-sysroot-part4
+      - b2g-repack-sysroot-part5
 
 jobs:
   build1:
@@ -42,16 +42,15 @@ jobs:
         echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
         #rclone
         mkdir -p ~/.config/rclone
-        touch ~/.config/rclone/rclone.conf
-        echo [itd] >> ~/.config/rclone/rclone.conf
-        echo type = drive >> ~/.config/rclone/rclone.conf
-        echo client_id = ${{secrets.GUP_CLIENT_ID}} >> ~/.config/rclone/rclone.conf
-        echo client_secret = ${{secrets.GUP_CLIENT_SECRET}}  >> ~/.config/rclone/rclone.conf
-        echo scope = drive >> ~/.config/rclone/rclone.conf
-        echo token = ${{secrets.RCLONE_TEKON}}  >> ~/.config/rclone/rclone.conf
-        echo team_drive = 0AOiB_t6aReyRUk9PVA >> ~/.config/rclone/rclone.conf
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
         brew install rclone
         rclone ls itd:test
         
@@ -65,10 +64,11 @@ jobs:
         cd /Volumes/android
         rclone copy itd:B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
-        tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar.zst
+        tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar
-        cp ./curl.sh ./B2G
+        ls
+        df -h
         
     - name: Fetch pre-build-out source
       run: |     
@@ -110,5 +110,5 @@ jobs:
     - name: send webhook          
       run: |
         cd /Volumes/android/
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-build-gecko-part5"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-build-gecko-part6"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
         
