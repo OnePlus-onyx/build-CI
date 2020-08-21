@@ -18,6 +18,9 @@ jobs:
         #ssh 123
         echo 123
         mkdir -p ~/.ssh
+        echo 1233
+        touch ~/.ssh/id_rsa
+        echo 12345
         echo ${{secrets.SSH_PRIVATE_KEY}}  > ~/.ssh/id_rsa
         echo 123
         chmod 600 ~/.ssh/id_rsa
