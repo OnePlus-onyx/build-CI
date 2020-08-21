@@ -69,7 +69,6 @@ jobs:
         tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar.zst
         sudo rm -r ./B2G.tar
-        cp ./curl.sh ./B2G
         
     - name: Fetch source
       run: |
