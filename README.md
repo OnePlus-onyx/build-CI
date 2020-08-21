@@ -13,9 +13,11 @@ b2g-build1-part2.yml
 
 b2g-build2-part3.yml
 
-b2g-repack-sysroot-part4.yml
+b2g-build3-part4.yml
 
-b2g-build-gecko-part5.yml
+b2g-repack-sysroot-part5.yml
+
+b2g-build-gecko-part6.yml
 
 
 ### Ubports flow
