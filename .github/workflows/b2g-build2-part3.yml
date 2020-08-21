@@ -15,6 +15,18 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
+        #ssh
+        mkdir -p ~/.ssh
+        echo ${{secrets.SSH_PRIVATE_KEY}}  > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        ls
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -42,17 +54,6 @@ jobs:
         echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
         echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf 
-        #ssh
-        mkdir -p ~/.ssh
-        echo ${{secrets.SSH_PRIVATE_KEY}}  > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        #rclone
-        mkdir -p ~/.config/rclone
-        git clone git@github.com:ittat/tmp.git
-        cd tmp
-        mv ./rclone.conf ~/.config/rclone
-        brew install rclone
-        rclone ls itd:test
 
         
     - name: Fetch source
