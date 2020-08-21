@@ -1,8 +1,8 @@
 name: Build Ubport 9.0
 on:
-# push:
-#  branches:
-#     - master
+ push:
+  branches:
+    - master
  schedule:
    - cron: 0 8  1 * ?
 env:
@@ -66,8 +66,8 @@ jobs:
         
         
     - name: Build HAL
-      run: |
-        checkout ut-9.0
+        git clone https://github.com/OnePlus-onyx/build-CI -b ut-9.0
+        cd build-CI
         chmod +x build-hal.sh
         bash -x build-hal.sh
         
