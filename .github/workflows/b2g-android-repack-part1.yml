@@ -3,7 +3,10 @@ on:
   repository_dispatch:
     types: 
       - b2g-repack-android-part1
-        
+
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
+
 jobs:
   Download:
     runs-on: macos-latest
@@ -32,14 +35,27 @@ jobs:
         make
         sudo make install 
         #gupload
-        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
-        touch ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf    
+        #curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
+        #touch ~/.googledrive.conf
+        #echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
+        #echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
+        #echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
+        #echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
+        #echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
+        #echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf    
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
+        
+        
         
     - name: Fetch source
       run: |
@@ -58,17 +74,119 @@ jobs:
         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10-x86_64
         df -h
         
-    - name: repack soucre
+    - name: fix soucre
       run: |
         df -h
         cd /Volumes/android/B2G
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         sudo rm -rf .repo
-        sudo rm -r ./gecko
-        sudo rm -r ./gonk-misc
-        git clone https://github.com/OnePlus-onyx/gonk-misc.git -b without-gecko  /Volumes/android/B2G/gonk-misc --depth=1 
-        git clone https://github.com/kaiostech/gonk-binder.git -b master  /Volumes/android/B2G/gonk-misc/gonk-binde --depth=1 
-        ls
+        #sudo rm -r ./gecko
+        #sudo rm -r ./gonk-misc
+        #git clone https://github.com/OnePlus-onyx/gonk-misc.git -b without-gecko  /Volumes/android/B2G/gonk-misc --depth=1 
+        #git clone https://github.com/kaiostech/gonk-binder.git -b master  /Volumes/android/B2G/gonk-misc/gonk-binde --depth=1 
+        #ls
+        
+        # Remove the Gecko build & packaging steps
+        patch -d gonk-misc -p1 <<'EOF'
+        diff --git a/Android.mk b/Android.mk
+        index 6225f10..6b707b4 100644
+        --- a/Android.mk
+        +++ b/Android.mk
+        @@ -170,15 +170,15 @@ endif
+         $(LOCAL_INSTALLED_MODULE) : $(LOCAL_BUILT_MODULE)
+          @echo Install dir: $(TARGET_OUT)/b2g
+          rm -rf $(filter-out $(addprefix $(TARGET_OUT)/b2g/,$(PRESERVE_DIRS)),$(wildcard $(TARGET_OUT)/b2g/*))
+        -	cd $(TARGET_OUT) && tar xvfz $(abspath $<)
+        +	:
+         ifneq ($(EXPORT_DEVICE_PREFS),)
+        -	cp -n $(EXPORT_DEVICE_PREFS)/*.js $(TARGET_OUT)/b2g/defaults/pref/
+        +	:
+         endif
+         ifneq ($(EXPORT_DEVICE_USER_BUILD_PREFS),)
+        -	cp -n $(EXPORT_DEVICE_USER_BUILD_PREFS) $(TARGET_OUT)/b2g/defaults/pref/
+        +	:
+         endif
+         ifneq ($(EXPORT_BUILD_PREFS),)
+        -	cp -n $(EXPORT_BUILD_PREFS) $(TARGET_OUT)/b2g/defaults/pref/
+        +	:
+         endif
+
+         GECKO_LIB_DEPS := \
+        @@ -242,35 +242,7 @@ endif
+
+         .PHONY: $(LOCAL_BUILT_MODULE)
+         $(LOCAL_BUILT_MODULE): $(TARGET_CRTBEGIN_DYNAMIC_O) $(TARGET_CRTEND_O) $(addprefix $(TARGET_OUT_SHARED_LIBRARIES)/,$(GECKO_LIB_DEPS)) $(GECKO_LIB_STATIC)
+        -ifeq ($(USE_PREBUILT_B2G),1)
+        -	@echo -e "\033[0;33m ==== Use prebuilt gecko ==== \033[0m";
+        -	mkdir -p $(@D) && cp $(abspath $(PREFERRED_B2G)) $@
+        -else
+        -	echo "export GECKO_OBJDIR=$(abspath $(GECKO_OBJDIR))"; \
+        -	echo "export GONK_PRODUCT_NAME=$(TARGET_DEVICE)"; \
+        -	echo "export GONK_PATH=$(abspath .)"; \
+        -	echo "export PLATFORM_VERSION=$(PLATFORM_SDK_VERSION)"; \
+        -	echo "export TARGET_ARCH=$(TARGET_ARCH)"; \
+        -	echo "export TARGET_ARCH_VARIANT=$(TARGET_ARCH_VARIANT)"; \
+        -	echo "export TARGET_CPU_VARIANT=$(TARGET_CPU_VARIANT)"; \
+        -	echo "export PRODUCT_MANUFACTURER=$(PRODUCT_MANUFACTURER)"; \
+        -	echo "export MOZ_DISABLE_LTO=$(MOZ_DISABLE_LTO)"; \
+        -	echo "export HOST_OS=$(HOST_OS)";	\
+        -	unset CC_WRAPPER && unset CXX_WRAPPER && \
+        -	export GECKO_OBJDIR="$(abspath $(GECKO_OBJDIR))" && \
+        -	export GONK_PATH="$(abspath .)" && \
+        -	export GONK_PRODUCT_NAME="$(TARGET_DEVICE)" && \
+        -	export PLATFORM_VERSION="$(PLATFORM_SDK_VERSION)" && \
+        -	export TARGET_ARCH="$(TARGET_ARCH)" && \
+        -	export TARGET_ARCH_VARIANT="$(TARGET_ARCH_VARIANT)" && \
+        -	export TARGET_CPU_VARIANT="$(TARGET_CPU_VARIANT)" && \
+        -	export PRODUCT_MANUFACTURER="$(PRODUCT_MANUFACTURER)" && \
+        -	export MOZ_DISABLE_LTO="$(MOZ_DISABLE_LTO)" && \
+        -	export HOST_OS="$(HOST_OS)" && \
+        -	(cd $(GECKO_PATH) ; $(SHELL) build-b2g.sh) && \
+        -	(cd $(GECKO_PATH) ; $(SHELL) build-b2g.sh package) && \
+        -	mkdir -p $(@D) && cp $(GECKO_OBJDIR)/dist/b2g-*.tar.gz $@
+        -endif
+        +	:
+
+         # Include a copy of the repo manifest that has the revisions used
+         ifneq ($(DISABLE_SOURCES_XML),true)
+        EOF
+
+        # Force compressing debug symbols
+        patch -d build/soong -p1 <<'EOF'
+        diff --git a/cc/config/global.go b/cc/config/global.go
+        index 815c31d8..9d82d460 100644
+        --- a/cc/config/global.go
+        +++ b/cc/config/global.go
+        @@ -44,6 +44,7 @@ var (
+
+            "-O2",
+            "-g",
+        +		"-gz", // Compress debug symbols
+
+            "-fno-strict-aliasing",
+          }
+        @@ -69,6 +70,7 @@ var (
+            "-Werror=sequence-point",
+            "-Werror=date-time",
+            "-Werror=format-security",
+        +		"-gz", // Compress debug symbols
+          }
+
+          deviceGlobalCppflags = []string{
+        @@ -85,6 +87,7 @@ var (
+            "-Wl,--no-undefined-version",
+            "-Wl,--exclude-libs,libgcc.a",
+            "-Wl,--exclude-libs,libgcc_stripped.a",
+        +		"-Wl,--compress-debug-sections=zlib", // Compress debug symbols
+          }
+
+          deviceGlobalLldflags = append(ClangFilterUnknownLldflags(deviceGlobalLdflags),
+        EOF
+
+
+
+    - name: repack soucre
+      run: |
         cd  /Volumes/android
         tar -cvf ./B2G.tar ./B2G
         zstd ./B2G.tar
@@ -81,8 +199,9 @@ jobs:
       run: |
         df -h
         cd /Volumes/android/
-        mv ./B2G.tar.zst ./B2G.tar.zst
-        ~/.google-drive-upload/bin/gupload -o ./B2G.tar.zst
+        #mv ./B2G.tar.zst ./B2G.tar.zst
+        #~/.google-drive-upload/bin/gupload -o ./B2G.tar.zst
+        rclone copy ./B2G.tar.zst itd:ci 
         df -h
         
     - name: send webhook          
