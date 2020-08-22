@@ -24,7 +24,6 @@ jobs:
         git log --since ==${yesterday} >> ~/log.gecko
         cd ~/gonk-misc
         git log --since ==${yesterday} >> ~/log.gonk
-        cat log
         echo $yesterday
         
     - name: Send Gecko Commit
