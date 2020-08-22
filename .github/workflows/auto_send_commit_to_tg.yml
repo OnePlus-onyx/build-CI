@@ -15,6 +15,7 @@ jobs:
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g  -b gonk
         git clone https://github.com/kaiostech/gonk-misc -b main
+        ls
         cd ~/gecko-b2g
         #today
         export today=$(date +%Y-%m-%d)
