@@ -25,7 +25,7 @@ jobs:
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         #mount
         cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 250g ~/android.dmg
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 420g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         #zstd
         cd  /Volumes/android
@@ -73,22 +73,22 @@ jobs:
     - name: Fetch pre-build-out source
       run: |     
         cd /Volumes/android/B2G
-        rclone copy itd:out2.tar.zst ./
-        zstd --decompress out2.tar.zst
-        sudo rm -r ./out2.tar.zst
-        tar -xvf ./out2.tar ./out
-        sudo rm -r ./out2.tar
+        rclone copy itd:out3.tar.zst ./
+        zstd --decompress out3.tar.zst
+        sudo rm -r ./out3.tar.zst
+        tar -xvf ./out3.tar ./out
+        sudo rm -r ./out3.tar
         ls ./out
         df -h
         
-    - name: build soucre
-      run: |
-        df -h
-        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        cd /Volumes/android/B2G
-        export DISABLE_SOURCES_XML=true
-        ./build.sh -j4
-        df -h
+#     - name: build soucre
+#       run: |
+#         df -h
+#         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+#         cd /Volumes/android/B2G
+#         export DISABLE_SOURCES_XML=true
+#         ./build.sh -j4
+#         df -h
         
     - name: repack sysroot 
       run: |
