@@ -63,7 +63,7 @@ jobs:
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         cd /Volumes/android
-        rclone copy itd:B2G.tar.zst ./
+        rclone copy itd:ci/B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
         sudo rm -r ./B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
@@ -74,7 +74,7 @@ jobs:
     - name: Fetch pre-build-out source
       run: |     
         cd /Volumes/android/B2G
-        rclone copy itd:out3.tar.zst ./
+        rclone copy itd:ci/out3.tar.zst ./
         zstd --decompress out3.tar.zst
         sudo rm -r ./out3.tar.zst
         tar -xvf ./out3.tar ./out
@@ -144,8 +144,8 @@ jobs:
         cp ~/package_sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
-        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        mv ./gecko-b2g ./gecko
+        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #mv ./gecko-b2g ./gecko
         ./package_sysroot.sh
         ls -al -h b2g-sysroot.tar.zst
         ls
@@ -155,7 +155,8 @@ jobs:
       run: |
         df -h
         cd /Volumes/android/B2G
-        ~/.google-drive-upload/bin/gupload -o ./b2g-sysroot.tar.zst
+        #~/.google-drive-upload/bin/gupload -o ./b2g-sysroot.tar.zst
+        rclone copy ./b2g-sysroot.tar.zst itd:ci 
         df -h
 
     - name: send webhook          
