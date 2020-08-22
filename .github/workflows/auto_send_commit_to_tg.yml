@@ -43,6 +43,8 @@ jobs:
                exit 0
               fi
               subcommit=${mess%%|*}
+              echo -----------------------------
+              echo $subcommit
               if [[ $subcommit =~ phabricator ]]; then 
                echo "yes";
               else 
