@@ -82,7 +82,7 @@ jobs:
         cd /Volumes/android/B2G
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         cd gonk-misc
-        git am ~/emulator-build/0001-err.patch
+        git am ~/build-CI/0001-err.patch
         cd ../
         sudo rm -rf .repo
         # Force compressing debug symbols
