@@ -2,9 +2,9 @@
 name: emulator-build
 
 on: 
-  push:
-    branches:
-      - emulator-build
+#  push:
+#    branches:
+#      - emulator-build
 
 jobs:
   build1:
