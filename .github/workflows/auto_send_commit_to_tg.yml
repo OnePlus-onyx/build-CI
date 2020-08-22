@@ -43,7 +43,7 @@ jobs:
                exit 0
               fi
               subcommit=${mess%%|*}
-              var=`echo $subcommit | grep phabricator`
+              var=`echo "$subcommit" | grep phabricator`
               echo --------------------------
               echo $var
               echo -------------------------
