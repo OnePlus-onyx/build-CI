@@ -15,7 +15,6 @@ jobs:
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g  -b gonk
         git clone https://github.com/kaiostech/gonk-misc -b main
-        ls
         cd ~/gecko-b2g
         #today
         export today=$(date +%Y-%m-%d)
@@ -44,7 +43,7 @@ jobs:
                exit 0
               fi
               subcommit=${mess%%|*}
-              if [ ! -n `cat $subcommit | grep phabricator` ]; then
+              if [ ! -n `echo $subcommit | grep phabricator` ]; then
                 curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$subcommit"
               fi
               mess=${mess#*|commit}
