@@ -15,13 +15,13 @@ jobs:
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g  -b gonk
         git clone https://github.com/kaiostech/gonk-misc -b main
-        cd gecko-b2g
+        cd ~/gecko-b2g
         #today
         export today=$(date +%Y-%m-%d)
         #yesterday 
         export yesterday=$(date -d "yesterday" +%Y-%m-%d)
         git log --since ==${yesterday} >> ~/log.gecko
-        cd gonk-misc
+        cd ~/gonk-misc
         git log --since ==${yesterday} >> ~/log.gonk
         cat log
         echo $yesterday
