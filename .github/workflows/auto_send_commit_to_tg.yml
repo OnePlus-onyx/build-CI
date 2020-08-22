@@ -43,12 +43,14 @@ jobs:
                exit 0
               fi
               subcommit=${mess%%|*}
-              var=`echo "$subcommit" | grep phabricator`
               echo --------------------------
-              echo $var
+              echo "$subcommit"
+              echo "$subcommit" | grep phabricator
+              #echo $var
               echo -------------------------
               if [ ! -n "$var" ]; then
-                curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$subcommit"
+                echo 123
+                #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$subcommit"
               fi
               mess=${mess#*|commit}
            done
