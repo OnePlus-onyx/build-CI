@@ -4,7 +4,9 @@ on:
   repository_dispatch:
     types: 
       - b2g-build1-part2
-        
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}         
+
 jobs:
   build1:
     runs-on: macos-latest
@@ -92,7 +94,8 @@ jobs:
     - name: update 
       run: |
         cd /Volumes/android/B2G
-        ~/.google-drive-upload/bin/gupload -o ./out.tar.zst
+        #~/.google-drive-upload/bin/gupload -o ./out.tar.zst
+        rclone copy ./out.tar.zst itd:ci 
         
     - name: send webhook          
       run: |
