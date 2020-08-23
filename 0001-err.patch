@@ -1,14 +1,15 @@
-From 6bc5bcc6d003b9faee54450a0142c91ec9cb53ab Mon Sep 17 00:00:00 2001
-From: kai-dev <kai-dev@email.com>
-Date: Sat, 22 Aug 2020 20:51:21 +0800
-Subject: [PATCH] err
+From f04e0d1c5271fbdfe0ca6d762b311884c4db1166 Mon Sep 17 00:00:00 2001
+From: ittat <ittat@github.com>
+Date: Sun, 23 Aug 2020 01:20:46 +0000
+Subject: [PATCH] fix
 
+Signed-off-by: ittat <ittat@github.com>
 ---
- Android.mk | 38 +++++---------------------------------
- 1 file changed, 5 insertions(+), 33 deletions(-)
+ Android.mk | 44 ++++++++------------------------------------
+ 1 file changed, 8 insertions(+), 36 deletions(-)
 
 diff --git a/Android.mk b/Android.mk
-index f0a0eaa..6c8d5eb 100644
+index f0a0eaa..0fc2bc5 100644
 --- a/Android.mk
 +++ b/Android.mk
 @@ -177,15 +177,15 @@ endif
@@ -16,9 +17,10 @@ index f0a0eaa..6c8d5eb 100644
         @echo Install dir: $(TARGET_OUT)/b2g
         rm -rf $(filter-out $(addprefix $(TARGET_OUT)/b2g/,$(PRESERVE_DIRS)),$(wildcard $(TARGET_OUT)/b2g/*))
 -       cd $(TARGET_OUT) && tar xvfz $(abspath $<)
-+       :
- ifneq ($(EXPORT_DEVICE_PREFS),)
+-ifneq ($(EXPORT_DEVICE_PREFS),)
 -       cp -n $(EXPORT_DEVICE_PREFS)/*.js $(TARGET_OUT)/b2g/defaults/pref/
++       :
++q ($(EXPORT_DEVICE_PREFS),)
 +       :
  endif
  ifneq ($(EXPORT_DEVICE_USER_BUILD_PREFS),)
@@ -29,12 +31,14 @@ index f0a0eaa..6c8d5eb 100644
 -       cp -n $(EXPORT_BUILD_PREFS) $(TARGET_OUT)/b2g/defaults/pref/
 +       :
  endif
-
+ 
  GECKO_LIB_DEPS := \
-@@ -250,35 +250,7 @@ endif
-
- .PHONY: $(LOCAL_BUILT_MODULE)
- $(LOCAL_BUILT_MODULE): $(TARGET_CRTBEGIN_DYNAMIC_O) $(TARGET_CRTEND_O) $(addprefix $(TARGET_OUT_SHARED_LIBRARIES)/,$(GECKO_LIB_DEPS)) $(GECKO_LIB_STATIC)
+@@ -248,37 +248,9 @@ ifeq ($(IME_ENGINE), touchpal)
+ GECKO_LIB_DEPS += libtouchpal.so
+ endif
+ 
+-.PHONY: $(LOCAL_BUILT_MODULE)
+-$(LOCAL_BUILT_MODULE): $(TARGET_CRTBEGIN_DYNAMIC_O) $(TARGET_CRTEND_O) $(addprefix $(TARGET_OUT_SHARED_LIBRARIES)/,$(GECKO_LIB_DEPS)) $(GECKO_LIB_STATIC)
 -ifeq ($(USE_PREBUILT_B2G),1)
 -       @echo -e "\033[0;33m ==== Use prebuilt gecko ==== \033[0m";
 -       mkdir -p $(@D) && cp $(abspath $(PREFERRED_B2G)) $@
@@ -64,9 +68,12 @@ index f0a0eaa..6c8d5eb 100644
 -       (cd $(GECKO_PATH) ; $(SHELL) build-b2g.sh package) && \
 -       mkdir -p $(@D) && cp $(GECKO_OBJDIR)/dist/b2g-*.tar.gz $@
 -endif
++ .PHONY: $(LOCAL_BUILT_MODULE)
++ $(LOCAL_BUILT_MODULE): $(TARGET_CRTBEGIN_DYNAMIC_O) $(TARGET_CRTEND_O) $(addprefix $(TARGET_OUT_SHARED_LIBRARIES)/,$(GECKO_LIB_DEPS)) $(GECKO_LIB_STATIC)
 +       :
-
+ 
  .PHONY: buildsymbols
  buildsymbols:
---
-2.17.1
+-- 
+2.28.0
+
