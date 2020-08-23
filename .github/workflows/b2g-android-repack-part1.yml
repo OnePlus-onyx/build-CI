@@ -127,40 +127,11 @@ jobs:
         cd gonk-misc
         git am ~/build-CI/0001-err.patch
         cd ../
-        sudo rm -rf .repo
         # Force compressing debug symbols
-        patch -d build/soong -p1 <<'EOF'
-        diff --git a/cc/config/global.go b/cc/config/global.go
-        index 815c31d8..9d82d460 100644
-        --- a/cc/config/global.go
-        +++ b/cc/config/global.go
-        @@ -44,6 +44,7 @@ var (
-
-            "-O2",
-            "-g",
-        +		"-gz", // Compress debug symbols
-
-            "-fno-strict-aliasing",
-          }
-        @@ -69,6 +70,7 @@ var (
-            "-Werror=sequence-point",
-            "-Werror=date-time",
-            "-Werror=format-security",
-        +		"-gz", // Compress debug symbols
-          }
-
-          deviceGlobalCppflags = []string{
-        @@ -85,6 +87,7 @@ var (
-            "-Wl,--no-undefined-version",
-            "-Wl,--exclude-libs,libgcc.a",
-            "-Wl,--exclude-libs,libgcc_stripped.a",
-        +		"-Wl,--compress-debug-sections=zlib", // Compress debug symbols
-          }
-
-          deviceGlobalLldflags = append(ClangFilterUnknownLldflags(deviceGlobalLdflags),
-        EOF
-
-
+        cd build/soong
+        git am ~/build-CI/0001-gz.patch
+        cd ../../
+        sudo rm -rf .repo
 
     - name: repack soucre
       run: |
