@@ -1,0 +1,42 @@
+From 1c33e982b54f638a5e5fa554b1f5a9f721b4504f Mon Sep 17 00:00:00 2001
+From: kai-dev <kai-dev@email.com>
+Date: Sun, 23 Aug 2020 10:04:02 +0800
+Subject: [PATCH] gz
+
+Signed-off-by: kai-dev <kai-dev@email.com>
+---
+ cc/config/global.go | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/cc/config/global.go b/cc/config/global.go
+index 815c31d..17f9f18 100644
+--- a/cc/config/global.go
++++ b/cc/config/global.go
+@@ -44,7 +44,7 @@ var (
+ 
+ 		"-O2",
+ 		"-g",
+-
++                "-gz",
+ 		"-fno-strict-aliasing",
+ 	}
+ 
+@@ -69,6 +69,7 @@ var (
+ 		"-Werror=sequence-point",
+ 		"-Werror=date-time",
+ 		"-Werror=format-security",
++		"-gz",
+ 	}
+ 
+ 	deviceGlobalCppflags = []string{
+@@ -85,6 +86,7 @@ var (
+ 		"-Wl,--no-undefined-version",
+ 		"-Wl,--exclude-libs,libgcc.a",
+ 		"-Wl,--exclude-libs,libgcc_stripped.a",
++		"-Wl,--compress-debug-sections=zlib", 
+ 	}
+ 
+ 	deviceGlobalLldflags = append(ClangFilterUnknownLldflags(deviceGlobalLdflags),
+-- 
+2.17.1
+
