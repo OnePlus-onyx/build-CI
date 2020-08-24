@@ -159,6 +159,11 @@ jobs:
         rclone copy ./b2g-sysroot.tar.zst itd:ci 
         df -h
 
+    - name: Send Notify
+      run: |
+        today=$(date +%Y-%m-%d)
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=Time=${today} & BuildType=${{github.event.action}}: b2g-sysroot PASS!"
+     
     - name: send webhook          
       run: |
         cd /Volumes/android/
