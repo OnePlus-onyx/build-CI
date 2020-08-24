@@ -30,6 +30,17 @@ jobs:
         git config --global user.email "ittat@github.com"
         #curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         #cargo install sccache
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
         
     - uses: hecrj/setup-rust-action@v1
       with:
@@ -43,7 +54,8 @@ jobs:
       run: |
         df -h
         cd ~
-        wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
+        #wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
+        rclone copy  itd:ci/b2g-sysroot.tar.zst ./
         #curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
