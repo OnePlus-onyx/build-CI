@@ -101,7 +101,7 @@ jobs:
     - name: Send Notify
       run: |
         today=$(date +%Y-%m-%d)
-        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=Time=${today} & BuildType=${{github.event.action}}: b2g-build-gecko PASS!"
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:b2g-build-gecko PASS!"
         
     - name: Upload 
       if: github.event.action == 'b2g-build-gecko-part6'
