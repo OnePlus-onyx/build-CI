@@ -1,5 +1,7 @@
 name: b2g-build-gecko
 on:
+  schedule:
+    - cron: '0 23 * * *'
   repository_dispatch:
     types: 
       - b2g-build-gecko-part6
@@ -13,11 +15,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-      
-    - name: Print GitHub event action
-      run: |
-          echo "${{ github.event.action }}"
-          exit 1
           
     - name: Initialization system environment
       run: |
@@ -100,9 +97,14 @@ jobs:
         ./build-b2g.sh package
         df -h
         ls ${GECKO_OBJDIR}/dist
+
+    - name: Send Notify
+      run: |
+        today=$(date +%Y-%m-%d)
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=Time=${today} & BuildType=${{github.event.action}}: b2g-build-gecko Done!"
         
-        
-    - name : Upload 
+    - name: Upload 
+      if: github.event.action == "b2g-build-gecko-part6"
       uses: actions/upload-artifact@master
       with:
         name: b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
