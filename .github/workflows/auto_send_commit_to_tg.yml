@@ -21,6 +21,9 @@ jobs:
         #yesterday 
         export yesterday=$(date -d "yesterday" +%Y-%m-%d)
         git log --since=${yesterday} --until=${yesterday} >> ~/log.gecko
+        git log --since=${yesterday} --until=${yesterday}
+        echo ----------------------------------------------
+        git log --since=${today} --until=${today}
         cd ~/gonk-misc
         git log --since=${yesterday} --until=${yesterday} >> ~/log.gonk
         echo $yesterday
