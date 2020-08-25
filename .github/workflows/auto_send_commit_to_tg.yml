@@ -45,7 +45,7 @@ jobs:
               subcommit=${mess%%|*}
               echo -----------------------------
               echo $subcommit
-              if [[ $subcommit =~ phabricator && $subcommit =~ release+treescript@mozilla.org ]]; then 
+              if [[ $subcommit =~ phabricator || $subcommit =~ release+treescript@mozilla.org ]]; then 
                echo "yes";
               else 
                echo "no";
