@@ -26,7 +26,20 @@ jobs:
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 70g ~/android.dmg
         hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
-        
+
+    - name: Fetch source
+      run: |
+        df -h
+        cd ~
+        #wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
+        #rclone copy  itd:ci/b2g-sysroot.tar.zst ./
+        #curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        tar -xvf mozbuild.tar.bz2
+        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        #sudo rm b2g-sysroot.tar.zst
+        sudo rm mozbuild.tar.bz2
+
     - name: Fetch source
       run: |
         df -h
@@ -44,8 +57,9 @@ jobs:
       run: |
         df -h
         cd /Volumes/android/gecko-b2g
-        #./mach bootstrap --no-interactive  --application-choice 'GeckoView/Firefox for Android'
-        ./mach bootstrap --no-interactive  --application-choice 'Firefox for Desktop'
+        export SHELL=/bin/bash
+        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
         brew reinstall nasm 
         brew reinstall yasm
         brew install autoconf@2.13
