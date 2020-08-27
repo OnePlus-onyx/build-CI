@@ -70,7 +70,7 @@ jobs:
         #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
         git clone https://github.com/kaiostech/gecko-b2g -b gonk
         cd gecko-b2g
-        git branch test1 db9b06b4817197128a16e40d736f0fdf1a65e968
+        git branch test1 a88bff5aefecbe554f06b8aa5678e09a60b714f2
         git checkout test1
         df -h
         
