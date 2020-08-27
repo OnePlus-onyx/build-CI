@@ -1,6 +1,9 @@
 name: Build B2G-desktop
 
 on: 
+  push:
+    branches:
+      - master
   repository_dispatch:
     types: 
       - b2g-build-destop
@@ -49,6 +52,8 @@ jobs:
         brew reinstall nasm 
         brew reinstall yasm
         brew install autoconf@2.13
+        #MACH_USE_SYSTEM_PYTHON
+        ./mach create-mach-environment
         MOZCONFIG=./mozconfig-b2g-desktop ./mach build
         #and run it with ./mach run
         tar -zcvf /Volumes/android/b2gdebug.tar.gz /Volumes/android/gecko-b2g/obj-x86_64-apple-darwin19.4.0/dist/B2GDebug.app
