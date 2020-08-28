@@ -1,16 +1,15 @@
-name: b2g-emulator-build1
-
+name: b2g-emulator-part2-build1
 on:
   repository_dispatch:
     types: 
-      - b2g-build1-part2
+      - b2g-emulator-part2-build1
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}         
 
 jobs:
-  build1:
+  emulator_build1:
     runs-on: macos-latest
-    timeout-minutes: 420
+    timeout-minutes: 360
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -91,6 +90,6 @@ jobs:
     - name: send webhook          
       run: |
         cd /Volumes/android/
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-build2-part3"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-emulator-part3-build2"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
         
         
