@@ -47,7 +47,7 @@ jobs:
     - name: Build B2G
       run: |
         df -h
-        cd /Volumes/android/gecko-b2g
+        cd /Volumes/android/gecko-b2g-1
         export SHELL=/bin/bash
         #./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
         brew reinstall nasm 
