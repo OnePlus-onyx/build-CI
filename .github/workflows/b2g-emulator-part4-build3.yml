@@ -1,15 +1,15 @@
-name: b2g-emulator-build3
+name: b2g-emulator-part4-build3
 on:
   repository_dispatch:
     types: 
-      - b2g-build3-part4
+      - b2g-emulator-part4-build3
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
 
 jobs:
-  build1:
+  emulator_build3:
     runs-on: macos-latest
-    timeout-minutes: 720
+    timeout-minutes: 360
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -33,15 +33,6 @@ jobs:
         cd zstd
         make
         sudo make install 
-        #gupload
-        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
-        touch ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf 
         #ssh
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
@@ -62,7 +53,7 @@ jobs:
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         cd /Volumes/android
-        rclone copy itd:ci/B2G.tar.zst ./
+        rclone copy itd:ci/emulator/B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
         sudo rm -r ./B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
@@ -71,7 +62,7 @@ jobs:
     - name: Fetch source
       run: |
         cd /Volumes/android/B2G
-        rclone copy itd:ci/out2.tar.zst ./
+        rclone copy itd:ci/emulator/out2.tar.zst ./
         zstd --decompress out2.tar.zst
         sudo rm -r ./out2.tar.zst
         tar -xvf ./out2.tar ./out
@@ -121,11 +112,11 @@ jobs:
          df -h
          cd /Volumes/android/B2G
          #~/.google-drive-upload/bin/gupload -o ./out3.tar.zst
-         rclone copy ./out3.tar.zst itd:ci 
+         rclone copy ./out3.tar.zst itd:ci/emulator 
          df -h
 
     - name: send webhook          
       run: |
         cd /Volumes/android/
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-repack-sysroot-part5"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-emulator-part5-repack-sysroot"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
         
