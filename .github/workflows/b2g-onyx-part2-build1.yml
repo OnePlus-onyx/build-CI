@@ -66,6 +66,8 @@ jobs:
     - name: apply patch
       run: |
         cd /Volumes/android/B2G
+        sudo rm -rf ./patcher
+        git clone https://github.com/OnePlus-onyx/patcher -b test-ci
         ./patcher/patcher.sh
         
         
