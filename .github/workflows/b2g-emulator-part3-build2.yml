@@ -1,15 +1,15 @@
-name: b2g-emulator-build2
+name: b2g-emulator-part3-build2
 on:
   repository_dispatch:
     types: 
-      - b2g-build2-part3
+      - b2g-emulator-part3-build2
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
 
 jobs:
-  build1:
+  emulator_build2:
     runs-on: macos-latest
-    timeout-minutes: 720
+    timeout-minutes: 360
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -56,7 +56,7 @@ jobs:
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         cd /Volumes/android
-        rclone copy itd:ci/B2G.tar.zst ./
+        rclone copy itd:ci/emulator/B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar.zst
@@ -65,7 +65,7 @@ jobs:
     - name: Fetch source
       run: |
         cd /Volumes/android/B2G
-        rclone copy itd:ci/out.tar.zst ./
+        rclone copy itd:ci/emulator/out.tar.zst ./
         zstd --decompress out.tar.zst
         sudo rm -r ./out.tar.zst
         tar -xvf ./out.tar ./out
@@ -109,5 +109,5 @@ jobs:
     - name: send webhook          
       run: |
         cd /Volumes/android/
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-build3-part4"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-emulator-part4-build3"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
         
