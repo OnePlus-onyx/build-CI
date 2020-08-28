@@ -35,15 +35,6 @@ jobs:
         cd zstd
         make
         sudo make install 
-        #gupload
-        curl --compressed -s https://raw.githubusercontent.com/labbots/google-drive-upload/master/install.sh | sh -s
-        touch ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_ID}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_CLIENT_SECRET}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ACCESS_TOKEN_EXPIRY}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_REFRESH_TOKEN}} >> ~/.googledrive.conf
-        echo ${{secrets.GUP_ROOT_FOLDER}} >> ~/.googledrive.conf 
         #ssh
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
@@ -112,7 +103,7 @@ jobs:
          df -h
          cd /Volumes/android/B2G
          #~/.google-drive-upload/bin/gupload -o ./out2.tar.zst
-         rclone copy ./out2.tar.zst itd:ci 
+         rclone copy ./out2.tar.zst itd:ci/emulator 
          df -h
 
     - name: send webhook          
