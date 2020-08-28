@@ -1,9 +1,9 @@
 name: Build B2G-desktop
 
 on: 
-  push:
-    branches:
-      - master
+#  push:
+#    branches:
+#      - master
   repository_dispatch:
     types: 
       - b2g-build-destop
