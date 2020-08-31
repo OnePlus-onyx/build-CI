@@ -1,10 +1,10 @@
-name: b2g-build-gecko
+name: b2g-emulator-part6-build-gecko
 on:
   schedule:
     - cron: '0 23 */3 * *'
   repository_dispatch:
     types: 
-      - b2g-build-gecko-part6
+      - b2g-emulator-part6-build-gecko
 
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
@@ -59,7 +59,7 @@ jobs:
         df -h
         cd ~
         #wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
-        rclone copy  itd:ci/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/emulator/b2g-sysroot.tar.zst ./
         #curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
