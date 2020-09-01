@@ -43,12 +43,8 @@ jobs:
         sudo mount -t sysfs /sys ./rootfs/sys    
         sudo mount -o bind /dev ./rootfs/dev
         uname -a
-        touch ./chroot.sh
-        echo "sudo chroot ./rootfs" >> ./chroot.sh
-        echo "uname -a" >> ./chroot.sh
-        echo "exit" >> ./chroot.sh
-        chmod +x ./chroot.sh
-        sudo LC_ALL=C LANGUAGE=C LANG=C chroot ./rootfs apt-get update
+        sudo LC_ALL=C LANGUAGE=C LANG=C chroot ./rootfs uname -a
+        #sudo LC_ALL=C LANGUAGE=C LANG=C chroot ./rootfs apt-get update
         #bash ./chroot.sh
         
         
