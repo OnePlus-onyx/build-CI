@@ -1,10 +1,14 @@
 name: b2g-emulator-part6-build-gecko
 on:
+  push:
+    branches: 
+      - master
   schedule:
     - cron: '0 23 */3 * *'
   repository_dispatch:
     types: 
       - b2g-emulator-part6-build-gecko
+
 
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
@@ -73,7 +77,12 @@ jobs:
         #git branch test1 47adc72ef716a81b005df36f2ec97e291fb3caae
         #git checkout test1
         df -h
-        
+
+    - name: check source
+      run: |
+        ls $HOME/.mozbuild/b2g-sysroot
+        ls $HOME/.mozbuild/b2g-sysroot/hardware/libhardware_legacy/include
+
     - name: bootstrap source
       run: |
         df -h
