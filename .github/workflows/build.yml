@@ -41,6 +41,8 @@ jobs:
         sudo cp /usr/bin/qemu-arm-static ./rootfs/usr/bin/
         sudo cp /usr/bin/qemu-aarch64-static ./rootfs/usr/bin/
         sudo mount -t proc /proc ./rootfs/proc
+        sudo mount -t sysfs /sys ./rootfs/sys    
+        sudo mount -o bind /dev ./rootfs/dev
         
       # Runs a set of commands using the runners shell
 #     - name: Saving Rootfs
