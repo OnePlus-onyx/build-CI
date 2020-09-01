@@ -32,10 +32,11 @@ jobs:
     - name: Building Rootfs
       run: |
         mkdir rootfs
-        wget http://cdimage.ubuntu.com/ubuntu-base/releases/16.04/release/ubuntu-base-16.04.3-base-armhf.tar.gz
-        tar xvf ubuntu-base-16.04.3-base-armhf.tar.gz -C  ./rootfs
+        wget http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04.1-base-armhf.tar.gz
+        tar xvf ubuntu-base-18.04.1-base-armhf.tar.gz -C  ./rootfs
         #sudo debootstrap --arch=$ARCH --foreign $version rootfs
-        ls -l rootfs
+        ls -l ./rootfs
+        
       # Runs a set of commands using the runners shell
 #     - name: Saving Rootfs
 #       run: |
