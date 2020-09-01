@@ -1,6 +1,9 @@
 name: b2g-onyx-part1-aosp-repack
 on:
-  repository_dispatch:
+ push:
+   branches: 
+     - master
+ repository_dispatch:
     types: 
       - b2g-onyx-part1-aosp-repack
         
@@ -79,7 +82,14 @@ jobs:
         cd build/soong
         git am ~/build-CI/0001-gz.patch
         cd ../../
+        echo apply patch
+        cd /Volumes/android/B2G
+        ls
+        #sudo rm -rf ./patcher
+        #git clone https://github.com/OnePlus-onyx/patcher -b test-ci
+        ./patcher/patcher.sh        
         sudo rm -rf .repo
+        
     - name: repack soucre
       run: |
         cd  /Volumes/android
