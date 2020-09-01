@@ -109,9 +109,9 @@ jobs:
          rclone copy ./out2.tar.zst itd:ci/onyx 
          df -h
          
-#     - name: send webhook          
-#       run: |
-#         cd /Volumes/android/
-#         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-emulator-part4-build3"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+    - name: send webhook          
+      run: |
+        cd /Volumes/android/
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g-onyx-part4-build3"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
         
 
