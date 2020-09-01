@@ -1,8 +1,8 @@
 name: b2g-onyx-part1-aosp-repack
 on:
- push:
-   branches: 
-     - master
+#  push:
+#    branches: 
+#      - master
  repository_dispatch:
     types: 
       - b2g-onyx-part1-aosp-repack
