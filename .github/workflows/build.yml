@@ -1,5 +1,5 @@
 
-name: Build B2G-desktop
+name: Build root sys armhf
 
 on: 
   push:
@@ -35,7 +35,7 @@ jobs:
       run: |
         mkdir rootfs
         wget http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04.1-base-armhf.tar.gz
-        tar -xzvf --exclude=/proc --exclude=/dev --exclude=/sys  ./ubuntu-base-18.04.1-base-armhf.tar.gz -C  ./rootfs
+        tar -xzvf   ./ubuntu-base-18.04.1-base-armhf.tar.gz -C  ./rootfs
         #sudo debootstrap --arch=$ARCH --foreign $version rootfs
         ls -l ./rootfs
         #sudo cp /usr/bin/qemu-arm-static ./rootfs/usr/bin/
