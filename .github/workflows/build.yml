@@ -6,8 +6,6 @@ on:
     branches:
       - test
 
-
-
 env:
   ARCH: amd64
   version: focal
