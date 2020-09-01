@@ -38,9 +38,9 @@ jobs:
         sudo tar -xpf  ./ubuntu-base-18.04.1-base-armhf.tar.gz -C  ./rootfs
         #sudo debootstrap --arch=$ARCH --foreign $version rootfs
         ls -l ./rootfs
-        #sudo cp /usr/bin/qemu-arm-static ./rootfs/usr/bin/
-        #sudo cp /usr/bin/qemu-aarch64-static ./rootfs/usr/bin/
-        #sudo mount -t proc /proc ./rootfs/proc
+        sudo cp /usr/bin/qemu-arm-static ./rootfs/usr/bin/
+        sudo cp /usr/bin/qemu-aarch64-static ./rootfs/usr/bin/
+        sudo mount -t proc /proc ./rootfs/proc
         
       # Runs a set of commands using the runners shell
 #     - name: Saving Rootfs
