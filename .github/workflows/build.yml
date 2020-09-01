@@ -43,6 +43,9 @@ jobs:
         sudo mount -t proc /proc ./rootfs/proc
         sudo mount -t sysfs /sys ./rootfs/sys    
         sudo mount -o bind /dev ./rootfs/dev
+        uname -a
+        sudo chroot ./rootfs
+        uname -a
         
       # Runs a set of commands using the runners shell
 #     - name: Saving Rootfs
