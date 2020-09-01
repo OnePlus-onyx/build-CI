@@ -1,8 +1,8 @@
 name: b2g-onyx-part3-build2
 on:
-  push:
-    branches: 
-      - master
+#   push:
+#     branches: 
+#       - master
     
   repository_dispatch:
     types: 
