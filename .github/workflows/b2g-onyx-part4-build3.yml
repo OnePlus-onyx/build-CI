@@ -1,8 +1,8 @@
 name: b2g-onyx-part4-build3
 on:
-#   push:
-#     branches: 
-#       - master
+  push:
+    branches: 
+      - master
   repository_dispatch:
     types: 
       - b2g-onyx-part4-build3
@@ -20,6 +20,7 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
+        echo ${{secrets.GIT_ACCESS_TOKEN}}
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -76,8 +77,8 @@ jobs:
     - name: fix soucre
       run: |
         cd /Volumes/android/B2G/system
-        sudo rm -tf ./core
-        git clone https://github.com/ReB2GOS/system_core -b gobk-onyx
+        sudo rm -rf ./core
+        git clone https://github.com/ReB2GOS/system_core -b gonk-onyx
         mv system_core core
         cd /Volumes/android/B2G/external
         sudo rm -rf ./selinux
