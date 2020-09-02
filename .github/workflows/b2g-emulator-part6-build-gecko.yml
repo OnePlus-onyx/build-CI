@@ -71,18 +71,18 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk
+        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
         #cd gecko-b2g
         #git branch test1 47adc72ef716a81b005df36f2ec97e291fb3caae
         #git checkout test1
         df -h
 
-    - name: check source
-      run: |
-        ls $HOME/.mozbuild/b2g-sysroot
-        tree $HOME/.mozbuild/b2g-sysroot/include
-        ls $HOME/.mozbuild/b2g-sysroot/hardware/libhardware_legacy/include
+#     - name: check source
+#       run: |
+#         ls $HOME/.mozbuild/b2g-sysroot
+#         tree $HOME/.mozbuild/b2g-sysroot/include
+#         ls $HOME/.mozbuild/b2g-sysroot/hardware/libhardware_legacy/include
 
     - name: bootstrap source
       run: |
