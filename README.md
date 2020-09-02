@@ -28,3 +28,5 @@ ut-*.yml
                   b2g-x86_64
  
  b2g: b2g-x86_64, b2g-onyx
+ 
+ test: chroot 
