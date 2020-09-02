@@ -81,13 +81,6 @@ jobs:
         ls -al dist_output
         df -h
  
-#     - name: test
-#       run: |
-#         cd /Volumes/android/B2G
-#         echo 1
-#         ls prebuilts/gcc/
-#         echo 2
-#         ls out/soong/.intermediates/frameworks/av/camera/libcamera_client
         
     - name: repack sysroot 
       run: |
@@ -101,7 +94,7 @@ jobs:
         cp ~/package_onyx_sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
-        #mv ./gecko-b2g ./gecko
+        #
         ./package_onyx_sysroot.sh
         ls -al -h b2g-sysroot.tar.zst
         ls
