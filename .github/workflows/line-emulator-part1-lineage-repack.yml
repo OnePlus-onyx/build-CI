@@ -64,7 +64,7 @@ jobs:
         echo Download ...
         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh emulator-10-x86_64
         cd ~
-        git clone https://github.com/OnePlus-onyx/build-CI -b emulator-build
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
         df -h
         
     - name: fix soucre
