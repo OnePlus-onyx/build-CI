@@ -82,7 +82,7 @@ jobs:
       run: |
         ls $HOME/.mozbuild/b2g-sysroot
         #tree $HOME/.mozbuild/b2g-sysroot/include
-        ls $HOME/.mozbuild/b2g-sysroot/include/hardware/libhardware_legacy/include
+        ls $HOME/.mozbuild/b2g-sysroot/include/
 
     - name: bootstrap source
       run: |
