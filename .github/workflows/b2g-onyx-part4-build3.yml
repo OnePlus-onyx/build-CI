@@ -77,7 +77,7 @@ jobs:
       run: |
         cd /Volumes/android/B2G/system
         sudo rm -rf ./core
-        git clone https://github.com/ReB2GOS/system_core -b gonk-onyx
+        git clone https://github.com/ReB2GOS/system_core -b gonk
         mv system_core core
         cd /Volumes/android/B2G/external
         sudo rm -rf ./selinux
