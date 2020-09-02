@@ -124,16 +124,17 @@ system/media/camera/include"
 copy_to_sysroot "${INCLUDE_FOLDERS}" "include"
 
 # Store the generated HIDL headers in the sysroot
-GENERATED_AIDL_HEADERS="out/soong/.intermediates/frameworks/av/camera/libcamera_client/android_x86_64_core_shared/gen/aidl
-out/soong/.intermediates/frameworks/av/media/libaudioclient/libaudioclient/android_x86_64_core_shared/gen/aidl
-out/soong/.intermediates/frameworks/av/media/libmedia/libmedia_omx/android_x86_64_core_shared/gen/aidl
+#android_arm_armv7-a-neon_krait_core_shared
+GENERATED_AIDL_HEADERS="out/soong/.intermediates/frameworks/av/camera/libcamera_client/android_arm_armv7-a-neon_krait_core_shared/gen/aidl
+out/soong/.intermediates/frameworks/av/media/libaudioclient/libaudioclient/android_arm_armv7-a-neon_krait_core_shared/gen/aidl
+out/soong/.intermediates/frameworks/av/media/libmedia/libmedia_omx/android_arm_armv7-a-neon_krait_core_shared/gen/aidl
 out/soong/.intermediates/gonk-misc/gonk-binder/binder_b2g_connectivity_interface-cpp-source/gen/include
 out/soong/.intermediates/gonk-misc/gonk-binder/binder_b2g_telephony_interface-cpp-source/gen/include
-out/soong/.intermediates/system/connectivity/wificond/libwificond_ipc/android_x86_64_core_static/gen/aidl
+out/soong/.intermediates/system/connectivity/wificond/libwificond_ipc/android_arm_armv7-a-neon_krait_core_static/gen/aidl
 out/soong/.intermediates/system/netd/resolv/dnsresolver_aidl_interface-V2-cpp-source/gen/include
 out/soong/.intermediates/system/netd/server/netd_aidl_interface-V2-cpp-source/gen/include
 out/soong/.intermediates/system/netd/server/netd_event_listener_interface-V1-cpp-source/gen/include
-out/soong/.intermediates/system/vold/libvold_binder_shared/android_x86_64_core_shared/gen/aidl"
+out/soong/.intermediates/system/vold/libvold_binder_shared/android_arm_armv7-a-neon_krait_core_shared/gen/aidl"
 
 copy_to_sysroot "${GENERATED_AIDL_HEADERS}" "include"
 
