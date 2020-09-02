@@ -99,7 +99,7 @@ jobs:
     - name: Building X86_64
       run: |
         df -h
-        cd ~/gecko-b2g
+        cd ~/gecko-b2g-1
         export SHELL=/bin/bash
         export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
         export GONK_PRODUCT_NAME=generic_x86_64
