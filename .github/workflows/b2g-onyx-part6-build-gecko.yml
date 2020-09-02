@@ -116,5 +116,5 @@ jobs:
       if: github.event.action == 'b2g-build-gecko-part6'
       uses: actions/upload-artifact@master
       with:
-        name: b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
-        path: ~/.mozbuild/b2g-sysroot/objdir-emulator-gecko/dist/b2g-81.0a1.en-US.linux-android-x86_64.tar.gz
+        name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+        path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
