@@ -24,7 +24,7 @@ jobs:
     - name: Initialization system environment
       run: |
           qwe=${{secrets.GIT_ACCESS_TOKEN}}
-          echo qwe
+          echo $qwe
           
     - name: Initialization system environment
       run: |
