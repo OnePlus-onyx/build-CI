@@ -87,7 +87,7 @@ jobs:
     - name: bootstrap source
       run: |
         df -h
-        cd ~/gecko-b2g
+        cd ~/gecko-b2g-1
         export SHELL=/bin/bash
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
         ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
