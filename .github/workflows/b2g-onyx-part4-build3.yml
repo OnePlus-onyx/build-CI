@@ -20,7 +20,6 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        echo ${{secrets.GIT_ACCESS_TOKEN}}
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
