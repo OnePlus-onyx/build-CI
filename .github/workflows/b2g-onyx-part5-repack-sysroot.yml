@@ -80,19 +80,19 @@ jobs:
 #         ./build.sh -j4
 #         df -h
  
-    - name: test
-      run: |
-        cd /Volumes/android/B2G
-        echo 1
-        ls prebuilts/gcc/
-        echo 2
-        ls out/soong/.intermediates/frameworks/av/camera/libcamera_client
+#     - name: test
+#       run: |
+#         cd /Volumes/android/B2G
+#         echo 1
+#         ls prebuilts/gcc/
+#         echo 2
+#         ls out/soong/.intermediates/frameworks/av/camera/libcamera_client
         
     - name: repack sysroot 
       run: |
         df -h
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
-        cd b2g
+        cd build-CI
         cp ./package_onyx_sysroot.sh ~/
         chmod +x ~/package_onyx_sysroot.sh
         #
