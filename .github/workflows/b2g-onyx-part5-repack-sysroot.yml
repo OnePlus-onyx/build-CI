@@ -71,14 +71,15 @@ jobs:
         ls ./out
         df -h
         
-#     - name: build soucre
-#       run: |
-#         df -h
-#         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-#         cd /Volumes/android/B2G
-#         export DISABLE_SOURCES_XML=true
-#         ./build.sh -j4
-#         df -h
+    - name: build soucre
+      run: |
+        df -h
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        cd /Volumes/android/B2G
+        export DISABLE_SOURCES_XML=true
+        ./build.sh -j4 dist DIST_DIR=dist_output
+        ls -al dist_output
+        df -h
  
 #     - name: test
 #       run: |
