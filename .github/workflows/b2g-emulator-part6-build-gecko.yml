@@ -78,11 +78,11 @@ jobs:
         #git checkout test1
         df -h
 
-#     - name: check source
-#       run: |
-#         ls $HOME/.mozbuild/b2g-sysroot
-#         tree $HOME/.mozbuild/b2g-sysroot/include
-#         ls $HOME/.mozbuild/b2g-sysroot/hardware/libhardware_legacy/include
+    - name: check source
+      run: |
+        ls $HOME/.mozbuild/b2g-sysroot
+        #tree $HOME/.mozbuild/b2g-sysroot/include
+        ls $HOME/.mozbuild/b2g-sysroot/include/hardware/libhardware_legacy/include
 
     - name: bootstrap source
       run: |
