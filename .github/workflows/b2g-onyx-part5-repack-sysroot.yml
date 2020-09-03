@@ -78,6 +78,8 @@ jobs:
         cd /Volumes/android/B2G
         export DISABLE_SOURCES_XML=true
         ./build.sh -j4 dist DIST_DIR=dist_output
+        ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_aosp_ota_update.zip
+        ls
         ls -al dist_output
         df -h
  
@@ -113,6 +115,17 @@ jobs:
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} PASS!"
  
+    - name: Upload  onyx_aosp_ota_update1.zip
+      uses: actions/upload-artifact@master
+      with:
+        name: onyx_aosp_ota_update1.zip
+        path: /Volumes/android/B2G/dist_output/onyx_aosp_ota_update.zip
+
+    - name: Upload  onyx_aosp_ota_update2.zip
+      uses: actions/upload-artifact@master
+      with:
+        name: onyx_aosp_ota_update2.zip
+        path: /Volumes/android/B2G/onyx_aosp_ota_update.zip
 
     - name: Upload  b2g_onyx-img-eng.runner.zip
       uses: actions/upload-artifact@master
