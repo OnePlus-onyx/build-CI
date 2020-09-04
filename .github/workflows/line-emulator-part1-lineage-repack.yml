@@ -80,6 +80,8 @@ jobs:
         git am ~/build-CI/0001-gz.patch
         cd ../../
         sudo rm -rf .repo
+        sudo rm -rf gecko
+        
     - name: repack soucre
       run: |
         cd  /Volumes/android
