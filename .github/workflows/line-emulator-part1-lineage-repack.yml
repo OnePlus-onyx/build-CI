@@ -71,7 +71,7 @@ jobs:
       run: |
         df -h
         cd /Volumes/android/B2G
-        sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        #sed -i '' '14d'  system/sepolicy/tests/Android.bp
         cd gonk-misc
         git am ~/build-CI/0001-err.patch
         cd ../
