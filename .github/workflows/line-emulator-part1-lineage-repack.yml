@@ -1,5 +1,8 @@
 name: line-emulator-part1-lineage-repack
 on:
+  push:
+    branches: 
+      - master
   repository_dispatch:
     types: 
       - line-emulator-part1-lineage-repack
