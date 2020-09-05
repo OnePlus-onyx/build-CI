@@ -77,7 +77,7 @@ jobs:
     - name: fix soucre
       run: |
         cd /Volumes/android/
-        git clone https://github.com/lineage-b2g/android_build -b lineage-b2g --depth=1
+        git clone https://github.com/lineage-b2g/android_build -b b2g/lineage-17.1 --depth=1
         sudo rm -rf /Volumes/android/B2G/build/make/tools/releasetools/build_image.py
         cp  android_build/tools/releasetools/build_image.py  /Volumes/android/B2G/build/make/tools/releasetools
         ls /Volumes/android/B2G/build/make/tools/releasetools
