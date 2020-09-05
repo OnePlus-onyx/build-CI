@@ -74,14 +74,23 @@ jobs:
         ls ./out
         df -h
         
-#     - name: build soucre
-#       run: |
-#         df -h
-#         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-#         cd /Volumes/android/B2G
-#         export DISABLE_SOURCES_XML=true
-#         ./build.sh -j4
-#         df -h
+    - name: fix soucre
+      run: |
+        cd /Volumes/android/
+        git clone https://github.com/lineage-b2g/android_build -b lineage-b2g --depth=1
+        sudo rm -rf /Volumes/android/B2G/build/make/tools/releasetools/build_image.py
+        cp  android_build/tools/releasetools/build_image.py  /Volumes/android/B2G/build/make/tools/releasetools
+        ls /Volumes/android/B2G/build/make/tools/releasetools
+       
+             
+    - name: build soucre
+      run: |
+        df -h
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        cd /Volumes/android/B2G
+        export DISABLE_SOURCES_XML=true
+        ./build.sh -j4
+        df -h
         
     - name: repack sysroot 
       run: |
