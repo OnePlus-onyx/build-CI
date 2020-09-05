@@ -103,7 +103,7 @@ jobs:
          df -h
          cd /Volumes/android/B2G
          #~/.google-drive-upload/bin/gupload -o ./out3.tar.zst
-         rclone copy ./out2.tar.zst itd:ci/lineage 
+         rclone copy ./out3.tar.zst itd:ci/lineage 
          df -h
          
     - name: Send Notify
