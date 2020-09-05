@@ -59,17 +59,19 @@ jobs:
         rclone copy itd:ci/lineage/B2G.tar.zst ./
         zstd --decompress B2G.tar.zst
         tar -xvf ./B2G.tar ./B2G
-        #sudo rm -r ./B2G.tar.zst
-        #sudo rm -r ./B2G.tar
+        sudo rm -r ./B2G.tar.zst
+        sudo rm -r ./B2G.tar
+        cd B2G
+        sed -i '' '631d'  frameworks/base/core/jni/com_android_internal_os_Zygote.cpp
         
     - name: Fetch source
       run: |
         cd /Volumes/android/B2G
         rclone copy itd:ci/lineage/out2.tar.zst ./
         zstd --decompress out2.tar.zst
-        #sudo rm -r ./out2.tar.zst
+        sudo rm -r ./out2.tar.zst
         tar -xvf ./out2.tar ./out
-        #sudo rm -r ./out2.tar
+        sudo rm -r ./out2.tar
         ls ./out
         df -h
         
@@ -92,10 +94,10 @@ jobs:
     - name: repack out
       run: |
          cd /Volumes/android/B2G
-         tar -cvf ./out4.tar ./out
-         #sudo rm -rf ./out
-         zstd ./out4.tar
-         #sudo rm ./out4.tar
+         tar -cvf ./out3.tar ./out
+         sudo rm -rf ./out
+         zstd ./out3.tar
+         sudo rm ./out3.tar
          df -h
                 
     - name:  update          
@@ -103,7 +105,7 @@ jobs:
          df -h
          cd /Volumes/android/B2G
          #~/.google-drive-upload/bin/gupload -o ./out3.tar.zst
-         rclone copy ./out4.tar.zst itd:ci/lineage 
+         rclone copy ./out3.tar.zst itd:ci/lineage 
          df -h
          
     - name: Send Notify
