@@ -69,7 +69,7 @@ jobs:
         zstd --decompress out2.tar.zst
         sudo rm -r ./out2.tar.zst
         tar -xvf ./out2.tar ./out
-        sudo rm -r ./out.tar
+        sudo rm -r ./out2.tar
         ls ./out
         df -h
         
