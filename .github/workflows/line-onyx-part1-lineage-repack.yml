@@ -1,8 +1,8 @@
 name: line-onyx-part1-lineage-repack
 on:
-#   push:
-#     branches: 
-#       - master
+  push:
+    branches: 
+      - master
   repository_dispatch:
     types: 
       - line-onyx-part1-lineage-repack
@@ -84,6 +84,12 @@ jobs:
         cd ../../
         sudo rm -rf .repo
         sudo rm -rf gecko
+        
+        cd /Volumes/android/
+        sed -i '' '631d'  B2G/frameworks/base/core/jni/com_android_internal_os_Zygote.cpp
+        git clone https://github.com/lineage-b2g/android_build -b b2g/lineage-17.1 --depth=1
+        sudo rm -rf /Volumes/android/B2G/build/make/tools/releasetools/build_image.py
+        cp  android_build/tools/releasetools/build_image.py  /Volumes/android/B2G/build/make/tools/releasetools
         
     - name: repack soucre
       run: |
