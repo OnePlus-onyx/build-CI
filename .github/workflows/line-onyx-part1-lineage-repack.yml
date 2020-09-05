@@ -1,8 +1,8 @@
 name: line-onyx-part1-lineage-repack
 on:
-  push:
-    branches: 
-      - master
+#   push:
+#     branches: 
+#       - master
   repository_dispatch:
     types: 
       - line-onyx-part1-lineage-repack
