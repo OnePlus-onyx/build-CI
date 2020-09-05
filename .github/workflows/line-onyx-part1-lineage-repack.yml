@@ -1,0 +1,111 @@
+name: line-onyx-part1-lineage-repack
+on:
+  push:
+    branches: 
+      - master
+  repository_dispatch:
+    types: 
+      - line-onyx-part1-lineage-repack
+        
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
+
+jobs:
+  Download:
+    runs-on: macos-latest
+    timeout-minutes: 360
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+        
+    - name: Initialization system environment
+      run: |
+        df -h
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        brew install expect  gnu-sed ccache
+        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        #mount
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 150g ~/android.dmg
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
+        #zstd
+        cd  /Volumes/android
+        git clone https://github.com/facebook/zstd.git
+        cd zstd
+        make
+        sudo make install   
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
+        
+        
+        
+    - name: Fetch source
+      run: |
+        df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        #export CCACHE_COMPRESS=1
+        export USE_CCACHE=1
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        cd /Volumes/android
+        git clone https://github.com/lineage-b2g/B2G -b b2g/lineage-17.1  --depth=1 
+        cd ./B2G
+        echo Download ...
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        cd ~
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        df -h
+        
+    - name: fix soucre
+      run: |
+        df -h
+        cd /Volumes/android/B2G
+        #sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        cd gonk-misc
+        git am ~/build-CI/0001-err.patch
+        cd ../
+        # Force compressing debug symbols
+        cd build/soong
+        git am ~/build-CI/0001-gz.patch
+        cd ../../
+        sudo rm -rf .repo
+        sudo rm -rf gecko
+        
+    - name: repack soucre
+      run: |
+        cd  /Volumes/android
+        tar -cvf ./B2G.tar ./B2G
+        zstd ./B2G.tar
+        sudo rm ./B2G.tar
+        sudo rm -r ./B2G
+        ls -al -h ./
+        df -h
+        
+    - name: update 
+      run: |
+        df -h
+        cd /Volumes/android/
+        #mv ./B2G.tar.zst ./B2G.tar.zst
+        #~/.google-drive-upload/bin/gupload -o ./B2G.tar.zst
+        rclone copy ./B2G.tar.zst itd:ci/lineos
+        df -h
+        
+    - name: send webhook          
+      run: |
+        cd /Volumes/android/
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "line-onyx-part2-build1"}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        
