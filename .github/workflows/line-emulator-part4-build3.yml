@@ -22,7 +22,8 @@ jobs:
     - name: Initialization system environment
 #       if: steps.name.test.exitcode != 0
       run: |
-        stat -f%z ./
+        #stat -f%z ./
+        du -k -s ./
         exit 2
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
