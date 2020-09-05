@@ -1,8 +1,8 @@
 name: line-emulator-part4-build3
 on:
-#   push:
-#     branches: 
-#       - master
+  push:
+    branches: 
+      - master
   repository_dispatch:
     types: 
       - line-emulator-part4-build3
@@ -68,7 +68,7 @@ jobs:
         rclone copy itd:ci/lineage/out2.tar.zst ./
         zstd --decompress out2.tar.zst
         sudo rm -r ./out2.tar.zst
-        tar -xvf ./out.tar ./out
+        tar -xvf ./out2.tar ./out
         sudo rm -r ./out.tar
         ls ./out
         df -h
