@@ -1,8 +1,8 @@
 name: line-emulator-part4-build3
 on:
-#   push:
-#     branches: 
-#       - master
+  push:
+    branches: 
+      - master
   repository_dispatch:
     types: 
       - line-emulator-part4-build3
@@ -61,9 +61,16 @@ jobs:
         tar -xvf ./B2G.tar ./B2G
         sudo rm -r ./B2G.tar.zst
         sudo rm -r ./B2G.tar
-        cd B2G
-        sed -i '' '631d'  frameworks/base/core/jni/com_android_internal_os_Zygote.cpp
-        
+
+    - name: fix soucre
+      run: |
+        cd /Volumes/android/
+        sed -i '' '631d'  B2G/frameworks/base/core/jni/com_android_internal_os_Zygote.cpp
+        git clone https://github.com/lineage-b2g/android_build -b b2g/lineage-17.1 --depth=1
+        sudo rm -rf /Volumes/android/B2G/build/make/tools/releasetools/build_image.py
+        cp  android_build/tools/releasetools/build_image.py  /Volumes/android/B2G/build/make/tools/releasetools
+        ls /Volumes/android/B2G/build/make/tools/releasetools
+
     - name: Fetch source
       run: |
         cd /Volumes/android/B2G
