@@ -10,6 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: 'echo "field: ${{ github.event.client_payload.b2g }}"'
+      - run: 'echo "field: ${{ github.event.client_payload.out }}"'
       - run: 'echo "payload: ${{ toJson(github.event.client_payload) }}"'
       - run: echo baz
         if: github.event.action == 'baz'
