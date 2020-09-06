@@ -1,8 +1,8 @@
 name: line-onyx-part2-build1
 on:
-#   push:
-#     branches: 
-#       - master
+  push:
+    branches: 
+      - master
   repository_dispatch:
     types: 
       - line-onyx-part2-build1
@@ -68,7 +68,7 @@ jobs:
     - name: Fetch source
       run: |
         cd /Volumes/android/B2G
-        rclone copy itd:ci/onyx/out.tar.zst ./
+        rclone copy itd:ci/lineos/out.tar.zst ./
         zstd --decompress out.tar.zst
         sudo rm -r ./out.tar.zst
         tar -xvf ./out.tar ./out
@@ -78,7 +78,7 @@ jobs:
         
     - name: fix soucre
       run: |
-        cd /Volumes/android/B2G/oneplus
+        cd /Volumes/android/B2G/kernel/oneplus
         sudo rm -rf ./onyx
         git clone https://github.com/YumeMichi/kernel_oneplus_onyx -b dev2 --depth=1
         mv kernel_oneplus_onyx onyx
