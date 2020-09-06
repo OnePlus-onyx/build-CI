@@ -80,11 +80,12 @@ jobs:
       run: |
         cd /Volumes/android/B2G/kernel/oneplus
         sudo rm -rf ./onyx
-        git clone https://github.com/YumeMichi/kernel_oneplus_onyx -b dev2 --depth=1
+        #git clone https://github.com/YumeMichi/kernel_oneplus_onyx -b dev2 --depth=1
+        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx -b gonk_android-10.0.0_r11  --depth=1
         mv kernel_oneplus_onyx onyx
         
     - name: build soucre
-      continue-on-error: true
+      #continue-on-error: true
       run: |
         df -h
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
