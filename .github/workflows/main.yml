@@ -25,5 +25,5 @@ jobs:
           
       - id: dewe
         name: eun 1
-        run: echo ${{ steps.build1.exitcode }}
+        run: echo ${{ steps.build1.outcome }}
 
