@@ -78,12 +78,13 @@ jobs:
         ls ./out
         df -h
 
-    - name: build soucre
+    - name: move error.log
       run: |
-        echo 1
         ls -al /Volumes/android/B2G/out/error*
+        echo "old error.log:"
         cat /Volumes/android/B2G/out/error.log
-        cat /Volumes/android/B2G/out/error.1.log
+        sudo rm /Volumes/android/B2G/out/error.log
+        touch /Volumes/android/B2G/out/error.log
 
     - name: build soucre
       continue-on-error: true
@@ -100,48 +101,51 @@ jobs:
         gtimeout 275m ./build.sh -j4
         df -h
         
-#     - name: check build exit code
-#       if: steps.name.build.exitcode != 124 && steps.name.build.exitcode != 0
-#       run: |
-#         echo Error!
-#         today=$(date +%Y-%m-%d)
-#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.${B2G}.${out}.error.${{steps.name.build.exitcode}} Error!"
-#         exit 2
+    - name: check error.log
+      id: check
+      run: |
+        if [ -s /Volumes/android/B2G/out/error.log ]; then
+          echo Error!
+          cat /Volumes/android/B2G/out/error.log
+          today=$(date +%Y-%m-%d)
+          curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.${B2G}.${out}.error.${{steps.name.build.exitcode}} Error!"
+          exit 2
+        else
+          exit 0
+        fi
 
 
-#     - name: remove source exclude out file
-#       if: steps.name.build.exitcode == 124 || steps.name.build.exitcode == 0
-#       run: |
-#          cd /Volumes/android/B2G
-#          sudo rm -rf  `ls | grep -v "out" `
-#          df -h
-         
-#     - name: repack out 
-#       if: steps.name.build.exitcode == 124 || steps.name.build.exitcode == 0
-#       run: |
-#         cd /Volumes/android/B2G
-#         tar -cvf ./out${outversion}.tar ./out
-#         zstd ./out${outversion}.tar
-#         sudo rm ./out${outversion}.tar
-#         sudo rm -r ./out
-#         df -h
+    - name: remove source exclude out file
+      if: steps.check.conclusion == "success"
+      run: |
+        # remove other flier
+        cd /Volumes/android/B2G
+        sudo rm -rf  `ls | grep -v "out" `
+        df -h
+        # repack out 
+        cd /Volumes/android/B2G
+        tar -cvf ./out${outversion}.tar ./out
+        zstd ./out${outversion}.tar
+        sudo rm ./out${outversion}.tar
+        sudo rm -r ./out
+        df -h
         
-#     - name: update 
-#       if: steps.name.build.exitcode == 124 || steps.name.build.exitcode == 0
-#       run: |
-#         cd /Volumes/android/B2G
-#         rclone copy ./out${outversion}.tar.zst itd:ci/test 
+    - name: update 
+      if: steps.check.conclusion == "success"
+      run: |
+        cd /Volumes/android/B2G
+        rclone copy ./out${outversion}.tar.zst itd:ci/test 
             
-#     - name: send test
-#       if: steps.name.build.exitcode == 124           
-#       run: |
-#         cd /Volumes/android/
-#         nextoutversion=`expr ${outversion} + 1`
-#         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "test", "client_payload": {"b2g": "B2G", "out":"${nextoutversion}"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+    - name: send test
+      if: steps.build.outcome == "failure" && steps.build.conclusion == "success"  &&  steps.check.conclusion == "success"         
+      run: |
+        cd /Volumes/android/
+        nextoutversion=`expr ${outversion} + 1`
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "test", "client_payload": {"b2g": "B2G", "out":"${nextoutversion}"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
 
-#     - name: Send Done Notify & send b2g-sys
-#       if: steps.name.build.exitcode == 0
-#       run: |
-#        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.${B2G}.${out}.exitcode.${{steps.name.build.exitcode}} Done!"
-# #      curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "test", "client_payload": {"b2g": "B2G", "out":"${nextoutversion}"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+    - name: Send Done Notify & send b2g-sys
+      if: steps.check.conclusion == "success" &&  steps.build.outcome == "success" && steps.build.conclusion == "success"
+      run: |
+       curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.${B2G}.${out}.exitcode.${{steps.name.build.exitcode}} Done!"
+#      curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "test", "client_payload": {"b2g": "B2G", "out":"${nextoutversion}"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
       
