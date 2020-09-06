@@ -21,7 +21,7 @@ jobs:
         continue-on-error: true
         run: |
           echo 12345
-          exit 123
+          exit 1
           
       - id: dewe
         name: eun 1
