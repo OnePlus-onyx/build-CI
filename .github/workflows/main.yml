@@ -30,7 +30,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
-        if: steps.name.step1.exitcode == 124
         run: |
-          echo 1
+          echo ${{ steps.name.step1.exitcode }}
+          echo ${{ steps.step1.exitcode }}
           echo test, and deploy your project.
