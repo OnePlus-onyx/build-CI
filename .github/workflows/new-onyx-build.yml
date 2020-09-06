@@ -2,7 +2,7 @@ name: onyx_build
 on: 
   repository_dispatch:
       types: 
-      - onyx_build
+      - test
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
   B2G: ${{ github.event.client_payload.b2g }}    
