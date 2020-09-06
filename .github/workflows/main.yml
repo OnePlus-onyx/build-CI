@@ -21,11 +21,13 @@ jobs:
         continue-on-error: true
         run: |
           echo 12345
-          exit 0
+          exit 2
           
       - id: dewe
         name: eun 1
         run: |
           echo ${{ steps.build1.outcome }}
           echo ${{ steps.build1.conclusion }}
+          echo ${{ steps.build1.outputs }}
+          
 
