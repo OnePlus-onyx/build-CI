@@ -1,8 +1,8 @@
 name: line-emulator-part4-build3
 on:
-  push:
-    branches: 
-      - master
+#   push:
+#     branches: 
+#       - master
   repository_dispatch:
     types: 
       - line-emulator-part4-build3
