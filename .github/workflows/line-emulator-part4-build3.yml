@@ -84,7 +84,17 @@ jobs:
         sudo rm -r ./out2.tar
         ls ./out
         df -h
-        
+
+    - name: test soucre
+      run: |
+        echo 1
+        ls -al /Volumes/android/B2G/out/error*
+        cat /Volumes/android/B2G/out/error.log
+        echo 1123
+        cat /Volumes/android/B2G/out/error.1.log
+        echo 1342423
+
+
     - name: build soucre
       continue-on-error: true
       run: |
