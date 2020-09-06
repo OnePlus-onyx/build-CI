@@ -118,3 +118,10 @@ jobs:
       with:
         name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
         path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+
+    - name: update 
+      run: |
+        df -h
+        cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
+        rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/onyx 
+        df -h
