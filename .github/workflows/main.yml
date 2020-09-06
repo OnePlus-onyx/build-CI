@@ -25,6 +25,7 @@ jobs:
           
       - id: dewe
         name: eun 1
-        run: echo ${{ steps.build1.outcome }}
-        run: echo ${{ steps.build1.conclusion }}
+        run: |
+          echo ${{ steps.build1.outcome }}
+          echo ${{ steps.build1.conclusion }}
 
