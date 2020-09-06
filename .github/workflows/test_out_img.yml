@@ -68,7 +68,7 @@ jobs:
     - name: Fetch pre-out source
       run: |
         cd /Volumes/android/B2G
-        rclone copy itd:ci/test/out${outversion}.tar.zst ./
+        rclone copy itd:ci/onyx/out${outversion}.tar.zst ./
         zstd --decompress out${outversion}.tar.zst
         sudo rm -r ./out${outversion}.tar.zst
         tar -xvf ./out${outversion}.tar ./out
