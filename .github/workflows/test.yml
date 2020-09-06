@@ -83,6 +83,7 @@ jobs:
         echo 1
         ls -al /Volumes/android/B2G/out/error*
         cat /Volumes/android/B2G/out/error.log
+        cat /Volumes/android/B2G/out/error.1.log
 
     - name: build soucre
       continue-on-error: true
