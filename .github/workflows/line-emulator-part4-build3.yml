@@ -22,11 +22,12 @@ jobs:
     - name: Initialization system environment
 #       if: steps.name.test.exitcode != 0
       run: |
+        ls
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache coreutils fu
+        brew install expect  gnu-sed ccache coreutils du
         stat -f%z ./
         du -k -s ./
         exit 2
