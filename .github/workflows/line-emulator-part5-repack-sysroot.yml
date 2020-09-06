@@ -1,8 +1,8 @@
 name: line-emulator-part5-repack-sysroot
 on:
-  push:
-    branches: 
-      - master
+#   push:
+#     branches: 
+#       - master
   repository_dispatch:
     types: 
       - line-emulator-part5-repack-sysroot
