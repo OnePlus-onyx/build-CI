@@ -17,13 +17,13 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - id: build
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
-      - name: Run a one-line script
+      - name: Run_script
         continue-on-error: true
-        id: step1
         run: |
           echo Hello, world!
           exit 124
@@ -32,5 +32,5 @@ jobs:
       - name: Run a multi-line script
         run: |
           echo ${{ steps.name.step1.exitcode }}
-          echo ${{ steps.step1.exitcode }}
+          echo ${{ steps.build.outputs.Run_script }}
           echo test, and deploy your project.
