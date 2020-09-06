@@ -65,6 +65,7 @@ jobs:
         ls
         df -h
         
+        
     - name: Fetch source
       run: |
         cd /Volumes/android/B2G
@@ -80,9 +81,12 @@ jobs:
       run: |
         cd /Volumes/android/B2G/kernel/oneplus
         sudo rm -rf ./onyx
-        #git clone https://github.com/YumeMichi/kernel_oneplus_onyx -b dev2 --depth=1
-        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx -b gonk_android-10.0.0_r11  --depth=1
+        git clone https://github.com/YumeMichi/kernel_oneplus_onyx -b dev2 --depth=1
+        #git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx -b gonk_android-10.0.0_r11  --depth=1
         mv kernel_oneplus_onyx onyx
+        cd /Volumes/android/B2G/
+        sed -i '' '55d'  device/oneplus/onyx/BoardConfig.mk
+        sed -i '' '55d'  device/oneplus/onyx/BoardConfig.mk
         
     - name: build soucre
       #continue-on-error: true
