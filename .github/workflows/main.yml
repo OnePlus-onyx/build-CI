@@ -18,9 +18,15 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - id: build
+        continue-on-error: true
         run: |
           echo 12345
-
+          exit 123
+          
+      - id: dewe
+        name: eun 1
+        run: echo 12
+   
       # Runs a single command using the runners shell
       - name: Run_script
         continue-on-error: true
@@ -31,6 +37,6 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
-          echo ${{ steps.name.step1.exitcode }}
+          echo ${{ steps.build.exitcode }}
           echo ${{ steps.build.outputs.Run_script }}
           echo test, and deploy your project.
