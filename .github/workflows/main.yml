@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: 'echo "field: ${{ github.event.client_payload.foo }}"'
+      - run: 'echo "field: ${{ github.event.client_payload.b2g }}"'
       - run: 'echo "payload: ${{ toJson(github.event.client_payload) }}"'
       - run: echo baz
         if: github.event.action == 'baz'
