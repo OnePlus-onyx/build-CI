@@ -1,0 +1,370 @@
+name: onyx_build
+on: 
+  repository_dispatch:
+      types: 
+      - aosp_build
+      - gecko_build
+      - test_build
+      
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
+  outversion: ${{ github.event.client_payload.outversion }}  
+  action_type: ${{ github.event.action }} 
+
+jobs: 
+  aosp_build:
+    if: github.event.action == 'aosp_build' || github.event.action == 'test_build' 
+    runs-on: macos-latest
+    timeout-minutes: 360
+    steps:
+    - name: Send Start Notify
+      run: |
+        today=$(date +%Y-%m-%d)
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
+     
+    - name: Checkout
+      uses: actions/checkout@v1       
+        
+    - name: Initialization system environment
+      run: |
+        df -h
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        
+        ####brew
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        brew install expect  gnu-sed ccache coreutils
+        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        
+        #####mount
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 400g ~/android.dmg
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
+        
+        #####zstd
+        cd  /Volumes/android
+        git clone https://github.com/facebook/zstd.git
+        cd zstd
+        make
+        sudo make install 
+        
+        #####ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
+        
+    - name: Fetch B2G source
+      run: |
+        df -h
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        cd /Volumes/android
+        git clone https://github.com/b2gOS/B2G -b master  --depth=1 
+        cd ./B2G
+        echo Download ...
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        df -h
+        
+    - name: fix soucre
+      run: |
+        ####
+        cd /Volumes/android/B2G
+        sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        
+        ####
+        echo apply patch
+        sudo rm -rf ./patcher
+        git clone https://github.com/OnePlus-onyx/patcher -b test
+        ./patcher/patcher.sh 
+        
+        ####     
+        #sudo rm -rf .repo
+        
+        ####
+        cd /Volumes/android/B2G/system
+        sudo rm -rf ./core
+        git clone https://github.com/ReB2GOS/system_core -b gonk-onyx
+        mv system_core core
+        
+        ####
+        cd /Volumes/android/B2G/external
+        sudo rm -rf ./selinux
+        git clone https://github.com/ReB2GOS/external_selinux -b aosp-10.0
+        mv external_selinux selinux
+        cd selinux 
+        git branch test1 c4d3d93c335fbcd34b589b008ee27e5a2a590a43
+        git checkout test1
+        
+        ####
+        echo ${{github.event.action}}
+        if [ ${{github.event.action}} == "aosp_build" ]; then
+            cd ~
+            git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+            cd /Volumes/android/B2G
+            cd gonk-misc
+            git am ~/build-CI/0001-err.patch
+            cd ../
+            # Force compressing debug symbols
+            cd build/soong
+            git am ~/build-CI/0001-gz.patch
+        fi
+        
+        ####
+        df -h
+        
+    - name: Fetch pre-out source
+      if: github.event.client_payload.outversion != 1
+      run: |
+        cd /Volumes/android/B2G
+        preoutversion=`expr ${outversion} - 1`
+        rclone copy itd:ci/new/out${preoutversion}.tar.zst ./
+        zstd --decompress out${preoutversion}.tar.zst
+        sudo rm -r ./out${preoutversion}.tar.zst
+        tar -xvf ./out${preoutversion}.tar ./out
+        sudo rm -r ./out${preoutversion}.tar
+        ls ./out
+        df -h
+        
+    - name: move error.log
+      if: github.event.client_payload.outversion != 1
+      run: |
+        ls -al /Volumes/android/B2G/out/error*
+        echo "old error.log:"
+        cat /Volumes/android/B2G/out/error.log
+        sudo rm /Volumes/android/B2G/out/error.log
+        touch /Volumes/android/B2G/out/error.log
+        
+    - name: build soucre
+      if: github.event.action == 'aosp_build'
+      continue-on-error: true
+      id: build
+      run: |
+        df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        export USE_CCACHE=1
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        cd /Volumes/android/B2G
+        export DISABLE_SOURCES_XML=true
+        gtimeout 275m ./build.sh -j4
+        df -h
+
+    - name: test build soucre
+      if: github.event.action == 'test_build'
+#       continue-on-error: true
+      run: |
+        df -h
+        # Download pre-build b2g-bin
+        cd /Volumes/android
+        mkdir pre-gecko
+        cd pre-gecko
+        rclone copy itd:ci/onyx/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz ./
+        # test build
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        export USE_CCACHE=1
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        cd /Volumes/android/B2G
+        export DISABLE_SOURCES_XML=true
+        export USE_PREBUILT_B2G=1
+        export PREFERRED_B2G="/Volumes/android/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
+        gtimeout 275m ./build.sh -j4 dist DIST_DIR=dist_output
+        ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_aosp_ota_update.zip
+        rclone copy onyx_b2g_ota_update.zip itd:ci/new 
+        ls -al dist_output
+        ls out/target/product/onyx/system
+        ls out/target/product/onyx/system/b2g
+        df -h
+        exit 124
+
+    - name: check error.log
+      id: check
+      run: |
+        if [ -s /Volumes/android/B2G/out/error.log ]; then
+          echo Error!
+          cat /Volumes/android/B2G/out/error.log
+          today=$(date +%Y-%m-%d)
+          curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${out}.error.${{steps.name.build.exitcode}} Error!"
+          exit 2
+        else
+          exit 0
+        fi
+        
+    - name: repack sysroot 
+      if: steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        cd build-CI
+        cp ./package_onyx_sysroot.sh ~/
+        chmod +x ~/package_onyx_sysroot.sh
+        df -h
+        cd /Volumes/android/B2G
+        cp ~/package_onyx_sysroot.sh ./
+        pip3 install zstandard
+        pip install zstandard
+        ./package_onyx_sysroot.sh
+        ls -al -h b2g-sysroot.tar.zst
+        mv b2g-sysroot.tar.zst /Volumes/android
+        df -h
+           
+    - name: remove source exclude out file
+      if: steps.check.conclusion == 'success'
+      run: |
+        # remove other flier
+        cd /Volumes/android/B2G
+        sudo rm -rf  `ls | grep -v "out" `
+        df -h
+        # repack out 
+        cd /Volumes/android/B2G
+        tar -cvf ./out${outversion}.tar ./out
+        zstd ./out${outversion}.tar
+        sudo rm ./out${outversion}.tar
+        sudo rm -r ./out
+        df -h
+        
+    - name: update 
+      if: steps.check.conclusion == 'success'
+      run: |
+        cd /Volumes/android/B2G
+        rclone copy ./out${outversion}.tar.zst itd:ci/new 
+            
+    - name: send aosp_build again
+      if: steps.build.outcome == 'failure' && steps.build.conclusion == 'success'  &&  steps.check.conclusion == 'success'         
+      run: |
+        cd /Volumes/android/
+        nextoutversion=`expr ${outversion} + 1`
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "aosp_build", "client_payload": {"out":"${nextoutversion}"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+  
+    - name: Send Done Notify & update b2g-sysroot & send build-gecko
+      if: steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+       curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${out}.exitcode.${{steps.name.build.exitcode}} Done!"
+       cd /Volumes/android/
+       rclone copy b2g-sysroot.tar.zst itd:ci/new
+       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gecko_build", "client_payload": {"out":"${outversion}"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+   
+   
+  gecko_build:
+    if: github.event.action == 'gecko_build'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - name: Send Start Notify
+      run: |
+        today=$(date +%Y-%m-%d)
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} Start!"
+
+    - name: Initialization system environment
+      run: |
+        df -h
+        sudo apt install git make mercurial  yasm  libncurses5
+        wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
+        tar xfj nasm-2.14.02.tar.bz2
+        cd nasm-2.14.02/
+        ./autogen.sh
+        ./configure --prefix=/usr/local/ 
+        make 
+        sudo make install
+        #hash -d nasm
+        nasm -v
+        cd ~
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        #curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        #cargo install sccache
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
+        
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: stable
+    - uses: actions/checkout@master
+    - name: Install sccache
+      run: cargo install sccache
+
+    - name: Fetch source
+      run: |
+        df -h
+        cd ~
+        #TODO
+        rclone copy  itd:ci/new/b2g-sysroot.tar.zst ./
+        curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        tar -xvf mozbuild.tar.bz2
+        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        sudo rm b2g-sysroot.tar.zst
+        sudo rm mozbuild.tar.bz2
+        cd ~
+        #TODO
+        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        df -h
+        
+    - name: bootstrap source
+      run: |
+        df -h
+        #TODO
+        cd ~/gecko-b2g-1
+        export SHELL=/bin/bash
+        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
+        df -h
+        
+    - name: Build gecko
+      run: |
+        df -h
+        #TODO
+        cd ~/gecko-b2g-1
+        export SHELL=/bin/bash
+        export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
+        export GONK_PRODUCT_NAME=onyx
+        export GECKO_OBJDIR=${GONK_PATH}/objdir-onyx-gecko
+        export PLATFORM_VERSION=29
+        export TARGET_ARCH=arm
+        export TARGET_ARCH_VARIANT=armv7-a-neon
+        export TARGET_CPU_VARIANT=krait
+        export MOZ_DISABLE_LTO=1
+        ./build-b2g.sh
+        ./build-b2g.sh package
+        df -h
+        ls ${GECKO_OBJDIR}/dist
+         
+    - name: Upload 
+      if: github.event.action == 'gecko_build'
+      uses: actions/upload-artifact@master
+      with:
+        name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+        path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+
+    - name: update 
+      run: |
+        df -h
+        cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
+        rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/new 
+        df -h
+           
+    - name: Send Done Notify && Send test_build
+      run: |
+        today=$(date +%Y-%m-%d)
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-build-gecko PASS!"
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "test_build", "client_payload": {"out":"${outversion}"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+
+  
