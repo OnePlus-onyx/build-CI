@@ -27,6 +27,7 @@ jobs:
         
     - name: Initialization system environment
       run: |
+        echo ${outversion}
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
