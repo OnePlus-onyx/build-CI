@@ -48,49 +48,82 @@ jobs:
         brew install rclone
         rclone ls itd:test
            
-    - name: Fetch source
+#     - name: Fetch source
+#       run: |
+#         df -h
+#         git config --global user.name "ittat"
+#         git config --global user.email "ittat@github.com"
+#         cd /Volumes/android
+#         git clone https://github.com/b2gOS/B2G -b master  --depth=1 
+#         cd ./B2G
+#         echo Download ...
+#         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+#         df -h
+
+    - name: Fetch B2G source
       run: |
         df -h
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
-        cd /Volumes/android
-        git clone https://github.com/b2gOS/B2G -b master  --depth=1 
-        cd ./B2G
-        echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        cd ~
+        rclone copy itd:ci/new/android.dmg.sparseimage.zst ./
+        zstd --decompress  android.dmg.sparseimage.zst
+        sudo rm -r ./android.dmg.sparseimage.zst
+        #####mount
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
-        
+
     - name: fix soucre
       run: |
-        ####
+        df -h
+        cd ~
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        cd /Volumes/android/
+        cp B2G/gonk-misc/Android.mk ./
+        cd /Volumes/android/B2G/gonk-misc
+        git am ~/build-CI/0001-err.patch
+        cd ../
+        # Force compressing debug symbols
+        cd build/soong
+        git am ~/build-CI/0001-gz.patch
+             
+        df -h
         cd /Volumes/android/B2G
-        sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        sudo rm -rf .repo
+        df -h
+
+
+#     - name: fix soucre
+#       run: |
+#         ####
+#         cd /Volumes/android/B2G
+#         sed -i '' '14d'  system/sepolicy/tests/Android.bp
         
-        ####
-        echo apply patch
-        sudo rm -rf ./patcher
-        git clone https://github.com/OnePlus-onyx/patcher -b test
-        ./patcher/patcher.sh 
+#         ####
+#         echo apply patch
+#         sudo rm -rf ./patcher
+#         git clone https://github.com/OnePlus-onyx/patcher -b test
+#         ./patcher/patcher.sh 
         
-        ####     
-        #df -h
-        #sudo rm -rf .repo
-        #df -h
+#         ####     
+#         #df -h
+#         #sudo rm -rf .repo
+#         #df -h
         
-        ####
-        cd /Volumes/android/B2G/system
-        sudo rm -rf ./core
-        git clone https://github.com/ReB2GOS/system_core -b gonk-onyx
-        mv system_core core
+#         ####
+#         cd /Volumes/android/B2G/system
+#         sudo rm -rf ./core
+#         git clone https://github.com/ReB2GOS/system_core -b gonk-onyx
+#         mv system_core core
         
-        ####
-        cd /Volumes/android/B2G/external
-        sudo rm -rf ./selinux
-        git clone https://github.com/ReB2GOS/external_selinux -b aosp-10.0
-        mv external_selinux selinux
-        cd selinux 
-        git branch test1 c4d3d93c335fbcd34b589b008ee27e5a2a590a43
-        git checkout test1
+#         ####
+#         cd /Volumes/android/B2G/external
+#         sudo rm -rf ./selinux
+#         git clone https://github.com/ReB2GOS/external_selinux -b aosp-10.0
+#         mv external_selinux selinux
+#         cd selinux 
+#         git branch test1 c4d3d93c335fbcd34b589b008ee27e5a2a590a43
+#         git checkout test1
         
     - name: repack soucre
       run: |
@@ -141,11 +174,6 @@ jobs:
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         
-        #####mount
-        cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 400g ~/android.dmg
-        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
-        
         #####zstd
         cd  /Volumes/android
         git clone https://github.com/facebook/zstd.git
@@ -170,11 +198,12 @@ jobs:
         df -h
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
-        cd /Volumes/android
-        git clone https://github.com/b2gOS/B2G -b master  --depth=1 
-        cd ./B2G
-        echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        cd ~
+        rclone copy itd:ci/new/android.dmg.sparseimage.zst ./
+        zstd --decompress  android.dmg.sparseimage.zst
+        sudo rm -r ./android.dmg.sparseimage.zst
+        #####mount
+        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
         df -h
         
     - name: fix soucre
@@ -196,19 +225,20 @@ jobs:
         ####
         df -h
         
-    - name: Fetch pre-out source
-      if: github.event.client_payload.outversion != 1
-      run: |
-        cd /Volumes/android/B2G
-        preoutversion=`expr ${outversion} - 1`
-        rclone copy itd:ci/new/out${preoutversion}.tar.zst ./
-        zstd --decompress out${preoutversion}.tar.zst
-        sudo rm -r ./out${preoutversion}.tar.zst
-        tar -xvf ./out${preoutversion}.tar ./out
-        sudo rm -r ./out${preoutversion}.tar
-        ls ./out
-        df -h
-        
+#     - name: Fetch pre-out source
+#       if: github.event.client_payload.outversion != 1
+#       run: |
+#         cd /Volumes/android/B2G
+#         preoutversion=`expr ${outversion} - 1`
+#         rclone copy itd:ci/new/out${preoutversion}.tar.zst ./
+#         zstd --decompress out${preoutversion}.tar.zst
+#         sudo rm -r ./out${preoutversion}.tar.zst
+#         tar -xvf ./out${preoutversion}.tar ./out
+#         sudo rm -r ./out${preoutversion}.tar
+#         ls ./out
+#         df -h
+    
+    #TODO
     - name: move error.log
       if: github.event.client_payload.outversion != 1
       run: |
@@ -254,7 +284,7 @@ jobs:
         export DISABLE_SOURCES_XML=true
         export USE_PREBUILT_B2G=1
         export PREFERRED_B2G="/Volumes/android/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
-        gtimeout 275m ./build.sh -j4 dist DIST_DIR=dist_output
+        ./build.sh -j4 dist DIST_DIR=dist_output
         ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_aosp_ota_update.zip
         rclone copy onyx_b2g_ota_update.zip itd:ci/new 
         ls -al dist_output
@@ -263,18 +293,19 @@ jobs:
         df -h
         exit 124
 
-    - name: check error.log
-      id: check
-      run: |
-        if [ -s /Volumes/android/B2G/out/error.log ]; then
-          echo Error!
-          cat /Volumes/android/B2G/out/error.log
-          today=$(date +%Y-%m-%d)
-          curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
-          exit 2
-        else
-          exit 0
-        fi
+    #TODO
+#     - name: check error.log
+#       id: check
+#       run: |
+#         if [ -s /Volumes/android/B2G/out/error.log ]; then
+#           echo Error!
+#           cat /Volumes/android/B2G/out/error.log
+#           today=$(date +%Y-%m-%d)
+#           curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
+#           exit 2
+#         else
+#           exit 0
+#         fi
         
     - name: repack sysroot 
       if: steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
