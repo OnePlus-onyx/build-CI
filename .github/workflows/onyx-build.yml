@@ -355,9 +355,6 @@ jobs:
     - name: repack soucre
       if: steps.check.conclusion == 'success'
       run: |
-        if [ ${{steps.build.reject_img_again}} == "failure" ]; then
-          echo ERROR! Can't reject sparseimage!!
-        fi
         cd ~
         zstd ${image}.dmg.sparseimage
         df -h
