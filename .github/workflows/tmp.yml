@@ -130,6 +130,7 @@ jobs:
         #mv ./B2G.tar.zst ./B2G.tar.zst
         rclone copy ./android.dmg.sparseimage.zst itd:ci/new
         df -h
+        sudo rm -f sudo rm -rf android.dmg.sparseimage
         
 #     - name: send webhook          
 #       run: |
