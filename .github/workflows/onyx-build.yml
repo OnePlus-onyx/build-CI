@@ -29,6 +29,11 @@ jobs:
         cd ~
         hdiutil detach /Volumes/android
         rm android.dmg.sparseimage
+
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        cd ~
         hdiutil detach ${work}
         rm ${image}.dmg.sparseimage
         df -h
@@ -94,7 +99,7 @@ jobs:
         mv system_core core
         
         ####
-        cd ${work}B2G/external
+        cd ${work}/B2G/external
         sudo rm -rf ./selinux
         git clone https://github.com/ReB2GOS/external_selinux -b aosp-10.0
         mv external_selinux selinux
