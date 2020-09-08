@@ -164,8 +164,8 @@ jobs:
       run: |
         df -h
         cd ~
-        #hdiutil detach /Volumes/android
-        #rm android.dmg.sparseimage
+        hdiutil detach /Volumes/android
+        rm android.dmg.sparseimage
 
     - name: Clean system environment
       continue-on-error: true
