@@ -48,6 +48,9 @@ jobs:
     - name: Fetch B2G source
       continue-on-error: true
       run: |
+        df -h
+        cd ~ 
+        ls -al
         cd /Volumes/android/B2G
         ls -al
         cd ~
