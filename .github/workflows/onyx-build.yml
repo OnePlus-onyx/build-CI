@@ -20,7 +20,16 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-        
+
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        df -h
+        cd ~
+        hdiutil detach /Volumes/android
+        rm android.dmg.sparseimage
+        df -h
+
     - name: Initialization system environment
       run: |
         df -h
@@ -72,8 +81,7 @@ jobs:
         ####
         cd /Volumes/android/B2G
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
-        
-        
+                
         ####
         cd /Volumes/android/B2G/system
         sudo rm -rf ./core
@@ -112,6 +120,7 @@ jobs:
         hdiutil detach /Volumes/android
         cd ~
         zstd android.dmg.sparseimage
+        rm android.dmg.sparseimage
         ls -al android.dmg.sparseimage*
         
     - name: update 
@@ -119,6 +128,7 @@ jobs:
         df -h
         cd ~
         rclone copy ./android.dmg.sparseimage.zst itd:ci/new
+        sudo android.dmg.sparseimage.zst
         df -h
         
     - name: send aosp_build webhook          
@@ -139,7 +149,16 @@ jobs:
      
     - name: Checkout
       uses: actions/checkout@v1       
-        
+
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        df -h
+        cd ~
+        hdiutil detach /Volumes/android
+        rm android.dmg.sparseimage
+        df -h
+
     - name: Initialization system environment
       run: |
         df -h
@@ -244,6 +263,10 @@ jobs:
         ls -al dist_output
         ls out/target/product/onyx/system
         ls out/target/product/onyx/system/b2g
+        
+        cd ~
+        hdiutil detach /Volumes/android
+        sudo rm android.dmg.sparseimage
         df -h
         exit 124
 
@@ -294,6 +317,7 @@ jobs:
         zstd android.dmg.sparseimage
         ls -al android.dmg.sparseimage*
         sudo rm android.dmg.sparseimage
+        df -h
         
     - name: update build source
       if: steps.check.conclusion == 'success'
