@@ -172,7 +172,6 @@ jobs:
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         
         #####zstd
-        cd  /Volumes/android
         git clone https://github.com/facebook/zstd.git
         cd zstd
         make
