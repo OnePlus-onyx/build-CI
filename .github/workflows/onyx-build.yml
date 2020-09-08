@@ -260,6 +260,10 @@ jobs:
         cd pre-gecko
         rclone copy itd:ci/new/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz ./
         
+        ####
+        cd ${work}/B2G
+        sed -i '' '437d'  build/make/tools/releasetools/ota_from_target_files.py
+        
         #### test build
         export CCACHE_DIR=~/.ccache
         /usr/local/bin/ccache  -M 70G
