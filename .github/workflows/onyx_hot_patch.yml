@@ -71,7 +71,12 @@ jobs:
         #####mount
         hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
         df -h
-        
+
+
+#     - name: hot patch
+#       run: |
+#         df -h
+#         cd ${work}/B2G/gonk-misc
         
     - name: B2G Build - Build Source include Gecko
       run: |
@@ -90,9 +95,9 @@ jobs:
         cat .config
         source build/envsetup.sh
         lunch full_b2g_onyx-eng
-        mmm gecko-misc/libcarthage
+        mmm gonk-misc/libcarthage
         echo 11111111111111111111111111122
-        mm gecko-misc/libcarthage
+        mm gonk-misc/libcarthage
         #./build.sh -j4 dist DIST_DIR=dist_output
         #./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
         
