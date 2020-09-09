@@ -70,7 +70,7 @@ jobs:
         cd ~
         #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
         #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
-        git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test --depth=1
+        git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test
         mv gecko-dev gecko-b2g
         #TODO
         cd gecko-b2g
