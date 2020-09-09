@@ -99,10 +99,11 @@ jobs:
         source build/envsetup.sh
         lunch b2g_onyx-eng
         mmm gonk-misc/libcarthage
-        echo 11111111111111111111111111122
-        mm gonk-misc/libcarthage
+        rclone copy  ${work}/B2G/out/target/product/onyx/system/lib/libcarthage.so itd:ci/${image} 
+        
         #./build.sh -j4 dist DIST_DIR=dist_output
         #./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
+
         
     - name: check error.log
       id: check
