@@ -2,33 +2,30 @@ name: onyx_build
 on: 
   repository_dispatch:
       types: 
-      - repack_aosp
-      - aosp_build
-      - gecko_build
-      - test_build
+      - onyx_repack_aosp
+      - onyx_aosp_build
+      - onyx_gecko_build
+      - onyx_b2g_build
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
   image: ${{github.event.client_payload.image}}  
   work: /Volumes/${{github.event.client_payload.image}} 
   action_type: ${{ github.event.action }} 
+#TODO test
+#   repack_aosp: onyx_repack_aosp
+#   aosp_build: onyx_aosp_build
+#   gecko_build: onyx_gecko_build
+#   b2g_build: onyx_b2g_build
 
 jobs: 
   Download:
-    if: github.event.action == 'repack_aosp' 
+    if: github.event.action == 'onyx_repack_aosp' 
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-
-    - name: Clean system environment
-      continue-on-error: true
-      run: |
-        df -h
-        cd ~
-        hdiutil detach /Volumes/android
-        rm android.dmg.sparseimage
 
     - name: Clean system environment
       continue-on-error: true
@@ -78,8 +75,7 @@ jobs:
         REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
         df -h
 
-
-    - name: fix soucre
+    - name: Fix soucre
       run: |
         ####
         echo apply patch
@@ -125,7 +121,7 @@ jobs:
         sudo rm -rf .repo
         df -h
            
-    - name: repack soucre
+    - name: Compress Soucre
       run: |
         hdiutil detach ${work}
         cd ~
@@ -133,24 +129,24 @@ jobs:
         rm ${image}.dmg.sparseimage
         ls -al ${image}.dmg.sparseimage*
         
-    - name: update 
+    - name: Uplaod Source 
       run: |
         df -h
-        rclone copy ~/${image}.dmg.sparseimage.zst itd:ci/new
+        rclone copy ~/${image}.dmg.sparseimage.zst itd:ci/${image}
         sudo rm -rf android.dmg.sparseimage.zst
         df -h
         
-    - name: send aosp_build webhook          
+    - name: Send "onyx_aosp_build" WebHook          
       run: |
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
    
    
   aosp_build:
-    if: github.event.action == 'aosp_build' || github.event.action == 'test_build' 
+    if: github.event.action == 'onyx_aosp_build' || github.event.action == 'onyx_b2g_build' 
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
-    - name: Send Start Notify
+    - name: Send Start Notify To Telegram
       run: |
         echo ${outversion}
         today=$(date +%Y-%m-%d)
@@ -158,14 +154,6 @@ jobs:
      
     - name: Checkout
       uses: actions/checkout@v1       
-
-    - name: Clean system environment
-      continue-on-error: true
-      run: |
-        df -h
-        cd ~
-        hdiutil detach /Volumes/android
-        rm android.dmg.sparseimage
 
     - name: Clean system environment
       continue-on-error: true
@@ -206,20 +194,20 @@ jobs:
         rclone ls itd:test
         
         
-    - name: Fetch B2G source
+    - name: Fetch Source
       run: |
         df -h
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd ~
-        rclone copy itd:ci/new/${image}.dmg.sparseimage.zst ./
+        rclone copy itd:ci/${image}/${image}.dmg.sparseimage.zst ./
         zstd --decompress  ${image}.dmg.sparseimage.zst
         sudo rm -r ./${image}.dmg.sparseimage.zst
         #####mount
         hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
         df -h
 
-    - name: move error.log
+    - name: Check The Previous “error.log”
       run: |
         if [ -d "${work}/B2G/out" ];then
           ls -al ${work}/B2G/out/error*
@@ -229,8 +217,8 @@ jobs:
           touch ${work}/B2G/out/error.log
         fi
         
-    - name: build soucre
-      if: github.event.action == 'aosp_build'
+    - name: Build Source Without Gecko
+      if: github.event.action == 'onyx_aosp_build'
       continue-on-error: true
       id: build
       run: |
@@ -245,8 +233,17 @@ jobs:
         gtimeout 275m ./build.sh -j4
         df -h
 
-    - name: test build soucre
-      if: github.event.action == 'test_build'
+#TODO
+    - name: template fix
+      if: github.event.action == 'onyx_b2g_build'
+      continue-on-error: true
+      run: |
+        df -h
+        cd ${work}
+        sudo rm -rf ./b2g-sysroot
+        
+    - name: B2G Build - Build Source include Gecko
+      if: github.event.action == 'onyx_b2g_build'
       run: |
         df -h
         # Download pre-build b2g-bin
@@ -259,13 +256,12 @@ jobs:
         ####
         mkdir pre-gecko
         cd pre-gecko
-        rclone copy itd:ci/new/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz ./
+        rclone copy itd:ci/${image}/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz ./
         
         ####
         cd ${work}/B2G
         sed -i '' '437d'  build/make/tools/releasetools/ota_from_target_files.py
 
-        
         #### test build
         export CCACHE_DIR=~/.ccache
         /usr/local/bin/ccache  -M 70G
@@ -279,23 +275,6 @@ jobs:
         ./build.sh -j4 dist DIST_DIR=dist_output
         ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
         
-        ####
-        cd  ${work}/B2G
-        ls -al dist_output
-        ls out/target/product/onyx/system
-        ls out/target/product/onyx/system/b2g
-        
-        ####
-        cd  ${work}/B2G
-        rclone copy onyx_b2g_ota_update.zip itd:ci/new 
-        
-        cd ~
-        hdiutil detach ${work}
-        sudo rm ${image}.dmg.sparseimage
-        df -h
-        exit 124
-
-
     - name: check error.log
       id: check
       run: |
@@ -305,6 +284,7 @@ jobs:
           today=$(date +%Y-%m-%d)
           curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
           cd ~
+          sleep 20
           hdiutil detach ${work}
           sudo rm -rf ${image}.dmg.sparseimage*
           df -h
@@ -315,7 +295,7 @@ jobs:
         
     - name: repack sysroot 
       id: sysroot
-      if: steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      if: github.event.action == 'onyx_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
         cd build-CI
@@ -333,11 +313,33 @@ jobs:
         df -h
 
     - name: update b2g-sysroot
-      if:  steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      if:  github.event.action == 'onyx_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
-        rclone copy b2g-sysroot.tar.zst itd:ci/new
+        rclone copy b2g-sysroot.tar.zst itd:ci/${image}
         sudo rm b2g-sysroot.tar.zst
+
+#TODO
+#     - name: Upload b2g-ota artifact
+#       if: github.event.action == 'onyx_b2g_build' 
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+#         path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+
+
+    - name: Update b2g-ota
+      if:  github.event.action == 'onyx_b2g_build' 
+      run: |
+        ####
+        cd  ${work}/B2G
+        ls -al dist_output
+        ls out/target/product/onyx/system
+        ls out/target/product/onyx/system/b2g
+        
+        ####
+        rclone copy onyx_b2g_ota_update.zip itd:ci/${image} 
+        
 
     - name: reject image
       continue-on-error: true
@@ -358,38 +360,45 @@ jobs:
         sleep 20
         hdiutil detach ${work} > ~/log.b2g
 
-    - name: repack soucre
+    - name: Compress Soucre
       if: steps.check.conclusion == 'success'
       run: |
         cd ~
         zstd ${image}.dmg.sparseimage
         df -h
         
-    - name: update build source
+    - name: Update Build Source
       if: steps.check.conclusion == 'success'
       run: |
         df -h
         cd ~
-        rclone copy ./${image}.dmg.sparseimage.zst itd:ci/new
-        df -h
+        echo ${{github.event.action}}
+        if [ ${{github.event.action}} == "onyx_b2g_build" ]; then
+          mv ./${image}.dmg.sparseimage.zst ./${image}.dmg.sparseimage.zst.complete
+          rclone copy ./${image}.dmg.sparseimage.zst.complete itd:ci/${image}
+          sudo rm  -rf ./${image}.dmg.sparseimage.zst.complete
+        else
+          rclone copy ./${image}.dmg.sparseimage.zst itd:ci/${image}
+          sudo rm  -rf ./${image}.dmg.sparseimage.zst
+        fi
         ls -al ${image}.dmg.sparseimage*
         sudo rm ${image}.dmg.sparseimage
-        sudo rm  -rf ./${image}.dmg.sparseimage.zst
+        df -h
             
     - name: send aosp_build again
-      if: steps.build.outcome == 'failure' && steps.build.conclusion == 'success'  &&  steps.check.conclusion == 'success'         
+      if: github.event.action == 'onyx_aosp_build' && steps.build.outcome == 'failure' && steps.build.conclusion == 'success'  &&  steps.check.conclusion == 'success'         
       run: |
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
 
     - name: Send Done Notify & send build-gecko
-      if: steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      if: github.event.action == 'onyx_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
-       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gecko_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_gecko_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
    
    
   gecko_build:
-    if: github.event.action == 'gecko_build'
+    if: github.event.action == 'onyx_gecko_build'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -439,8 +448,7 @@ jobs:
       run: |
         df -h
         cd ~
-        #TODO
-        rclone copy  itd:ci/new/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/${image}/b2g-sysroot.tar.zst ./
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
         tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
@@ -451,7 +459,7 @@ jobs:
         #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
         df -h
         
-    - name: bootstrap source
+    - name: Bootstrap Gecko
       run: |
         df -h
         cd ~/gecko-b2g
@@ -459,8 +467,8 @@ jobs:
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
         ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
         df -h
-        
-    - name: Build gecko
+       
+    - name: Build Gecko for onyx
       run: |
         df -h
         cd ~/gecko-b2g
@@ -478,24 +486,24 @@ jobs:
         df -h
         ls ${GECKO_OBJDIR}/dist
          
-    - name: Upload 
+    - name: Upload Artifact
       if: github.event.action == 'gecko_build'
       uses: actions/upload-artifact@master
       with:
         name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
         path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
 
-    - name: Upload 
+    - name: Upload to Gdrive
       run: |
         df -h
         cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
-        rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/new 
+        rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/${image} 
         df -h
            
-    - name: Send Done Notify && Send test_build
+    - name: Send Done Notify && Send onyx_b2g_build
       run: |
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-build-gecko PASS!"
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "test_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_b2g_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
 
   
