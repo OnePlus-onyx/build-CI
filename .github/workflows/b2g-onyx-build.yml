@@ -275,7 +275,7 @@ jobs:
         ./build.sh -j4 dist DIST_DIR=dist_output
         ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
         
-    - name: check error.log
+    - name: Check Current ”error.log“ Status
       id: check
       run: |
         if [ -s ${work}/B2G/out/error.log ]; then
@@ -293,7 +293,7 @@ jobs:
           exit 0
         fi
         
-    - name: repack sysroot 
+    - name: Repack “b2g-sysroot” for onyx 
       id: sysroot
       if: github.event.action == 'onyx_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
@@ -312,7 +312,7 @@ jobs:
         sudo rm -rf ./b2g-sysroot
         df -h
 
-    - name: update b2g-sysroot
+    - name: Upload “b2g-sysroot”
       if:  github.event.action == 'onyx_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
@@ -320,7 +320,7 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
 
 #TODO
-#     - name: Upload b2g-ota artifact
+#     - name: Upload b2g-ota.zip artifact !!!!
 #       if: github.event.action == 'onyx_b2g_build' 
 #       uses: actions/upload-artifact@master
 #       with:
@@ -328,7 +328,7 @@ jobs:
 #         path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
 
 
-    - name: Update b2g-ota
+    - name: Update b2g-ota.zip  !!!!
       if:  github.event.action == 'onyx_b2g_build' 
       run: |
         ####
@@ -341,7 +341,7 @@ jobs:
         rclone copy onyx_b2g_ota_update.zip itd:ci/${image} 
         
 
-    - name: reject image
+    - name: Reject Build Image
       continue-on-error: true
       id: reject_img
       run: |
@@ -350,7 +350,7 @@ jobs:
         sleep 20
         hdiutil detach ${work} > ~/log.b2g
         
-    - name: reject image again
+    - name: Reject Build Image Again
       continue-on-error: true
       id: reject_img_again
       if: steps.reject_img.conclusion == 'failure'
@@ -385,12 +385,12 @@ jobs:
         sudo rm ${image}.dmg.sparseimage
         df -h
             
-    - name: send aosp_build again
+    - name: Send "onyx_aosp_build" WebHook Again
       if: github.event.action == 'onyx_aosp_build' && steps.build.outcome == 'failure' && steps.build.conclusion == 'success'  &&  steps.check.conclusion == 'success'         
       run: |
         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
 
-    - name: Send Done Notify & send build-gecko
+    - name: Send Done Notify & Send "onyx_build_gecko" WebHook
       if: github.event.action == 'onyx_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
@@ -444,7 +444,7 @@ jobs:
     - name: Install sccache
       run: cargo install sccache
 
-    - name: Fetch source
+    - name: Fetch Source
       run: |
         df -h
         cd ~
@@ -500,7 +500,7 @@ jobs:
         rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/${image} 
         df -h
            
-    - name: Send Done Notify && Send onyx_b2g_build
+    - name: Send Done Notify && Send "onyx_b2g_build" WebHook
       run: |
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-build-gecko PASS!"
