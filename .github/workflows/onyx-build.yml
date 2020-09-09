@@ -265,7 +265,6 @@ jobs:
         cd ${work}/B2G
         sed -i '' '437d'  build/make/tools/releasetools/ota_from_target_files.py
 
-        sudo rm -rf ./b2g-sysroot
         
         #### test build
         export CCACHE_DIR=~/.ccache
@@ -326,6 +325,7 @@ jobs:
         ./package_onyx_sysroot.sh
         ls -al -h b2g-sysroot.tar.zst
         mv b2g-sysroot.tar.zst ${work}
+        sudo rm -rf ./b2g-sysroot
         df -h
 
     - name: update b2g-sysroot
@@ -347,7 +347,7 @@ jobs:
     - name: reject image again
       continue-on-error: true
       id: reject_img_again
-      if: steps.build.reject_img == 'failure'
+      if: steps.reject_img.conclusion == 'failure'
       run: |
         cd ~
         cat ~/log.b2g
