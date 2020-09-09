@@ -2,7 +2,7 @@ name: onyx_hot_patch
 on: 
   repository_dispatch:
       types: 
-      - onyx_onyx_hot_patch
+      - onyx_hot_patch
 #       - onyx_aosp_build
 
       
