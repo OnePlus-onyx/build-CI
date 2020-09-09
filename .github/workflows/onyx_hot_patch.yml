@@ -80,11 +80,16 @@ jobs:
         sudo rm -rf libcarthage
         git clone https://github.com/OnePlus-onyx/libcarthage -b test
         ls
+        cd ${work}/B2G/hardware
+        ls
+        sudo rm -rf libhardware
+        https://github.com/OnePlus-onyx/platform_hardware_libhardware -b onyx-test --depth=1
+        mv platform_hardware_libhardware libhardware
+        ls
         
     - name: B2G Build - Build Source include Gecko
       run: |
         df -h
-        
         #### test build
         export CCACHE_DIR=~/.ccache
         /usr/local/bin/ccache  -M 70G
