@@ -73,10 +73,13 @@ jobs:
         df -h
 
 
-#     - name: hot patch
-#       run: |
-#         df -h
-#         cd ${work}/B2G/gonk-misc
+    - name: hot patch
+      run: |
+        df -h
+        cd ${work}/B2G/gonk-misc
+        sudo rm -rf libcarthage
+        git clone https://github.com/OnePlus-onyx/libcarthage -b test
+        ls
         
     - name: B2G Build - Build Source include Gecko
       run: |
