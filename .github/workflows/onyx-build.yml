@@ -280,7 +280,7 @@ jobs:
         ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_aosp_ota_update.zip
         
         ####
-        rclone copy onyx_b2g_ota_update.zip itd:ci/new 
+        #rclone copy onyx_b2g_ota_update.zip itd:ci/new 
         ls -al dist_output
         ls out/target/product/onyx/system
         ls out/target/product/onyx/system/b2g
