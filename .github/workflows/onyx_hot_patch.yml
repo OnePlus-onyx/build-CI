@@ -97,7 +97,7 @@ jobs:
         export PREFERRED_B2G="${work}/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
         cat .config
         source build/envsetup.sh
-        lunch
+        lunch b2g_onyx-eng
         mmm gonk-misc/libcarthage
         echo 11111111111111111111111111122
         mm gonk-misc/libcarthage
