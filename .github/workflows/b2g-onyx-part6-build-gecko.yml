@@ -60,7 +60,7 @@ jobs:
         df -h
         cd ~
         #wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
-        rclone copy  itd:ci/onyx/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/b2g_onyx/b2g-sysroot.tar.zst ./
         #curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
@@ -69,7 +69,9 @@ jobs:
         sudo rm mozbuild.tar.bz2
         cd ~
         #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test
+        mv gecko-dev gecko-b2g
         #cd gecko-b2g
         #git branch test1 47adc72ef716a81b005df36f2ec97e291fb3caae
         #git checkout test1
@@ -82,7 +84,7 @@ jobs:
     - name: bootstrap source
       run: |
         df -h
-        cd ~/gecko-b2g-1
+        cd ~/gecko-b2g
         export SHELL=/bin/bash
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
         ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
@@ -91,7 +93,7 @@ jobs:
     - name: Building X86_64
       run: |
         df -h
-        cd ~/gecko-b2g-1
+        cd ~/gecko-b2g
         export SHELL=/bin/bash
         export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
         #b2g_onyx??
@@ -123,5 +125,5 @@ jobs:
       run: |
         df -h
         cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
-        rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/onyx 
+        rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/b2g_onyx
         df -h
