@@ -83,7 +83,7 @@ jobs:
         cd ${work}/B2G/hardware
         ls
         sudo rm -rf libhardware
-        https://github.com/OnePlus-onyx/platform_hardware_libhardware -b onyx-test --depth=1
+        git clone https://github.com/OnePlus-onyx/platform_hardware_libhardware -b onyx-test --depth=1
         mv platform_hardware_libhardware libhardware
         ls
         
