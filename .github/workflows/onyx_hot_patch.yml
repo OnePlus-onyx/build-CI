@@ -100,15 +100,15 @@ jobs:
         export DISABLE_SOURCES_XML=true
         export USE_PREBUILT_B2G=1
         export PREFERRED_B2G="${work}/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
-        cat .config
-        source build/envsetup.sh
-        lunch b2g_onyx-eng
-        mmm gonk-misc/libcarthage
-        rclone copy  ${work}/B2G/out/target/product/onyx/system/lib/libcarthage.so itd:ci/${image} 
+        #cat .config
+        #source build/envsetup.sh
+        #lunch b2g_onyx-eng
+        #mmm gonk-misc/libcarthage
+        #rclone copy  ${work}/B2G/out/target/product/onyx/system/lib/libcarthage.so itd:ci/${image} 
         
-        #./build.sh -j4 dist DIST_DIR=dist_output
+        ./build.sh -j4 dist DIST_DIR=dist_output
         #./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
-
+        rclone copy ${work}/B2G/out/target/product/onyx/system.img itd:ci/${image} 
         
     - name: check error.log
       id: check
