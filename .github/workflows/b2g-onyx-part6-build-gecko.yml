@@ -74,7 +74,7 @@ jobs:
         mv gecko-dev gecko-b2g
         #TODO
         cd gecko-b2g
-        git branch test13 47456674c0f79c2f2d2b74c1f6224e159242552a
+        git branch test13 5ac5d40f9b51c9d8a17a838a557c1595f3921f48
         git checkout test13
         df -h
 
