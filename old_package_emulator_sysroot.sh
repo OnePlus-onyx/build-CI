@@ -113,4 +113,4 @@ system/libhidl/transport/token/1.0/utils/include
 system/media/audio/include
 system/media/camera/include"
 
-tar -c $SYSROOT_PREBUILTS $SYSROOT_LIBRARIES $SYSROOT_INCLUDE_FOLDERS --transform 's,^,b2g-sysroot/,S' | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > "b2g-sysroot.tar.zst"
+tar -c $SYSROOT_PREBUILTS $SYSROOT_LIBRARIES $SYSROOT_INCLUDE_FOLDERS --transform 's,^,b2g-sysroot/,S' | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > "old-b2g-sysroot.tar.zst"
