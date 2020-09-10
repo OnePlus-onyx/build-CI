@@ -68,8 +68,8 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
         #cd gecko-b2g
         #git branch test1 47adc72ef716a81b005df36f2ec97e291fb3caae
         #git checkout test1
@@ -86,7 +86,7 @@ jobs:
     - name: bootstrap source
       run: |
         df -h
-        cd ~/gecko-b2g-1
+        cd ~/gecko-b2g
         export SHELL=/bin/bash
         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
         ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
@@ -95,7 +95,7 @@ jobs:
     - name: Building X86_64
       run: |
         df -h
-        cd ~/gecko-b2g-1
+        cd ~/gecko-b2g
         export SHELL=/bin/bash
         export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
         export GONK_PRODUCT_NAME=generic_x86_64
