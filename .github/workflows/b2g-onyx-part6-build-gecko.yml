@@ -70,12 +70,12 @@ jobs:
         cd ~
         #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
         #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
-        git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test
+        git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test1
         mv gecko-dev gecko-b2g
         #TODO
-        cd gecko-b2g
-        git branch test13 5ac5d40f9b51c9d8a17a838a557c1595f3921f48
-        git checkout test13
+        #cd gecko-b2g
+        #git branch test13 5ac5d40f9b51c9d8a17a838a557c1595f3921f48
+        #git checkout test13
         df -h
 
     - name: check source
