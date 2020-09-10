@@ -87,24 +87,23 @@ jobs:
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
         df -h
         cd /Volumes/android/B2G
-        cp ~/build-CI/package_emulator_sysroot.sh ./
-        chmod +x ~/package_emulator_sysroot.sh
-        #cp ~/build-CI/old_package_emulator_sysroot.sh ./
-        #chmod +x ~/old_package_emulator_sysroot.sh
+        #cp ~/build-CI/package_emulator_sysroot.sh ./
+        #chmod +x ./package_emulator_sysroot.sh
+        cp ~/build-CI/old_package_emulator_sysroot.sh ./
+        chmod +x ./old_package_emulator_sysroot.sh
         pip3 install zstandard
         pip install zstandard
-        ./package_emulator_sysroot.sh
-        #./old_package_emulator_sysroot.sh
+        #./package_emulator_sysroot.sh
+        ./old_package_emulator_sysroot.sh
         ls -al -h
         df -h
         
-#     - name: update 
-#       run: |
-#         df -h
-#         cd /Volumes/android/B2G
-#         #~/.google-drive-upload/bin/gupload -o ./b2g-sysroot.tar.zst
-#         rclone copy ./b2g-sysroot.tar.zst itd:ci/emulator 
-#         df -h
+    - name: update 
+      run: |
+        df -h
+        cd /Volumes/android/B2G
+        rclone copy ./old-b2g-sysroot.tar.zst itd:ci/emulator 
+        df -h
 
 #     - name: Send Notify
 #       run: |
