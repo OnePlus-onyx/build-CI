@@ -65,8 +65,9 @@ jobs:
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
         #tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
-        tar -C "$HOME/.mozbuild" -I zstd -x -a -f old-b2g-sysroot.tar.zst
-        ls $HOME/.mozbuild
+        mkdir -p $HOME/.mozbuild/b2g-sysroot
+        tar -C "$HOME/.mozbuild/b2g-sysroot" -I zstd -x -a -f old-b2g-sysroot.tar.zst
+        ls $HOME/.mozbuild/b2g-sysroot
         sudo rm old-b2g-sysroot.tar.zst
         #sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
@@ -83,8 +84,8 @@ jobs:
     - name: check source
       run: |
         ls $HOME/.mozbuild/b2g-sysroot
-        sudo apt install tree
-        tree $HOME/.mozbuild/b2g-sysroot/include
+        #sudo apt install tree
+        #tree $HOME/.mozbuild/b2g-sysroot/include
         #ls $HOME/.mozbuild/b2g-sysroot/include/hardware_legacy
         
 
