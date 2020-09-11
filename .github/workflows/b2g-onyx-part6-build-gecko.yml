@@ -59,13 +59,13 @@ jobs:
       run: |
         df -h
         cd ~
-        #rclone copy  itd:ci/b2g_onyx/b2g-sysroot.tar.zst ./
-        rclone copy  itd:ci/b2g_onyx/old-b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/b2g_onyx/b2g-sysroot.tar.zst ./
+        #rclone copy  itd:ci/b2g_onyx/old-b2g-sysroot.tar.zst ./
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
-        #tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
-        mkdir -p $HOME/.mozbuild/b2g-sysroot
-        tar -C "$HOME/.mozbuild/b2g-sysroot" -I zstd -x -a -f old-b2g-sysroot.tar.zst
+        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        #mkdir -p $HOME/.mozbuild/b2g-sysroot
+        #tar -C "$HOME/.mozbuild/b2g-sysroot" -I zstd -x -a -f old-b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g -b gonk
@@ -74,7 +74,8 @@ jobs:
         #mv gecko-dev gecko-b2g
         #TODO
         cd gecko-b2g
-        git branch test13 d319abba969f78dbc27d7fdcea38bf27ce259355
+        git branch test13 4c51fb9e9b7f95e583b4a1adfccba740b6e0132a
+        # work done d319abba969f78dbc27d7fdcea38bf27ce259355
         git checkout test13
         sudo rm -rf ./.repo
         df -h
@@ -82,7 +83,7 @@ jobs:
     - name: check source
       run: |
         cd ~
-        sudo rm old-b2g-sysroot.tar.zst
+        #sudo rm old-b2g-sysroot.tar.zst
         
         
 
