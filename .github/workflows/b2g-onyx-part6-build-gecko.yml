@@ -59,27 +59,31 @@ jobs:
       run: |
         df -h
         cd ~
-        #wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
-        rclone copy  itd:ci/b2g_onyx/b2g-sysroot.tar.zst ./
-        #curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        #rclone copy  itd:ci/b2g_onyx/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/b2g_onyx/old-b2g-sysroot.tar.zst ./
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
-        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
-        sudo rm b2g-sysroot.tar.zst
+        #tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        mkdir -p $HOME/.mozbuild/b2g-sysroot
+        tar -C "$HOME/.mozbuild/b2g-sysroot" -I zstd -x -a -f old-b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk
         #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
-        git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test1
-        mv gecko-dev gecko-b2g
+        #git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test1
+        #mv gecko-dev gecko-b2g
         #TODO
-        #cd gecko-b2g
-        #git branch test13 5ac5d40f9b51c9d8a17a838a557c1595f3921f48
-        #git checkout test13
+        cd gecko-b2g
+        git branch test13 d319abba969f78dbc27d7fdcea38bf27ce259355
+        git checkout test13
+        sudo rm -rf ./.repo
         df -h
 
     - name: check source
       run: |
+        cd ~
+        sudo rm old-b2g-sysroot.tar.zst
+        
         
 
     - name: bootstrap source
@@ -122,9 +126,9 @@ jobs:
         name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
         path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
 
-    - name: update 
-      run: |
-        df -h
-        cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
-        rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/b2g_onyx
-        df -h
+#     - name: update 
+#       run: |
+#         df -h
+#         cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
+#         rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/b2g_onyx
+#         df -h
