@@ -5,6 +5,9 @@ on:
       - b2g-onyx-part5-repack-sysroot
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
+  work: /Volumes/b2g_onyx
+  image: b2g_onyx
+
 jobs:
   repack_sysroot:
     runs-on: macos-latest
@@ -13,26 +16,33 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
      
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        cd ~
+        hdiutil detach ${work}
+        rm ${image}.dmg.sparseimage
+        df -h
+        
     - name: Initialization system environment
       run: |
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        
+        ####brew
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install expect  gnu-sed ccache coreutils
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        #mount
-        cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 420g ~/android.dmg
-        hdiutil attach /Users/runner/android.dmg.sparseimage -mountpoint /Volumes/android
-        #zstd
-        cd  /Volumes/android
+        
+        #####zstd
         git clone https://github.com/facebook/zstd.git
         cd zstd
         make
         sudo make install 
-        #ssh
+        
+        #####ssh
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
@@ -43,102 +53,112 @@ jobs:
         mv ./rclone.conf ~/.config/rclone
         brew install rclone
         rclone ls itd:test
-        
+     
+     
     - name: Fetch B2G source
       run: |
         df -h
-        export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 70G
-        /usr/local/bin/ccache -s
-        export USE_CCACHE=1
-        cd /Volumes/android
-        rclone copy itd:ci/onyx/B2G.tar.zst ./
-        zstd --decompress B2G.tar.zst
-        sudo rm -r ./B2G.tar.zst
-        tar -xvf ./B2G.tar ./B2G
-        sudo rm -r ./B2G.tar
-        ls
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        cd ~
+        rclone copy itd:ci/${image}/${image}.dmg.sparseimage.zst.complete ./
+        mv ${image}.dmg.sparseimage.zst.complete ${image}.dmg.sparseimage.zst
+        zstd --decompress  ${image}.dmg.sparseimage.zst
+        sudo rm -r ./${image}.dmg.sparseimage.zst
+        #####mount
+        hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
         df -h
         
-    - name: Fetch pre-build-out source
-      run: |     
-        cd /Volumes/android/B2G
-        rclone copy itd:ci/onyx/out3.tar.zst ./
-        zstd --decompress out3.tar.zst
-        sudo rm -r ./out3.tar.zst
-        tar -xvf ./out3.tar ./out
-        sudo rm -r ./out3.tar
-        ls ./out
-        df -h
-        
-    - name: build soucre
-      run: |
-        df -h
-        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        cd /Volumes/android/B2G
-        export DISABLE_SOURCES_XML=true
-        ./build.sh -j4 dist DIST_DIR=dist_output
-        ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_aosp_ota_update.zip
-        ls
-        ls -al dist_output
-        df -h
+#     - name: build soucre
+#       run: |
+#         df -h
+#         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+#         cd /Volumes/android/B2G
+#         export DISABLE_SOURCES_XML=true
+#         ./build.sh -j4 dist DIST_DIR=dist_output
+#         ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_aosp_ota_update.zip
+#         ls
+#         ls -al dist_output
+#         df -h
  
         
     - name: repack sysroot 
       run: |
-        df -h
+        cd ~
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
-        cd build-CI
-        cp ./package_onyx_sysroot.sh ~/
-        chmod +x ~/package_onyx_sysroot.sh
-        #
-        cd /Volumes/android/B2G
-        cp ~/package_onyx_sysroot.sh ./
+        #chmod +x ~/build-CI/package_onyx_sysroot.sh
+        chmod +x ~/build-CI/old_package_onyx_sysroot.sh
+        df -h
+        cd ${work}/B2G
+        #cp ~/build-CI/package_onyx_sysroot.sh ./
+        cp ~/build-CI/old_package_onyx_sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
-        #
-        ./package_onyx_sysroot.sh
-        ls -al -h b2g-sysroot.tar.zst
-        ls
+        #./package_onyx_sysroot.sh
+        #sudo rm -rf ./b2g-sysroot
+        #ls -al
+        ./old_package_onyx_sysroot.sh
+        ls -al
+        #mv b2g-sysroot.tar.zst ${work}
+        mv old-b2g-sysroot.tar.zst ${work}
+        rclone copy old-b2g-sysroot.tar.zst itd:ci/${image}
         df -h
         
     - name: update 
       run: |
         df -h
-        cd /Volumes/android/B2G
-        #~/.google-drive-upload/bin/gupload -o ./b2g-sysroot.tar.zst
-        rclone copy ./b2g-sysroot.tar.zst itd:ci/onyx 
+        cd ${work}
+        rclone copy ./old-b2g-sysroot.tar.zst itd:ci/${image}
         df -h
         
-    - name: Send Notify
-      run: |
-        today=$(date +%Y-%m-%d)
-        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} PASS!"
+#     - name: Send Notify
+#       run: |
+#         today=$(date +%Y-%m-%d)
+#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} PASS!"
  
-    - name: Upload  onyx_aosp_ota_update1.zip
-      uses: actions/upload-artifact@master
-      with:
-        name: onyx_aosp_ota_update1.zip
-        path: /Volumes/android/B2G/dist_output/onyx_aosp_ota_update.zip
+#     - name: Upload  onyx_aosp_ota_update1.zip
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: onyx_aosp_ota_update1.zip
+#         path: /Volumes/android/B2G/dist_output/onyx_aosp_ota_update.zip
 
-    - name: Upload  onyx_aosp_ota_update2.zip
-      uses: actions/upload-artifact@master
-      with:
-        name: onyx_aosp_ota_update2.zip
-        path: /Volumes/android/B2G/onyx_aosp_ota_update.zip
+#     - name: Upload  onyx_aosp_ota_update2.zip
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: onyx_aosp_ota_update2.zip
+#         path: /Volumes/android/B2G/onyx_aosp_ota_update.zip
 
-    - name: Upload  b2g_onyx-img-eng.runner.zip
-      uses: actions/upload-artifact@master
-      with:
-        name: b2g_onyx-img-eng.runner.zip
-        path: /Volumes/android/B2G/dist_output/b2g_onyx-img-eng.runner.zip
+#     - name: Upload  b2g_onyx-img-eng.runner.zip
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: b2g_onyx-img-eng.runner.zip
+#         path: /Volumes/android/B2G/dist_output/b2g_onyx-img-eng.runner.zip
      
-    - name: Upload   boot-debug.img
-      uses: actions/upload-artifact@master
-      with:
-        name: boot-debug.img
-        path: /Volumes/android/B2G/dist_output/boot-debug.img
+#     - name: Upload   boot-debug.img
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: boot-debug.img
+#         path: /Volumes/android/B2G/dist_output/boot-debug.img
   
+    - name: reject image
+      continue-on-error: true
+      id: reject_img
+      run: |
+        cd ~
+        touch ~/log.b2g
+        sleep 20
+        hdiutil detach ${work} > ~/log.b2g
+        
+    - name: reject image again
+      continue-on-error: true
+      id: reject_img_again
+      if: steps.reject_img.conclusion == 'failure'
+      run: |
+        cd ~
+        cat ~/log.b2g
+        sleep 20
+        hdiutil detach ${work} > ~/log.b2g
+        
 #     - name: send webhook          
 #       run: |
 #         cd /Volumes/android/
