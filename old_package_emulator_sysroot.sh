@@ -1,3 +1,8 @@
+#!/bin/bash
+
+export GONK_PATH=`pwd`
+export GECKO_PATH=${GONK_PATH}/gecko
+
 # Package the sysroot
 SYSROOT_PREBUILTS="prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9/lib/gcc/x86_64-linux-android/4.9.x"
 
