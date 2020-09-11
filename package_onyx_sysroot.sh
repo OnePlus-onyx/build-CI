@@ -79,7 +79,8 @@ out/target/product/onyx/system/lib/libutils.so
 out/target/product/onyx/system/lib/libvold_binder_shared.so
 out/target/product/onyx/system/lib/libwificond_ipc_shared.so
 out/target/product/onyx/system/lib/netd_aidl_interface-V2-cpp.so
-out/target/product/onyx/system/lib/netd_event_listener_interface-V1-cpp.so"
+out/target/product/onyx/system/lib/netd_event_listener_interface-V1-cpp.so
+out/target/product/onyx/system/lib/libmtp.so"
 
 copy_to_sysroot_full_path "${LIBRARIES}"
 
