@@ -60,21 +60,22 @@ jobs:
         df -h
         cd ~
         #wget https://firefoxci.taskcluster-artifacts.net/SqAWos4HSqSIZjNnf_yRxQ/0/public/build/b2g-sysroot.tar.zst
-        rclone copy  itd:ci/emulator/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/emulator/old-b2g-sysroot.tar.zst ./
         #curl https://packages.preprod.kaiostech.com/ndk/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
-        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        #tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        tar -C "$HOME/.mozbuild" -I zstd -x -a -f old-b2g-sysroot.tar.zst
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk
         #git clone https://github.com/ittat/gecko-b2g-1 -b test --depth=1
         #mv gecko-b2g-1 gecko-b2g
         #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
-        #cd gecko-b2g
-        #git branch test1 47adc72ef716a81b005df36f2ec97e291fb3caae
-        #git checkout test1
+        cd gecko-b2g
+        git branch test1 a5802f7bc1c3ac1c8c610f64722dedc4e1f36e28
+        git checkout test1
         df -h
 
     - name: check source
@@ -118,16 +119,16 @@ jobs:
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:b2g-build-gecko PASS!"
         
-    - name: Upload 
-      if: github.event.action == 'b2g-emulator-part6-build-gecko'
-      uses: actions/upload-artifact@master
-      with:
-        name: b2g-82.0a1.en-US.linux-android-x86_64.tar.gz
-        path: ~/.mozbuild/b2g-sysroot/objdir-emulator-gecko/dist/b2g-82.0a1.en-US.linux-android-x86_64.tar.gz
+#     - name: Upload 
+#       if: github.event.action == 'b2g-emulator-part6-build-gecko'
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: b2g-82.0a1.en-US.linux-android-x86_64.tar.gz
+#         path: ~/.mozbuild/b2g-sysroot/objdir-emulator-gecko/dist/b2g-82.0a1.en-US.linux-android-x86_64.tar.gz
    
-    - name: update 
-      run: |
-        df -h
-        cd ~/.mozbuild/b2g-sysroot/objdir-emulator-gecko/dist
-        rclone copy ./b2g-82.0a1.en-US.linux-android-x86_64.tar.gz itd:ci/emulator 
-        df -h
+#     - name: update 
+#       run: |
+#         df -h
+#         cd ~/.mozbuild/b2g-sysroot/objdir-emulator-gecko/dist
+#         rclone copy ./b2g-82.0a1.en-US.linux-android-x86_64.tar.gz itd:ci/emulator 
+#         df -h
