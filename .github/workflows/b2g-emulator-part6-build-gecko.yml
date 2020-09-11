@@ -77,7 +77,7 @@ jobs:
         #mv gecko-b2g-1 gecko-b2g
         #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
         cd gecko-b2g
-        git branch test1 a5802f7bc1c3ac1c8c610f64722dedc4e1f36e28
+        git branch test1 d319abba969f78dbc27d7fdcea38bf27ce259355
         git checkout test1
         df -h
 
