@@ -101,7 +101,7 @@ jobs:
         ls -al
         #mv b2g-sysroot.tar.zst ${work}
         mv old-b2g-sysroot.tar.zst ${work}
-        rclone copy old-b2g-sysroot.tar.zst itd:ci/${image}
+        rclone copy ${work}/old-b2g-sysroot.tar.zst itd:ci/${image}
         df -h
         
     - name: update 
