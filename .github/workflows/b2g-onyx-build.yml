@@ -260,11 +260,12 @@ jobs:
         cd pre-gecko
         rclone copy itd:ci/${image}/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz ./
         
+        #TODO
         ####
-        cd ${work}/B2G
-        sed -i '' '437d'  build/make/tools/releasetools/ota_from_target_files.py
+        #cd ${work}/B2G
+        #sed -i '' '437d'  build/make/tools/releasetools/ota_from_target_files.py
 
-        #### test build
+        ####  build
         export CCACHE_DIR=~/.ccache
         /usr/local/bin/ccache  -M 70G
         /usr/local/bin/ccache -s
@@ -456,8 +457,9 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        mv gecko-b2g-1 gecko-b2g
         df -h
         
     - name: Bootstrap Gecko
