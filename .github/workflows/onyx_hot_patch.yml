@@ -86,46 +86,46 @@ jobs:
         #sudo rm -rf B2G/hardware/libhardware/include/hardware/hwcomposer_defs.h
         #mv platform_hardware_libhardware/include/hardware/hwcomposer_defs.h B2G/hardware/libhardware/include/hardware/
         
-    - name: B2G Build - Build Source include Gecko
-      run: |
-        df -h
-        #### test build
-        export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 70G
-        /usr/local/bin/ccache -s
-        export USE_CCACHE=1
-        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        cd ${work}/B2G
-        export DISABLE_SOURCES_XML=true
-        export USE_PREBUILT_B2G=1
-        export PREFERRED_B2G="${work}/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
-        #cat .config
-        #source build/envsetup.sh
-        #lunch b2g_onyx-eng
-        #mmm gonk-misc/libcarthage
-        #rclone copy  ${work}/B2G/out/target/product/onyx/system/lib/libcarthage.so itd:ci/${image} 
+#     - name: B2G Build - Build Source include Gecko
+#       run: |
+#         df -h
+#         #### test build
+#         export CCACHE_DIR=~/.ccache
+#         /usr/local/bin/ccache  -M 70G
+#         /usr/local/bin/ccache -s
+#         export USE_CCACHE=1
+#         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+#         cd ${work}/B2G
+#         export DISABLE_SOURCES_XML=true
+#         export USE_PREBUILT_B2G=1
+#         export PREFERRED_B2G="${work}/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
+#         #cat .config
+#         #source build/envsetup.sh
+#         #lunch b2g_onyx-eng
+#         #mmm gonk-misc/libcarthage
+#         #rclone copy  ${work}/B2G/out/target/product/onyx/system/lib/libcarthage.so itd:ci/${image} 
         
-        ./build.sh -j4 dist DIST_DIR=dist_output
-        #./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
-        rclone copy ${work}/B2G/out/target/product/onyx/system.img itd:ci/${image} 
+#         ./build.sh -j4 dist DIST_DIR=dist_output
+#         #./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
+#         rclone copy ${work}/B2G/out/target/product/onyx/system.img itd:ci/${image} 
         
-    - name: check error.log
-      id: check
-      run: |
-        if [ -s ${work}/B2G/out/error.log ]; then
-          echo Error!
-          cat ${work}/B2G/out/error.log
-          today=$(date +%Y-%m-%d)
-          curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
-          cd ~
-          sleep 20
-          hdiutil detach ${work}
-          sudo rm -rf ${image}.dmg.sparseimage*
-          df -h
-          exit 2
-        else
-          exit 0
-        fi
+#     - name: check error.log
+#       id: check
+#       run: |
+#         if [ -s ${work}/B2G/out/error.log ]; then
+#           echo Error!
+#           cat ${work}/B2G/out/error.log
+#           today=$(date +%Y-%m-%d)
+#           curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
+#           cd ~
+#           sleep 20
+#           hdiutil detach ${work}
+#           sudo rm -rf ${image}.dmg.sparseimage*
+#           df -h
+#           exit 2
+#         else
+#           exit 0
+#         fi
 
 #     - name: Update b2g-ota
 #       if:  github.event.action == 'onyx_b2g_build' 
@@ -138,6 +138,26 @@ jobs:
         
 #         ####
 #         rclone copy onyx_b2g_ota_update.zip itd:ci/${image} 
+
+    - name: Repack “b2g-sysroot” for onyx 
+      run: |
+        cd ~
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        chmod +x ~/build-CI/package_onyx_sysroot.sh
+        df -h
+        cd ${work}/B2G
+        cp ~/build-CI/package_onyx_sysroot.sh ./
+        pip3 install zstandard
+        pip install zstandard
+        ./package_onyx_sysroot.sh
+        sudo rm -rf ./b2g-sysroot
+        ls -al
+        mv b2g-sysroot.tar.zst ${work}
+        cd ${work}
+        rclone copy b2g-sysroot.tar.zst itd:ci/${image}
+        sudo rm b2g-sysroot.tar.zst
+        df -h
+  
         
     - name: reject image
       continue-on-error: true
