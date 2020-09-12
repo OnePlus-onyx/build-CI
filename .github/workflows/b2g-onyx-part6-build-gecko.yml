@@ -75,8 +75,8 @@ jobs:
         #TODO
         cd gecko-b2g
         # NO f595b3d88f54d1b8d1ff243cfbd2877fe29cbeeb
-        git branch test13 817ac2e37fd0ab19518cd4a485e419651107e597
-        # test 2ce1627bc6374b51246c78806287f4c3ad74741f
+        # testing 817ac2e37fd0ab19518cd4a485e419651107e597
+        git branch test13 2ce1627bc6374b51246c78806287f4c3ad74741f
         # testing a88bff5aefecbe554f06b8aa5678e09a60b714f2
         # test 0944cec181379cef24a80a2be150451d9a1f312c
         # test f5894e94d8e2c6596a28638322ee2e82fd5c2d09
