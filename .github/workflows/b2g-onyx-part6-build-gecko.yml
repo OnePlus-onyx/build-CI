@@ -72,7 +72,7 @@ jobs:
         git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
         #git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test1
         #git clone https://github.com/lissyx/gecko-dev -b fix-keyboard-shell --depth=1
-        mv gecko-dev gecko-b2g
+        mv gecko-b2g-1 gecko-b2g
         #TODO
         #cd gecko-b2g
         # git branch test13
