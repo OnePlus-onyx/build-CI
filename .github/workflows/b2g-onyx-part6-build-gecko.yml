@@ -74,9 +74,10 @@ jobs:
         #mv gecko-dev gecko-b2g
         #TODO
         cd gecko-b2g
-        git branch test13 f595b3d88f54d1b8d1ff243cfbd2877fe29cbeeb
-        # 4c51fb9e9b7f95e583b4a1adfccba740b6e0132a
-        # work done d319abba969f78dbc27d7fdcea38bf27ce259355
+        # NO f595b3d88f54d1b8d1ff243cfbd2877fe29cbeeb
+        git branch test13 a88bff5aefecbe554f06b8aa5678e09a60b714f2
+        # work 4c51fb9e9b7f95e583b4a1adfccba740b6e0132a
+        # work d319abba969f78dbc27d7fdcea38bf27ce259355
         git checkout test13
         sudo rm -rf ./.repo
         df -h
