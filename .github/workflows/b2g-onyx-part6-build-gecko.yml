@@ -68,14 +68,14 @@ jobs:
         #tar -C "$HOME/.mozbuild/b2g-sysroot" -I zstd -x -a -f old-b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk
-        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk
+        #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
         #git clone https://github.com/OnePlus-onyx/gecko-dev -b onyx-test1
-        #git clone https://github.com/lissyx/gecko-dev -b fix-keyboard-shell --depth=1
-        mv gecko-b2g-1 gecko-b2g
+        git clone https://github.com/lissyx/gecko-dev -b fix-keyboard-shell --depth=1
+        #mv gecko-b2g-1 gecko-b2g
         #TODO
-        #cd gecko-b2g
-        # git branch test13
+        cd gecko-b2g
+        git branch test13 0b4811e73fe0e0579c0eb5b2241dfca9252f903d
         # cd1819dfedc4369c1c5ef85b33d4dbe103cb37e5
         # no e9900b5419137e7334734bf9322ed687117f1aa5
         # Nooo! 9be70dd01911b5d2d3a827645cc4df2ed953cd29
@@ -84,12 +84,12 @@ jobs:
         # work f5894e94d8e2c6596a28638322ee2e82fd5c2d09
         # work 4c51fb9e9b7f95e583b4a1adfccba740b6e0132a
         # work d319abba969f78dbc27d7fdcea38bf27ce259355
-        #git checkout test13
-        #sudo rm -rf ./.repo
-        #cd ~
-        #rm gecko-b2g/b2g/chrome/content/shell.js
-        #cp gecko-dev/b2g/chrome/content/shell.js gecko-b2g/b2g/chrome/content/
-        #rm -rf gecko-dev
+        git checkout test13
+        sudo rm -rf ./.repo
+        cd ~
+        rm gecko-b2g/b2g/chrome/content/shell.js
+        cp gecko-dev/b2g/chrome/content/shell.js gecko-b2g/b2g/chrome/content/
+        rm -rf gecko-dev
         df -h
 
     - name: check source
