@@ -89,7 +89,7 @@ jobs:
         cd ~
         rm gecko-b2g/b2g/chrome/content/shell.js
         cp gecko-dev/b2g/chrome/content/shell.js gecko-b2g/b2g/chrome/content/
-        mv gecko-dev
+        rm gecko-dev
         df -h
 
     - name: check source
