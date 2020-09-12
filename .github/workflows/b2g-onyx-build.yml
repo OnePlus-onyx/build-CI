@@ -87,21 +87,23 @@ jobs:
         ####
         cd ${work}/B2G
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
-                
-        ####
-        cd ${work}/B2G/system
-        sudo rm -rf ./core
-        git clone https://github.com/ReB2GOS/system_core -b gonk-onyx
-        mv system_core core
         
+        #Done
         ####
-        cd ${work}/B2G/external
-        sudo rm -rf ./selinux
-        git clone https://github.com/ReB2GOS/external_selinux -b aosp-10.0
-        mv external_selinux selinux
-        cd selinux 
-        git branch test1 c4d3d93c335fbcd34b589b008ee27e5a2a590a43
-        git checkout test1
+        #cd ${work}/B2G/system
+        #sudo rm -rf ./core
+        #git clone https://github.com/ReB2GOS/system_core -b gonk-onyx
+        #mv system_core core
+        
+        #Done
+        ####
+        #cd ${work}/B2G/external
+        #sudo rm -rf ./selinux
+        #git clone https://github.com/ReB2GOS/external_selinux -b aosp-10.0
+        #mv external_selinux selinux
+        #cd selinux 
+        #git branch test1 c4d3d93c335fbcd34b589b008ee27e5a2a590a43
+        #git checkout test1
         
         ####
         cd ~
