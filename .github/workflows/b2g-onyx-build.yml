@@ -80,8 +80,8 @@ jobs:
         ####
         echo apply patch
         cd ${work}/B2G
-        sudo rm -rf ./patcher
-        git clone https://github.com/OnePlus-onyx/patcher -b test
+        #sudo rm -rf ./patcher
+        #git clone https://github.com/OnePlus-onyx/patcher -b test
         ./patcher/patcher.sh 
         
         ####
