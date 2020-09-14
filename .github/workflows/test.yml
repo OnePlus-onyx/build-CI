@@ -39,6 +39,8 @@ jobs:
       run: |
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
+        ls /Applications/Xcode*
+        exit 123
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         ####mount
         cd /Users/runner
