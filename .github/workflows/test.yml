@@ -151,7 +151,7 @@ jobs:
         #exit 123
         more /System/Library/CoreServices/SystemVersion.plist
         #sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
-        sudo xcode-select --switch /Applications/Xcode_12.app/Contents/Developer
+        sudo xcode-select --switch /Applications/Xcode_11.app/Contents/Developer
         
         ####brew
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
