@@ -78,7 +78,7 @@ jobs:
     - name: Fix soucre
       run: |        
         ####
-        #cd ${work}/B2G
+        cd ${work}/B2G
         #sed -i '' '14d'  system/sepolicy/tests/Android.bp
         sed -i '' '631d'  frameworks/base/core/jni/com_android_internal_os_Zygote.cpp
         
