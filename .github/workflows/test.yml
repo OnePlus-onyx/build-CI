@@ -72,7 +72,7 @@ jobs:
         git clone https://github.com/lineage-b2g/B2G -b b2g/lineage-17.1  --depth=1 
         cd ./B2G
         echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j8 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
         df -h
         
     - name: Fix soucre
