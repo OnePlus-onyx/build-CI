@@ -1,8 +1,8 @@
 name: line-onyx-part2-build1
 on:
-#   push:
-#     branches: 
-#       - master
+  push:
+    branches: 
+      - master
   repository_dispatch:
     types: 
       - line-onyx-part2-build1
@@ -81,8 +81,8 @@ jobs:
       run: |
         cd /Volumes/android/B2G/kernel/oneplus
         sudo rm -rf ./onyx
-        git clone https://github.com/YumeMichi/kernel_oneplus_onyx -b dev2 --depth=1
-        #git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx -b gonk_android-10.0.0_r11  --depth=1
+        #git clone https://github.com/YumeMichi/kernel_oneplus_onyx -b dev2 --depth=1
+        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx -b gonk_android-10.0.0_r11  --depth=1
         mv kernel_oneplus_onyx onyx
         cd /Volumes/android/B2G/
         sed -i '' '55d'  device/oneplus/onyx/BoardConfig.mk
