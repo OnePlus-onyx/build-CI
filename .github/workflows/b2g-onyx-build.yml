@@ -355,7 +355,6 @@ jobs:
     - name: Reject Build Image Again
       continue-on-error: true
       id: reject_img_again
-      if: steps.reject_img.conclusion == 'failure'
       run: |
         cd ~
         cat ~/log.b2g
@@ -490,7 +489,7 @@ jobs:
         ls ${GECKO_OBJDIR}/dist
          
     - name: Upload Artifact
-      if: github.event.action == 'gecko_build'
+      if: github.event.action == 'onyx_gecko_build'
       uses: actions/upload-artifact@master
       with:
         name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
