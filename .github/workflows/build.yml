@@ -42,7 +42,7 @@ jobs:
         chmod +x repo
         ls
         git clone https://github.com/YumeMichi/android
-        cp onyx/lineage-17.1-sultan/local_manifest.xml ./
+        cp android/onyx/lineage-17.1-sultan/local_manifest.xml ./
         sudo rm -rf android
         repo init -u https://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
         mv ./local_manifest.xml android/.repo/local_manifests
