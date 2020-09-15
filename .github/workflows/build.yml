@@ -36,6 +36,8 @@ jobs:
         #sudo tar -xpf  ./ubuntu-base-18.04.1-base-armhf.tar.gz -C  ./rootfs
         wget http://cdimage.ubuntu.com/ubuntu-base/releases/focal/release/ubuntu-base-20.04-base-armhf.tar.gz
         sudo tar -xpf  ./ubuntu-base-20.04-base-armhf.tar.gz -C  ./rootfs
+        wget http://ftp.cn.debian.org/debian/pool/contrib/a/anbox/anbox_0.0~git20200526-1+b2_armhf.deb
+        sudo cp anbox_0.0~git20200526-1+b2_armhf.deb  ./rootfs
         #sudo debootstrap --arch=$ARCH --foreign $version rootfs
         ls -l ./rootfs
         sudo cp /usr/bin/qemu-arm-static ./rootfs/usr/bin/
@@ -50,7 +52,8 @@ jobs:
         #sudo chroot ./rootfs printf '%s' ' contrib' | sudo tee -a /etc/apt/sources.list
         sudo chroot ./rootfs apt update
         #sudo chroot ./rootfs apt install anbox-ubuntu-touch 
-        sudo chroot ./rootfs apt anbox
+        #sudo chroot ./rootfs apt anbox
+        sudo chroot ./rootfs dpkg -i /anbox_0.0~git20200526-1+b2_armhf.deb
         #bash ./chroot.sh
         
 #     - name: Building anbox
