@@ -159,7 +159,7 @@ jobs:
         
         ####brew
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache coreutils
+        brew install expect  gnu-sed ccache coreutils ncurses
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         
