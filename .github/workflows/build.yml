@@ -54,7 +54,7 @@ jobs:
       continue-on-error: true
       run: |        
         ./chroot.sh
-        cd rootfs/tmp
+        cd rootfs/mnt
         wget https://downloads.apache.org/guacamole/1.1.0/source/guacamole-server-1.1.0.tar.gz
         tar xzf guacamole-server-1.1.0.tar.gz
         rm guacamole-server-1.1.0.tar.gz
