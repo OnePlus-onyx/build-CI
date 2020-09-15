@@ -38,8 +38,8 @@ jobs:
         git config --global user.name "ittat"
         git config --global user.email "ittat@github.com"
         cd /Volumes/android
-        curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
-        chmod +x repo
+        curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o ~/bin/repo
+        chmod +x ~/bin/repo
         ls
         git clone https://github.com/YumeMichi/android
         cp android/onyx/lineage-17.1-sultan/local_manifest.xml ./
