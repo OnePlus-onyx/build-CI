@@ -36,6 +36,7 @@ jobs:
         sudo cp -b /etc/resolv.conf  ./rootfs/etc/resolv.conf
         chmod +x ./chroot.sh
         
+        
 #     - name: Building anbox
 #       run: |        
 #         ./chroot.sh
@@ -46,22 +47,15 @@ jobs:
       continue-on-error: true
       run: |        
         ./chroot.sh
-        sudo chroot ./rootfs apt update
-        sudo chroot ./rootfs apt install -y gcc g++ libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev build-essential net-tools curl git software-properties-common tomcat9 tomcat9-admin tomcat9-common tomcat9-user       
+        #sudo chroot ./rootfs apt update
+        #sudo chroot ./rootfs apt install -y gcc g++ libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev build-essential net-tools curl git software-properties-common tomcat9 tomcat9-admin tomcat9-common tomcat9-user       
         
     - name: Building Guacamole
       run: |    
-        cd ./rootfs/tmp
-        wget https://downloads.apache.org/guacamole/1.1.0/source/guacamole-server-1.1.0.tar.gz
-        tar xzf guacamole-server-1.1.0.tar.gz
-        ls
-        rm guacamole-server-1.1.0.tar.gz
-        cd ../../
-        sudo chroot ./rootfs  /tmp/guacamole-server-1.1.0/configure --with-init-dir=/etc/init.d
-        sudo chroot ./rootfs  cd /tmp/guacamole-server-1.1.0
-        sudo chroot ./rootfs make
-        sudo chroot ./rootfs  cd /tmp/guacamole-server-1.1.0 && make install
-        sudo chroot ./rootfs  cd /tmp/guacamole-server-1.1.0 && ldconfig
+        cp install_guacamole.sh ./rootfs
+        chmod +x ./rootfs/install_guacamole.sh
+        ./chroot.sh
+        sudo chroot ./rootfs /bin/bash ./install_guacamole.sh
         
         
 #     - name: test
