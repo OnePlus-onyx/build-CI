@@ -113,12 +113,19 @@ jobs:
 #           done
 
       # Runs a set of commands using the runners shell
-#     - name: Saving Rootfs
-#       run: |
-#         cd rootfs
-#         sudo tar -czvf rootfs-$version-$ARCH.tar.gz *
-#         mv rootfs-$version-$ARCH.tar.gz ../
-#         cd ..
+    - name: Saving Rootfs
+      run: |
+        cd rootfs
+        sudo tar -czvf rootfs.tar.gz *
+        mv rootfs.tar.gz ../
+        cd ..
+        
+    - name : Upload Rootfs
+      uses: actions/upload-artifact@master
+      with:
+        name: Rootfs
+        path: ./rootfs.tar.gz
+ 
 #     - name: Uploading Rootfs
 #       run: |
 #        curl -sL https://git.io/file-transfer | sh
