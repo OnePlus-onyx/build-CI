@@ -7,7 +7,7 @@
 #wget https://downloads.apache.org/guacamole/1.1.0/source/guacamole-server-1.1.0.tar.gz
 #tar xzf guacamole-server-1.1.0.tar.gz
 #rm guacamole-server-1.1.0.tar.gz
-/guacamole-server-1.1.0/configure --with-init-dir=/etc/init.d
+/tmp/guacamole-server-1.1.0/configure --with-init-dir=/etc/init.d
 make
 make install
 ldconfig
