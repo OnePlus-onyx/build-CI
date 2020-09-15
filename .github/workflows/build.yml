@@ -57,10 +57,10 @@ jobs:
         ls
         rm guacamole-server-1.1.0.tar.gz
         cd ../../
-        sudo chroot /tmp/guacamole-server-1.1.0/configure --with-init-dir=/etc/init.d
-        sudo chroot cd /tmp/guacamole-server-1.1.0 && make
-        sudo chroot cd /tmp/guacamole-server-1.1.0 && make install
-        sudo chroot cd /tmp/guacamole-server-1.1.0 && ldconfig
+        sudo chroot ./rootfs  /tmp/guacamole-server-1.1.0/configure --with-init-dir=/etc/init.d
+        sudo chroot ./rootfs   cd /tmp/guacamole-server-1.1.0 && make
+        sudo chroot ./rootfs  cd /tmp/guacamole-server-1.1.0 && make install
+        sudo chroot ./rootfs  cd /tmp/guacamole-server-1.1.0 && ldconfig
         
         
 #     - name: test
