@@ -5,8 +5,8 @@ busybox mount --rbind /dev rootfs/dev
 busybox mount --rbind /proc rootfs/proc
 busybox mount --rbind /sys rootfs/sys
 busybox mount -t tmpfs tmpfs rootfs/tmp
-busybox mount -vt devpts devpts /mnt/dev/pts -o gid=5,mode=620
-busybox mount -vt tmpfs tmpfs /mnt/run
+busybox mount -vt devpts devpts rootfs/dev/pts -o gid=5,mode=620
+busybox mount -vt tmpfs tmpfs rootfs/run
 chroot ./rootfs
 
 
