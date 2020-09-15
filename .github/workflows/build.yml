@@ -4,7 +4,7 @@ name: Build System Image
 on: 
   push:
     branches:
-      - aosp
+      - lineage
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        sudo xcode-select --switch /Applications/Xcode_11.4.app/Contents/Developer
+        sudo xcode-select --switch /Applications/Xcode_10.app/Contents/Developer
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install autoconf expect  gnu-sed ccache
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
@@ -41,18 +41,24 @@ jobs:
         curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
         chmod +x repo
         ls
-        ./repo init -u git://github.com/ReB2GOS/manifests.git -b exp   --depth=1 
+        git clone https://github.com/YumeMichi/android
+        cp onyx/lineage-17.1-sultan/local_manifest.xml ./
+        sudo rm -rf android
+        repo init -u https://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
+        mv ./local_manifest.xml android/.repo/local_manifests
+        cd android
         ls
-        ./repo sync  -j128  --no-tags --no-clone-bundle
-    - name: fix
-      run: |
-        cd /Volumes/android
-        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-        cat ./build/soong/cc/config/x86_darwin_host.go 
-        sed -i '' '14d'  system/sepolicy/tests/Android.bp
-        cat system/sepolicy/tests/Android.bp
-        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        df -h
+        ./repo sync  -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune
+        
+#     - name: fix
+#       run: |
+#         cd /Volumes/android
+#         sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
+#         cat ./build/soong/cc/config/x86_darwin_host.go 
+#         sed -i '' '14d'  system/sepolicy/tests/Android.bp
+#         cat system/sepolicy/tests/Android.bp
+#         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+#         df -h
 #
 #    - name: Setup Debug Session
 #      uses: csexton/debugger-action@master
@@ -64,14 +70,15 @@ jobs:
         cd /Volumes/android/
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx6G" 
         source build/envsetup.sh
-        lunch lemon_onyx-eng 
-        make -j8
+        lunch
+        #lunch lemon_onyx-eng 
+        #make -j8
         df -h
         
-    - name: Check
-      run: |
-        df -h
-        ls -al /Volumes/android/B2G/out/target/product/onyx 
+#     - name: Check
+#       run: |
+#         df -h
+#         ls -al /Volumes/android/B2G/out/target/product/onyx 
     - name: Remove android.img
       run: |
         cd ~
