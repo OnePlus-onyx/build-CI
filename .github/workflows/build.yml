@@ -43,25 +43,28 @@ jobs:
         sudo cp /usr/bin/qemu-arm-static ./rootfs/usr/bin/
         sudo cp /usr/bin/qemu-aarch64-static ./rootfs/usr/bin/
         sudo cp -b /etc/resolv.conf  ./rootfs/etc/resolv.conf
-        sudo mount -t proc /proc ./rootfs/proc
-        sudo mount -t sysfs /sys ./rootfs/sys    
-        sudo mount -o bind /dev ./rootfs/dev
-        uname -a
-        sudo LC_ALL=C LANGUAGE=C LANG=C chroot ./rootfs uname -a
+        chmod +x ./chroot.sh
+        
+    - name: Building anbox
+      run: |        
+        #sudo mount -t proc /proc ./rootfs/proc
+        #sudo mount -t sysfs /sys ./rootfs/sys    
+        #sudo mount -o bind /dev ./rootfs/dev
+        #uname -a
+        #sudo LC_ALL=C LANGUAGE=C LANG=C chroot ./rootfs uname -a
         #sudo LC_ALL=C LANGUAGE=C LANG=C chroot ./rootfs apt-get update
-        cat ./rootfs/etc/apt/sources.list 
-        echo ..........
+        #cat ./rootfs/etc/apt/sources.list 
+        #echo ..........
         #sudo chroot ./rootfs printf '%s' ' contrib' | sudo tee -a ./rootfs/etc/apt/sources.list 
-        cat ./rootfs/etc/apt/sources.list 
+        #cat ./rootfs/etc/apt/sources.list 
+        
+        ./chroot.sh
         sudo chroot ./rootfs apt update
         sudo chroot ./rootfs apt install -y anbox
         #sudo chroot ./rootfs apt install -y init-system-helpers iptables libboost-filesystem1.71.0 libboost-iostreams1.71.0 libboost-log1.71.0 libboost-program-options1.71.0 libboost-thread1.71.0 libc6 libegl1 libgcc-s1 libgles2 liblxc1 libprotobuf-lite17 libsdl2-2.0-0 libsdl2-image-2.0-0 libstdc++6 libsystemd0 lxc  
         #sudo chroot ./rootfs dpkg -i /anbox_0.0~git20191115-1build1_armhf.deb
         #bash ./chroot.sh
         
-#     - name: Building anbox
-#       run: |        
-#         cd ~
         
         
 #     - name: test
@@ -113,20 +116,16 @@ jobs:
 #           done
 
       # Runs a set of commands using the runners shell
-    - name: Saving Rootfs
-      run: |
-        cd rootfs
-        sudo tar -czvf rootfs.tar.gz *
-        mv rootfs.tar.gz ../
-        cd ..
-        
-    - name : Upload Rootfs
-      uses: actions/upload-artifact@master
-      with:
-        name: Rootfs
-        path: ./rootfs.tar.gz
- 
-#     - name: Uploading Rootfs
+#     - name: Saving Rootfs
 #       run: |
-#        curl -sL https://git.io/file-transfer | sh
-#        ./transfer wet rootfs-$version-$ARCH.tar.gz
+#         cd rootfs
+#         sudo tar -czvf rootfs.tar.gz *
+#         mv rootfs.tar.gz ../
+#         cd ..
+        
+#     - name : Upload Rootfs
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: Rootfs
+#         path: ./rootfs.tar.gz
+ 
