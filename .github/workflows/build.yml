@@ -36,11 +36,11 @@ jobs:
         sudo cp -b /etc/resolv.conf  ./rootfs/etc/resolv.conf
         chmod +x ./chroot.sh
         
-    - name: Building anbox
-      run: |        
-        ./chroot.sh
-        sudo chroot ./rootfs apt update
-        sudo chroot ./rootfs apt install -y anbox
+#     - name: Building anbox
+#       run: |        
+#         ./chroot.sh
+#         sudo chroot ./rootfs apt update
+#         sudo chroot ./rootfs apt install -y anbox
         
     - name: Building Guacamole
       run: |        
