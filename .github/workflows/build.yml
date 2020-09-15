@@ -45,6 +45,7 @@ jobs:
         uname -a
         sudo LC_ALL=C LANGUAGE=C LANG=C chroot ./rootfs uname -a
         #sudo LC_ALL=C LANGUAGE=C LANG=C chroot ./rootfs apt-get update
+        sudo chroot ./rootfs printf '%s' ' contrib' | sudo tee -a /etc/apt/sources.list
         sudo chroot ./rootfs apt update
         #sudo chroot ./rootfs apt install anbox-ubuntu-touch 
         sudo chroot ./rootfs apt anbox adb
