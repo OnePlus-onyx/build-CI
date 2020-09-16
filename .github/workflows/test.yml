@@ -213,8 +213,18 @@ jobs:
         #sudo rm -rf ./patcher
         #git clone https://github.com/OnePlus-onyx/patcher -b test
         ./patcher/patcher.sh 
+        
+        ####
+        cd ${work}/B2G
         sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
         cat ./build/soong/cc/config/x86_darwin_host.go 
+        
+        ####
+        cd ${work}/B2G
+        sudo rm -rf device/oneplus/onyx
+        cd device/oneplus
+        git clone https://github.com/lineage-b2g/device_oneplus_onyx -b b2g/lineage-17.1 --depth=1
+        mv device_oneplus_onyx onyx
         
     - name: Build Source Without Gecko
       if: github.event.action == 'line_aosp_build'
