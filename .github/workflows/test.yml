@@ -210,7 +210,7 @@ jobs:
         cd ${work}/B2G
         #sudo rm -rf ./patcher
         #git clone https://github.com/OnePlus-onyx/patcher -b test
-        ./patcher/patcher.sh 
+        #./patcher/patcher.sh 
         
         ####
         cd ${work}/B2G
