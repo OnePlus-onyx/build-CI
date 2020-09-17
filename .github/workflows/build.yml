@@ -8,7 +8,7 @@ on:
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
   image: line1_onyx 
-  work: /Volumes/line1_onyx
+  work: /Volumes/line_onyx
   action_type: ${{ github.event.action }}   
   
 jobs: 
