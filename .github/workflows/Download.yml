@@ -1,19 +1,18 @@
 name: Download
 on: 
-  repository_dispatch:
-      types: 
-      - line1_repack_aosp
+  push:
+    branches: 
+      - test
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
-  image: ${{github.event.client_payload.image}}  
-  work: /Volumes/${{github.event.client_payload.image}} 
+  image: line1_onyx 
+  work: /Volumes/line1_onyx
   action_type: ${{ github.event.action }} 
 
 
 jobs: 
   Download:
-    if: github.event.action == 'line1_repack_aosp' 
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
