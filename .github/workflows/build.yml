@@ -111,7 +111,21 @@ jobs:
         #git clone https://github.com/lineage-b2g/device_oneplus_onyx -b b2g/lineage-17.1 --depth=1
         #mv device_oneplus_onyx onyx
 
-
+    - name: Build Source Without Gecko
+      continue-on-error: true
+      id: build
+      run: |
+        #df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        export USE_CCACHE=1
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        cd ${work}/B2G
+        export DISABLE_SOURCES_XML=true
+        gtimeout 275m ./build.sh -j4
+        df -h   
+        
     - name: mutually kernel1 source
       continue-on-error: true
       run: |
@@ -132,7 +146,6 @@ jobs:
 
 
     - name: Build Source Without Gecko
-      if: github.event.action == 'line_aosp_build'
       continue-on-error: true
       id: build
       run: |
@@ -144,9 +157,8 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
-        export TARGET_KERNEL_CLANG_COMPILE=true
         gtimeout 275m ./build.sh -j4
-        df -h     
+        df -h   
    
     - name: B2G Build - Build Source include Gecko
       if: github.event.action == 'line_b2g_build'
