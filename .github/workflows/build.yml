@@ -1,0 +1,301 @@
+
+name: build
+on: 
+  release:
+#   push:
+#     branches: 
+#       - test
+      
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
+  image: line1_onyx 
+  work: /Volumes/line1_onyx
+  action_type: ${{ github.event.action }}   
+  
+jobs: 
+ aosp_build:
+    runs-on: macos-latest
+    timeout-minutes: 360
+    steps:
+    - name: Send Start Notify To Telegram
+      run: |
+        echo ${outversion}
+        today=$(date +%Y-%m-%d)
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
+     
+    - name: Checkout
+      uses: actions/checkout@v1       
+
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        cd ~
+        hdiutil detach ${work}
+        rm ${image}.dmg.sparseimage
+        df -h
+        
+    - name: Initialization system environment
+      run: |
+        df -h
+        #ls /Applications/Xcode*
+        #exit 123
+        more /System/Library/CoreServices/SystemVersion.plist
+        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        #sudo xcode-select --switch /Applications/Xcode_12.app/Contents/Developer
+        
+        
+        ####brew
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        brew install expect  gnu-sed ccache coreutils ncurses
+        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        
+        #####zstd
+        git clone https://github.com/facebook/zstd.git
+        cd zstd
+        make
+        sudo make install 
+        
+        #####ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
+        
+        
+    - name: Fetch Source
+      run: |
+        df -h
+        git config --global user.name "ittat"
+        git config --global user.email "ittat@github.com"
+        cd ~
+        rclone copy itd:ci/${image}/${image}.dmg.sparseimage.zst ./
+        zstd --decompress  ${image}.dmg.sparseimage.zst
+        sudo rm -r ./${image}.dmg.sparseimage.zst
+        #####mount
+        hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
+        df -h
+        
+    - name: Check The Previous “error.log”
+      run: |
+        if [ -d "${work}/B2G/out" ];then
+          ls -al ${work}/B2G/out/error*
+          echo "old error.log:"
+          cat ${work}/B2G/out/error.log
+          sudo rm ${work}/B2G/out/error.log
+          touch ${work}/B2G/out/error.log
+        fi
+    - name: Fix soucre
+      run: |
+        ####
+        #echo apply patch
+        cd ${work}/B2G
+        #sudo rm -rf ./patcher
+        #git clone https://github.com/OnePlus-onyx/patcher -b test
+        ./patcher/patcher.sh 
+        
+        ####
+        cd ${work}/B2G
+        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
+        cat ./build/soong/cc/config/x86_darwin_host.go 
+        
+        ####
+        #cd ${work}/B2G
+        #sudo rm -rf device/oneplus/onyx
+        #cd device/oneplus
+        #git clone https://github.com/lineage-b2g/device_oneplus_onyx -b b2g/lineage-17.1 --depth=1
+        #mv device_oneplus_onyx onyx
+
+
+    - name: mutually kernel1 source
+      continue-on-error: true
+      run: |
+        cd ${work}/B2G
+        /bin/bash -c "(PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    VARIANT_DEFCONFIG= SELINUX_DEFCONFIG= onyx_defconfig ) && (if [ ! -z \"\" ]; then                  echo \"Overriding kernel config with ''\";                      echo  >> out/target/product/onyx/obj/KERNEL_OBJ/.config; PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    oldconfig;               fi ) && (PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    savedefconfig ) && (if [ ! -z \"\" ]; then                       echo \"Using additional config ''\";                    kernel/oneplus/onyx/scripts/kconfig/merge_config.sh -m -O out/target/product/onyx/obj/KERNEL_OBJ out/target/product/onyx/obj/KERNEL_OBJ/.config kernel/oneplus/onyx/arch/arm/configs/;                    PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    KCONFIG_ALLCONFIG=out/target/product/onyx/obj/KERNEL_OBJ/.config alldefconfig;            fi )"
+        
+    - name: mutually kernel2 source
+      continue-on-error: true
+      run: |
+        cd ${work}/B2G
+        /bin/bash -c "(PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    zImage-dtb ) && (if grep -q '^CONFIG_OF=y' out/target/product/onyx/obj/KERNEL_OBJ/.config; then                    echo \"Building DTBs\";                         PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    dtbs;             fi ) && (if grep -q '=m' out/target/product/onyx/obj/KERNEL_OBJ/.config; then                   echo \"Building Kernel Modules\";                        PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    modules || exit \"\$?\";                         echo \"Installing Kernel Modules\";                      PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    INSTALL_MOD_PATH=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/kernel_modules_intermediates INSTALL_MOD_STRIP=1 modules_install;                   kernel_release=\$(cat out/target/product/onyx/obj/KERNEL_OBJ/include/config/kernel.release)                      kernel_modules_dir=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/kernel_modules_intermediates/lib/modules/\$kernel_release                        ;                       modules=\$(find \$kernel_modules_dir -type f -name '*.ko');                      (    rm -rf out/target/product/onyx/system/vendor/lib/modules ) && (mkdir -p out/target/product/onyx/system/vendor/lib/modules ) && (cp \$modules out/target/product/onyx/system/vendor/lib/modules/ ) && (rm -rf /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates ) && (mkdir -p /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates/lib/modules/0.0/vendor/lib/modules ) && (cp \$modules /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates/lib/modules/0.0/vendor/lib/modules ) && (out/host/darwin-x86/bin/depmod -b /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates 0.0 ) && (sed -e 's/\\(.*modules.*\\):/\\/\\1:/g' -e 's/ \\([^ ]*modules[^ ]*\\)/ \\/\\1/g' /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates/lib/modules/0.0/modules.dep > out/target/product/onyx/system/vendor/lib/modules/modules.dep ) && (cp /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates/lib/modules/0.0/modules.alias out/target/product/onyx/system/vendor/lib/modules);     fi )"
+  
+  - name: mutually kernel3 source
+      continue-on-error: true
+      run: |
+        cd ${work}/B2G
+        /bin/bash -c "(PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    zImage-dtb ) && (if grep -q '^CONFIG_OF=y' out/target/product/onyx/obj/KERNEL_OBJ/.config; then                    echo \"Building DTBs\";                         PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    dtbs;             fi ) && (if grep -q '=m' out/target/product/onyx/obj/KERNEL_OBJ/.config; then                   echo \"Building Kernel Modules\";                        PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    modules || exit \"\$?\";                         echo \"Installing Kernel Modules\";                      PATH=/Volumes/line_onyx/B2G/out/host/darwin-x86/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-/bin:\$PATH PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/bin:\$PATH LD_LIBRARY_PATH=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/darwin-x86/lib:\$LD_LIBRARY_PATH PERL5LIB=/Volumes/line_onyx/B2G/prebuilts/tools-lineage/common/perl-base BISON_PKGDATADIR=/Volumes/line_onyx/B2G/prebuilts/build-tools/common/bison /Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/make  -j4 CFLAGS_MODULE=\"-fno-pic\" HOSTCFLAGS=\"-I/Volumes/line_onyx/B2G/external/elfutils/libelf -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib\" HOSTCC=/usr/local/bin/gcc HOSTCXX=/usr/local/bin/g++ LEX=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/flex YACC=/Volumes/line_onyx/B2G/prebuilts/build-tools/darwin-x86/bin/bison -C kernel/oneplus/onyx O=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=\" /Volumes/line_onyx/B2G/prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-\"    INSTALL_MOD_PATH=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/kernel_modules_intermediates INSTALL_MOD_STRIP=1 modules_install;                   kernel_release=\$(cat out/target/product/onyx/obj/KERNEL_OBJ/include/config/kernel.release)                      kernel_modules_dir=/Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/kernel_modules_intermediates/lib/modules/\$kernel_release                        ;                       modules=\$(find \$kernel_modules_dir -type f -name '*.ko');                      (    rm -rf out/target/product/onyx/system/vendor/lib/modules ) && (mkdir -p out/target/product/onyx/system/vendor/lib/modules ) && (cp \$modules out/target/product/onyx/system/vendor/lib/modules/ ) && (rm -rf /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates ) && (mkdir -p /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates/lib/modules/0.0/vendor/lib/modules ) && (cp \$modules /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates/lib/modules/0.0/vendor/lib/modules ) && (out/host/darwin-x86/bin/depmod -b /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates 0.0 ) && (sed -e 's/\\(.*modules.*\\):/\\/\\1:/g' -e 's/ \\([^ ]*modules[^ ]*\\)/ \\/\\1/g' /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates/lib/modules/0.0/modules.dep > out/target/product/onyx/system/vendor/lib/modules/modules.dep ) && (cp /Volumes/line_onyx/B2G/out/target/product/onyx/obj/PACKAGING/depmod_vendor_intermediates/lib/modules/0.0/modules.alias out/target/product/onyx/system/vendor/lib/modules);     fi )"
+
+
+    - name: Build Source Without Gecko
+      if: github.event.action == 'line_aosp_build'
+      continue-on-error: true
+      id: build
+      run: |
+        #df -h
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        export USE_CCACHE=1
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        cd ${work}/B2G
+        export DISABLE_SOURCES_XML=true
+        export TARGET_KERNEL_CLANG_COMPILE=true
+        gtimeout 275m ./build.sh -j4
+        df -h     
+   
+    - name: B2G Build - Build Source include Gecko
+      if: github.event.action == 'line_b2g_build'
+      run: |
+        df -h
+        # Download pre-build b2g-bin
+        cd ${work}
+        
+        ####
+        sudo rm -rf ./B2G/gonk-misc/Android.mk
+        cp ./Android.mk ./B2G/gonk-misc/
+        
+        ####
+        mkdir pre-gecko
+        cd pre-gecko
+        rclone copy itd:ci/${image}/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz ./
+        
+        #TODO
+        ####
+        #cd ${work}/B2G
+        #sed -i '' '437d'  build/make/tools/releasetools/ota_from_target_files.py
+        ####  build
+        export CCACHE_DIR=~/.ccache
+        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache -s
+        export USE_CCACHE=1
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+        cd ${work}/B2G
+        export DISABLE_SOURCES_XML=true
+        export USE_PREBUILT_B2G=1
+        export PREFERRED_B2G="${work}/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
+        ./build.sh -j4 dist DIST_DIR=dist_output
+        ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
+        
+    - name: Check Current ”error.log“ Status
+      id: check
+      run: |
+        if [ -s ${work}/B2G/out/error.log ]; then
+          echo Error!
+          cat ${work}/B2G/out/error.log
+          today=$(date +%Y-%m-%d)
+          curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
+          cd ~
+          sleep 20
+          #hdiutil detach ${work}
+          #sudo rm -rf ${image}.dmg.sparseimage*
+          df -h
+          #exit 2
+        else
+          exit 0
+        fi
+        
+    - name: Repack “b2g-sysroot” for onyx 
+      id: sysroot
+      if: github.event.action == 'line_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+        cd ~
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        chmod +x ~/build-CI/package_onyx_sysroot.sh
+        df -h
+        cd ${work}/B2G
+        cp ~/build-CI/package_onyx_sysroot.sh ./
+        pip3 install zstandard
+        pip install zstandard
+        ./package_onyx_sysroot.sh
+        sudo rm -rf ./b2g-sysroot
+        ls -al
+        mv b2g-sysroot.tar.zst ${work}
+        df -h
+    - name: Upload “b2g-sysroot”
+      if:  github.event.action == 'onyx_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+        cd ${work}
+        rclone copy b2g-sysroot.tar.zst itd:ci/${image}
+        sudo rm b2g-sysroot.tar.zst
+#TODO
+#     - name: Upload b2g-ota.zip artifact !!!!
+#       if: github.event.action == 'onyx_b2g_build' 
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+#         path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+
+
+    - name: Update b2g-ota.zip  !!!!
+      if:  github.event.action == 'line_b2g_build' 
+      run: |
+        ####
+        cd  ${work}/B2G
+        ls -al dist_output
+        ls out/target/product/onyx/system
+        ls out/target/product/onyx/system/b2g
+        
+        ####
+        rclone copy onyx_b2g_ota_update.zip itd:ci/${image} 
+        
+    - name: Reject Build Image
+      continue-on-error: true
+      id: reject_img
+      run: |
+        cd ~
+        touch ~/log.b2g
+        sleep 20
+        hdiutil detach ${work} > ~/log.b2g
+        
+    - name: Reject Build Image Again
+      continue-on-error: true
+      id: reject_img_again
+      if: steps.reject_img.conclusion == 'failure'
+      run: |
+        cd ~
+        cat ~/log.b2g
+        sleep 20
+        hdiutil detach ${work} > ~/log.b2g
+        
+    - name: Compress Soucre
+      if: steps.check.conclusion == 'success'
+      run: |
+        cd ~
+        zstd ${image}.dmg.sparseimage
+        df -h
+               
+    - name: Update Build Source
+      if: steps.check.conclusion == 'success'
+      run: |
+        df -h
+        cd ~
+        echo ${{github.event.action}}
+        if [ ${{github.event.action}} == "onyx_b2g_build" ]; then
+          mv ./${image}.dmg.sparseimage.zst ./${image}.dmg.sparseimage.zst.complete
+          rclone copy ./${image}.dmg.sparseimage.zst.complete itd:ci/${image}
+          sudo rm  -rf ./${image}.dmg.sparseimage.zst.complete
+        else
+          rclone copy ./${image}.dmg.sparseimage.zst itd:ci/${image}
+          sudo rm  -rf ./${image}.dmg.sparseimage.zst
+        fi
+        ls -al ${image}.dmg.sparseimage*
+        sudo rm ${image}.dmg.sparseimage
+        df -h
+            
+    - name: Send "line_aosp_build" WebHook Again
+      if: github.event.action == 'line_aosp_build' && steps.build.outcome == 'failure' && steps.build.conclusion == 'success'  &&  steps.check.conclusion == 'success'         
+      run: |
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "line_aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        
+    - name: Send Done Notify & Send "line_build_gecko" WebHook
+      if: github.event.action == 'line_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+       curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
+       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "line_gecko_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+   
