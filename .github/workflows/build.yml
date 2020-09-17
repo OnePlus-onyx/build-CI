@@ -113,7 +113,6 @@ jobs:
 
     - name: Build Source Without Gecko
       continue-on-error: true
-      id: build
       run: |
         #df -h
         export CCACHE_DIR=~/.ccache
@@ -147,7 +146,6 @@ jobs:
 
     - name: Build Source Without Gecko
       continue-on-error: true
-      id: build
       run: |
         #df -h
         export CCACHE_DIR=~/.ccache
