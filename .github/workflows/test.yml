@@ -40,6 +40,7 @@ jobs:
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         ####mount
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 400g ~/${image}.dmg
