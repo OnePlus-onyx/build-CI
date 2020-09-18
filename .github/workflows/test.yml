@@ -91,9 +91,11 @@ jobs:
         mv Android.mk Android.mk.old
         cd ${work}/B2G/gonk-misc
         git am ~/build-CI/0001-err.patch
-        cp B2G/gonk-misc/Android.mk ./
+        cp Android.mk  ${work}
+        cd ${work}
         mv Android.mk Android.mk.patch
-        cd ../
+
+        cd  ${work}/B2G
         # Force compressing debug symbols
         cd build/soong
         git am ~/build-CI/0001-gz.patch
