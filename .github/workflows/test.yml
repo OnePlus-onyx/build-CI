@@ -251,7 +251,6 @@ jobs:
     - name: Build Source Without Gecko
       if: github.event.action == 'line_aosp_build'
       continue-on-error: true
-      id: build
       run: |
         #df -h
         export CCACHE_DIR=~/.ccache
@@ -267,6 +266,7 @@ jobs:
         
     - name: Build Source Without Gecko
       if: github.event.action == 'line_aosp_build'
+      id: build
       continue-on-error: true
       run: |
         #df -h
