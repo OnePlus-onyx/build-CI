@@ -247,22 +247,6 @@ jobs:
         mv android_vendor_lineage lineage
         
         
-
-    - name: Build Source Without Gecko
-      if: github.event.action == 'line_aosp_build'
-      continue-on-error: true
-      run: |
-        #df -h
-        export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 70G
-        /usr/local/bin/ccache -s
-        export USE_CCACHE=1
-        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        cd ${work}/B2G
-        export DISABLE_SOURCES_XML=true
-        #export TARGET_KERNEL_CLANG_COMPILE=true
-        ./build.sh -j4 bootimage
-        df -h     
         
     - name: Build Source Without Gecko
       if: github.event.action == 'line_aosp_build'
@@ -274,10 +258,11 @@ jobs:
         /usr/local/bin/ccache  -M 70G
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
+        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
         #export TARGET_KERNEL_CLANG_COMPILE=true
-        ./build.sh -j4 systemimage
+        gtimeout 275m ./build.sh -j4
         df -h  
    
 #     - name: Status
