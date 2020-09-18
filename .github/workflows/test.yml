@@ -88,24 +88,16 @@ jobs:
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
         cd ${work}
         cp B2G/gonk-misc/Android.mk ./
+        mv Android.mk Android.mk.old
         cd ${work}/B2G/gonk-misc
         git am ~/build-CI/0001-err.patch
+        cp B2G/gonk-misc/Android.mk ./
+        mv Android.mk Android.mk.patch
         cd ../
         # Force compressing debug symbols
         cd build/soong
         git am ~/build-CI/0001-gz.patch
         
-        ####
-        #echo apply patch
-        #cd ${work}/B2G
-        #sudo rm -rf ./patcher
-        #git clone https://github.com/OnePlus-onyx/patcher -b test
-        #./patcher/patcher.sh 
-        
-        ####
-        #cd ${work}/B2G
-        #sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-        #cat ./build/soong/cc/config/x86_darwin_host.go 
         
         ####
         df -h
@@ -213,47 +205,29 @@ jobs:
           touch ${work}/B2G/out/error.log
         fi
 
-    - name: Fix soucre
-      run: |
-        ####
-        cd ${work}/B2G
-        sudo rm -rf device/oneplus/onyx
-        cd device/oneplus
-        git clone https://github.com/lineage-b2g/device_oneplus_onyx -b b2g/lineage-17.1 --depth=1
-        mv device_oneplus_onyx onyx
-
-        ####
-        cd ${work}/B2G
-        sudo rm -rf kernel/oneplus/onyx
-        cd kernel/oneplus
-        #git clone https://github.com/lineage-b2g/kernel_oneplus_onyx -b fake-kernel  --depth=1
-        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx -b b2g/lineage-17.1  --depth=1
-        mv kernel_oneplus_onyx onyx
-        
-        ####
-        cd ${work}/B2G    
-        sudo rm -rf vendor/lineage
-        cd vendor
-        git clone https://github.com/lineage-b2g/android_vendor_lineage -b onyx/lineage-17.1 --depth=1
-        mv android_vendor_lineage lineage
-        
-        
+#     - name: Fix soucre
+#       run: |   
         
     - name: Build Source Without Gecko
       if: github.event.action == 'line_aosp_build'
       id: build
       continue-on-error: true
       run: |
-        #df -h
+        df -h
+        ####
+        cd ${work}
+        sudo rm -rf ./B2G/gonk-misc/Android.mk
+        cp ./Android.mk.patch B2G/gonk-misc/Android.mk 
+        ###
         export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache  -M 20G
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
         #export TARGET_KERNEL_CLANG_COMPILE=true
-        gtimeout 275m ./build.sh -j4
+        gtimeout 180m ./build.sh -j4
         df -h  
    
 #     - name: Status
@@ -303,14 +277,11 @@ jobs:
 
     - name: B2G Build - Build Source include Gecko
       if: github.event.action == 'line_b2g_build'
-      run: |
-        df -h
-        # Download pre-build b2g-bin
-        cd ${work}
-        
+      run: |      
         ####
+        cd ${work}
         sudo rm -rf ./B2G/gonk-misc/Android.mk
-        cp ./Android.mk ./B2G/gonk-misc/
+        cp ./Android.mk.old B2G/gonk-misc/Android.mk 
         
         ####
         mkdir pre-gecko
@@ -323,7 +294,7 @@ jobs:
         #sed -i '' '437d'  build/make/tools/releasetools/ota_from_target_files.py
         ####  build
         export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 70G
+        /usr/local/bin/ccache  -M 20G
         /usr/local/bin/ccache -s
         export USE_CCACHE=1
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
@@ -332,7 +303,8 @@ jobs:
         export USE_PREBUILT_B2G=1
         export PREFERRED_B2G="${work}/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
         ./build.sh -j4 dist DIST_DIR=dist_output
-        ./build/tools/releasetools/ota_from_target_files dist_output/b2g_onyx-target_files-eng.runner.zip onyx_b2g_ota_update.zip
+        ls dist_output
+        sudo rm ${work}/b2g*.tar.gz
 
     - name: Check Current ”error.log“ Status
       id: check
@@ -370,12 +342,14 @@ jobs:
         ls -al
         mv b2g-sysroot.tar.zst ${work}
         df -h
+        
     - name: Upload “b2g-sysroot”
-      if:  github.event.action == 'onyx_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      if:  github.event.action == 'line_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
         rclone copy b2g-sysroot.tar.zst itd:ci/${image}
         sudo rm b2g-sysroot.tar.zst
+        
 #TODO
 #     - name: Upload b2g-ota.zip artifact !!!!
 #       if: github.event.action == 'onyx_b2g_build' 
@@ -395,26 +369,22 @@ jobs:
         ls out/target/product/onyx/system/b2g
         
         ####
-        rclone copy onyx_b2g_ota_update.zip itd:ci/${image} 
+        #rclone copy onyx_b2g_ota_update.zip itd:ci/${image} 
         
     - name: Reject Build Image
       continue-on-error: true
       id: reject_img
       run: |
-        cd ~
-        touch ~/log.b2g
-        sleep 20
-        hdiutil detach ${work} > ~/log.b2g
+        sleep 30
+        hdiutil detach ${work}
         
     - name: Reject Build Image Again
       continue-on-error: true
       id: reject_img_again
-      if: steps.reject_img.conclusion == 'failure'
       run: |
         cd ~
-        cat ~/log.b2g
         sleep 20
-        hdiutil detach ${work} > ~/log.b2g
+        hdiutil detach ${work} 
         
     - name: Compress Soucre
       if: steps.check.conclusion == 'success'
@@ -429,7 +399,7 @@ jobs:
         df -h
         cd ~
         echo ${{github.event.action}}
-        if [ ${{github.event.action}} == "onyx_b2g_build" ]; then
+        if [ ${{github.event.action}} == "line_b2g_build" ]; then
           mv ./${image}.dmg.sparseimage.zst ./${image}.dmg.sparseimage.zst.complete
           rclone copy ./${image}.dmg.sparseimage.zst.complete itd:ci/${image}
           sudo rm  -rf ./${image}.dmg.sparseimage.zst.complete
