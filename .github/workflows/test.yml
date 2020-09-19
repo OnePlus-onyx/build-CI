@@ -304,8 +304,10 @@ jobs:
         export DISABLE_SOURCES_XML=true
         export USE_PREBUILT_B2G=1
         export PREFERRED_B2G="${work}/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
-        ./build.sh -j4 dist DIST_DIR=dist_output
-        ls dist_output
+        export TARGET_PREBUILT_KERNEL=${work}/B2G/device/oneplus/onyx/zImage-onyx
+        ./build.sh -j4
+        ./build.sh -j4 bootimage
+        
         sudo rm ${work}/b2g*.tar.gz
 
     - name: Check Current ”error.log“ Status
@@ -365,13 +367,15 @@ jobs:
       if:  github.event.action == 'line_b2g_build' 
       run: |
         ####
-        cd  ${work}/B2G
-        ls -al dist_output
-        ls out/target/product/onyx/system
-        ls out/target/product/onyx/system/b2g
+        cd  ${work}
+        ls B2G/out/target/product/onyx/system
+        ls B2G/out/target/product/onyx
         
         ####
         #rclone copy onyx_b2g_ota_update.zip itd:ci/${image} 
+        zip -er image.zip B2G/out/target/product/onyx/system.img B2G/out/target/product/onyx/boot.img
+        rclone copy image.zip itd:ci/${image}
+        sudo rm image.zip
         
     - name: Reject Build Image
       continue-on-error: true
