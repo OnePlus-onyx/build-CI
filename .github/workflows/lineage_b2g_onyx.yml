@@ -1,4 +1,4 @@
-name: test_build
+name: lineage_b2g_onyx
 on: 
   repository_dispatch:
       types: 
