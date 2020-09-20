@@ -41,7 +41,8 @@ jobs:
       run: |        
         ./chroot.sh
         sudo chroot ./rootfs apt update
-        sudo chroot ./rootfs apt install -y anbox guacamole
+        sudo chroot ./rootfs apt install -y guacamole
+        #sudo chroot ./rootfs apt install -y anbox guacamole
  
  
 #     - name: Building Guacamole
