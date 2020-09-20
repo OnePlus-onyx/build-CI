@@ -207,12 +207,12 @@ jobs:
           touch ${work}/B2G/out/error.log
         fi
 
-    - name: test
-      run: | 
-        brew install tree
-        tree   ${work}/B2G/out/soong/.intermediates/frameworks
-        echo 123
-        tree  ${work}/B2G/out/soong/.intermediates/system
+#     - name: test
+#       run: | 
+#         brew install tree
+#         tree   ${work}/B2G/out/soong/.intermediates/frameworks
+#         echo 123
+#         tree  ${work}/B2G/out/soong/.intermediates/system
         
     - name: Build Source Without Gecko
       if: github.event.action == 'line_aosp_build'
@@ -338,13 +338,13 @@ jobs:
       run: |
         cd ~
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
-        chmod +x ~/build-CI/package_onyx_sysroot.sh
+        chmod +x ~/build-CI/lineage_package_onyx_sysroot.sh
         df -h
         cd ${work}/B2G
-        cp ~/build-CI/package_onyx_sysroot.sh ./
+        cp ~/build-CI/lineage_package_onyx_sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
-        ./package_onyx_sysroot.sh
+        ./lineage_package_onyx_sysroot.sh
         sudo rm -rf ./b2g-sysroot
         ls -al
         mv b2g-sysroot.tar.zst ${work}
