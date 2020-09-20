@@ -207,8 +207,12 @@ jobs:
           touch ${work}/B2G/out/error.log
         fi
 
-#     - name: Fix soucre
-#       run: |   
+    - name: test
+      run: | 
+        brew install tree
+        tree   ${work}/B2G/out/soong/.intermediates/frameworks
+        echo 123
+        tree  ${work}/B2G/out/soong/.intermediates/system
         
     - name: Build Source Without Gecko
       if: github.event.action == 'line_aosp_build'
@@ -327,8 +331,7 @@ jobs:
         else
           exit 0
         fi
-
-
+        
     - name: Repack “b2g-sysroot” for onyx 
       id: sysroot
       if: github.event.action == 'line_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
