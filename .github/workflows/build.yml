@@ -26,10 +26,10 @@ jobs:
     - name: Download Rootfs
       run: |
         mkdir rootfs
-        wget http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04.1-base-armhf.tar.gz
-        sudo tar -xpf  ./ubuntu-base-18.04.1-base-armhf.tar.gz -C  ./rootfs
-        #wget http://cdimage.ubuntu.com/ubuntu-base/releases/focal/release/ubuntu-base-20.04-base-armhf.tar.gz
-        #sudo tar -xpf  ./ubuntu-base-20.04-base-armhf.tar.gz -C  ./rootfs
+        #wget http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04.1-base-armhf.tar.gz
+        #sudo tar -xpf  ./ubuntu-base-18.04.1-base-armhf.tar.gz -C  ./rootfs
+        wget http://cdimage.ubuntu.com/ubuntu-base/releases/focal/release/ubuntu-base-20.04-base-armhf.tar.gz
+        sudo tar -xpf  ./ubuntu-base-20.04-base-armhf.tar.gz -C  ./rootfs
         ls -l ./rootfs
         sudo cp /usr/bin/qemu-arm-static ./rootfs/usr/bin/
         sudo cp /usr/bin/qemu-aarch64-static ./rootfs/usr/bin/
