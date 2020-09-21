@@ -540,7 +540,7 @@ jobs:
         cd ~/kernel_oneplus_onyx 
         make onyx_defconfig ARCH=arm CROSS_COMPILE=/home/runner/arm-eabi-4.8/bin/arm-eabi-
         ls -al ./.config
-        make ARCH=arm CROSS_COMPILE=/home/runner/arm-eabi-4.8/bin/arm-eabi-
+        make ARCH=arm CROSS_COMPILE=/home/runner/arm-eabi-4.8/bin/arm-eabi-  CONFIG_NO_ERROR_ON_MISMATCH=y zImage-dtb
         ls -al arch/arm/boot/
         rclone copy arch/arm/boot/zImage-dtb itd:ci/${image}
 
