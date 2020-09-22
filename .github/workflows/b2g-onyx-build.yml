@@ -316,7 +316,7 @@ jobs:
         
         ####  img.zip  ####
         cd  ${work}
-        zip -er img.zip B2G/out/target/product/onyx/system.img B2G/out/target/product/onyx/boot.img
+        zip -r img.zip B2G/out/target/product/onyx/system.img B2G/out/target/product/onyx/boot.img
         mv img.zip ~
         cd ~
         rclone copy img.zip itd:ci/${image}
