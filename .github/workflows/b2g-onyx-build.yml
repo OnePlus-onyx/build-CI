@@ -236,11 +236,13 @@ jobs:
         cp ./Android.mk.old B2G/gonk-misc/Android.mk 
         
         ####
+        cd ${work}
         mkdir pre-gecko
         cd pre-gecko
         rclone copy itd:ci/${image}/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz ./
         
         ####
+        cd ${work}
         mkdir pre-kernel
         cd pre-kernel
         rclone copy itd:ci/${image}/zImage-dtb ./    
