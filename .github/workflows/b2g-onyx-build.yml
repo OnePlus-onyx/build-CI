@@ -161,12 +161,6 @@ jobs:
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         
-        #####zstd
-        git clone https://github.com/facebook/zstd.git
-        cd zstd
-        make
-        sudo make install 
-        
         #####ssh
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
