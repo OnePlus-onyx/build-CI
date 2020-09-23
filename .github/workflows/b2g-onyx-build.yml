@@ -1,5 +1,7 @@
 name: onyx_build
 on: 
+  schedule:
+    - cron: '0 23 */3 * *'
   repository_dispatch:
       types: 
       - onyx_repack_aosp
@@ -395,7 +397,7 @@ jobs:
    
    
   gecko_build:
-    if: github.event.action == 'onyx_gecko_build'
+    if: github.event.action == 'onyx_gecko_build' || github.event_name == 'schedule' 
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -418,10 +420,8 @@ jobs:
         #hash -d nasm
         nasm -v
         cd ~
-        git config --global user.name "ittat"
-        git config --global user.email "ittat@github.com"
-        #curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-        #cargo install sccache
+        git config --global user.name "ci"
+        git config --global user.email "ci@github.com"
         #ssh
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
@@ -452,9 +452,9 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
-        mv gecko-b2g-1 gecko-b2g
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        #mv gecko-b2g-1 gecko-b2g
         df -h
         
     - name: Bootstrap Gecko
@@ -485,7 +485,7 @@ jobs:
         ls ${GECKO_OBJDIR}/dist
          
     - name: Upload Artifact
-      if: github.event.action == 'onyx_gecko_build'
+      if: github.event_name == 'schedule'
       uses: actions/upload-artifact@master
       with:
         name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
@@ -498,11 +498,15 @@ jobs:
         rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/${image} 
         df -h
            
-    - name: Send Done Notify && Send "kernel_build" WebHook
+    - name: Send "kernel_build" WebHook
+      if: github.event.action == 'onyx_gecko_build'
+      run: |
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_kernel_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+  
+    - name: Send Done Notify 
       run: |
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-build-gecko PASS!"
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_kernel_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
 
 
   kernel_build:
