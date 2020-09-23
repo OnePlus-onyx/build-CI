@@ -134,7 +134,6 @@ jobs:
     steps:
     - name: Send Start Notify To Telegram
       run: |
-        ls -al ${GITHUB_WORKSPACE}/../../../
         echo ${outversion}
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
@@ -357,7 +356,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
-          asset_path: ${{ GITHUB_WORKSPACE }}/../../../img.zip
+          asset_path: ${{ HOME }}/img.zip
           asset_name: B2G_image.zip
           asset_content_type: application/zip
 
@@ -369,7 +368,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
-          asset_path: ${{ GITHUB_WORKSPACE }}/../../..//onyx_b2g_ota_update.zip
+          asset_path: ${{ HOME }}/onyx_b2g_ota_update.zip
           asset_name: onyx_b2g_ota_update.zip
           asset_content_type: application/zip
 
