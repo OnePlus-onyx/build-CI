@@ -338,15 +338,15 @@ jobs:
         name: img.zip
         path: ~/img.zip
         
-    - name: Create Release
-      if: github.event.action == 'onyx_b2g_build'
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+#     - name: Create Release
+#       if: github.event.action == 'onyx_b2g_build'
+#       id: create_release
+#       uses: actions/create-release@v1
+#       env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       with:
+#           tag_name: ${{ github.ref }}
+#           release_name: Release ${{ github.ref }}
 
     - name: Update Release Asset - system & boot
       continue-on-error: true
@@ -355,7 +355,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
           asset_path: ${HOME}/img.zip
           asset_name: B2G_image.zip
           asset_content_type: application/zip
@@ -367,7 +367,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
           asset_path: ${HOME}/onyx_b2g_ota_update.zip
           asset_name: onyx_b2g_ota_update.zip
           asset_content_type: application/zip
@@ -526,7 +526,18 @@ jobs:
         cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
         rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/${image} 
         df -h
-           
+
+    - name: Update Release Asset 
+      continue-on-error: true
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
+          asset_path: ${HOME}/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+          asset_name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+          asset_content_type: application/gzip
+
     - name: Send "kernel_build" WebHook
       if: github.event.action == 'onyx_gecko_build'
       run: |
