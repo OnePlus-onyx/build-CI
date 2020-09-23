@@ -287,6 +287,7 @@ jobs:
           exit 0
         fi
         
+        
     - name: Repack “b2g-sysroot” for onyx 
       id: sysroot
       if: github.event.action == 'onyx_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
@@ -342,6 +343,38 @@ jobs:
       with:
         name: img.zip
         path: ~/img.zip
+        
+    - name: Create Release
+      if: github.event.action == 'onyx_b2g_build'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+
+    - name: Update Release Asset - system & boot
+      if: github.event.action == 'onyx_b2g_build'
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ~/img.zip
+          asset_name: B2G_image.zip
+          asset_content_type: application/zip
+
+    - name: Update Release Asset - onyx-ota
+      if: github.event.action == 'onyx_b2g_build'
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ~/onyx_b2g_ota_update.zip
+          asset_name: onyx_b2g_ota_update.zip
+          asset_content_type: application/zip
 
     - name: Reject Build Image
       continue-on-error: true
