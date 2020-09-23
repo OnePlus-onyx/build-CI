@@ -315,6 +315,7 @@ jobs:
 
     - name: Update b2g-ota.zip  !!!!
       if:  github.event.action == 'onyx_b2g_build' 
+      continue-on-error: true
       run: |
         
         ####  img.zip  ####
@@ -331,6 +332,7 @@ jobs:
         rclone copy onyx_b2g_ota_update.zip itd:ci/${image} 
  
     - name: Upload b2g-ota.zip artifact
+      continue-on-error: true
       if: github.event.action == 'onyx_b2g_build' 
       uses: actions/upload-artifact@master
       with:
@@ -338,6 +340,7 @@ jobs:
         path: ~/onyx_b2g_ota_update.zip
     
     - name: Upload img.zip artifact
+      continue-on-error: true
       if: github.event.action == 'onyx_b2g_build' 
       uses: actions/upload-artifact@master
       with:
@@ -355,6 +358,7 @@ jobs:
           release_name: Release ${{ github.ref }}
 
     - name: Update Release Asset - system & boot
+      continue-on-error: true
       if: github.event.action == 'onyx_b2g_build'
       uses: actions/upload-release-asset@v1.0.1
       env:
@@ -366,6 +370,7 @@ jobs:
           asset_content_type: application/zip
 
     - name: Update Release Asset - onyx-ota
+      continue-on-error: true
       if: github.event.action == 'onyx_b2g_build'
       uses: actions/upload-release-asset@v1.0.1
       env:
