@@ -134,7 +134,7 @@ jobs:
     steps:
     - name: Send Start Notify To Telegram
       run: |
-        touch test.txt
+        touch test
         pwd
         echo ${outversion}
         today=$(date +%Y-%m-%d)
@@ -147,7 +147,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
-          asset_path: ./test.txt
+          asset_path: ./test
           asset_name: test
           asset_content_type: text/plain
 
