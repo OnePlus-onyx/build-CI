@@ -139,28 +139,29 @@ jobs:
         echo ${outversion}
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
+        echo "::set-env name=release_vision::b2g-onyx-${today}"
         
-#     - name: Create Release
-#       id: create_release
-#       uses: actions/create-release@v1
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#       with:
-#         tag_name: ${{ github.ref }}
-#         release_name: ${{ github.ref }}
-#         draft: false
-#         prerelease: false
-#         body: |
-#           # Release Notes
-#           test.txt - test
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ release_vision }}
+        release_name: ${{ release_vision }}
+        draft: false
+        prerelease: false
+        body: |
+          # Release Notes
+          test.txt - test
           
     - name: test
       uses: actions/upload-release-asset@v1.0.1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          #upload_url: ${{ steps.create_release.outputs.upload_url }}
-          upload_url: https://uploads.github.com/repos/OnePlus-onyx/build-CI/releases/31737473/assets{?name,label}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          #upload_url: https://uploads.github.com/repos/OnePlus-onyx/build-CI/releases/31737473/assets{?name,label}
           asset_path: /Users/runner/test1.txt
           asset_name: test1.txt
           asset_content_type: text/plain
