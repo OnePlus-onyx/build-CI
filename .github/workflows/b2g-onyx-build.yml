@@ -9,8 +9,8 @@ on:
       - onyx_gecko_build
       - onyx_b2g_build
       - onyx_kernel_build
+        
   release:
-    tags:
     - 'b2g-onyx-v*'
       
 env:
@@ -629,7 +629,6 @@ jobs:
 
 
   test:
-    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -637,6 +636,7 @@ jobs:
       run: |
         echo Hello, world!
         echo ${{ github.event }}
+        echo ${{ github.event.action }}
         echo ${{ github.event_name }}
         echo ${{ github.event_path }}
         echo ${{ github.event.tag_name }}
