@@ -139,7 +139,23 @@ jobs:
         echo ${outversion}
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
-     
+        cd ~
+        touch test.txt
+ 
+    - name: test
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
+          asset_path: /Users/runner/test.txt
+          asset_name: test.txt
+          asset_content_type: text/plain
+
+    - name: tesd
+      run: |
+        exit 0
+
     - name: Checkout
       uses: actions/checkout@v1       
 
