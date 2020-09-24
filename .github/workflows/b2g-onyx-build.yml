@@ -449,6 +449,9 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
+        #####
+        echo "::set-env name=RELEASE_REF::b2g-core_onyx_$(date +%Y-%m-%d)"
+
         sudo apt install git make mercurial  yasm  libncurses5
         wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
         tar xfj nasm-2.14.02.tar.bz2
@@ -524,12 +527,12 @@ jobs:
         df -h
         ls ${GECKO_OBJDIR}/dist
          
-    - name: Upload Artifact
-      if: github.event_name == 'schedule'
-      uses: actions/upload-artifact@master
-      with:
-        name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
-        path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+#     - name: Upload Artifact
+#       if: github.event_name == 'schedule'
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+#         path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
 
     - name: Upload to Gdrive
       run: |
@@ -538,14 +541,28 @@ jobs:
         rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/${image} 
         df -h
 
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.RELEASE_REF }}
+        #release_name: release_${{ env.RELEASE_REF }}
+        draft: false
+        prerelease: false
+        body: |
+          # Release Notes
+          b2g-en-US.linux-androideabi-arm
+
     - name: Update Release Asset 
       continue-on-error: true
       uses: actions/upload-release-asset@v1.0.1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
-          asset_path: ${HOME}/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /home/runner/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
           asset_name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
           asset_content_type: application/gzip
 
