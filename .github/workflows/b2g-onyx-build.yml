@@ -152,7 +152,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ env.RELEASE_REF }}
-        release_name: release_${{ env.RELEASE_REF }}
+        #release_name: release_${{ env.RELEASE_REF }}
         draft: false
         prerelease: false
         body: |
