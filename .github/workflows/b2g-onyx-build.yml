@@ -358,7 +358,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
-          asset_path: ./img.zip
+          asset_path: /Users/runner/img.zip
           asset_name: B2G_image.zip
           asset_content_type: application/zip
 
@@ -370,7 +370,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
-          asset_path: ./onyx_b2g_ota_update.zip
+          asset_path: /Users/runner/onyx_b2g_ota_update.zip
           asset_name: onyx_b2g_ota_update.zip
           asset_content_type: application/zip
 
