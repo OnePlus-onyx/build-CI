@@ -10,7 +10,6 @@ on:
       - onyx_b2g_build
       - onyx_kernel_build
   release:
-    types: [published]
     tags:
     - 'b2g-onyx-v*'
       
