@@ -139,7 +139,9 @@ jobs:
         echo ${outversion}
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
-        echo "::set-env name=release_vision::b2g-onyx-${today}"
+        echo "::set-env name=release_vision::${today}"
+        #echo "::set-env name=RELEASE_TAG::${TAG}"
+        #tag: "${{ env.RELEASE_TAG }}"
         
     - name: Create Release
       id: create_release
@@ -148,7 +150,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ env.release_vision }}
-        release_name: ${{ env.release_vision }}
+        release_name: release_${{ env.release_vision }}
         draft: false
         prerelease: false
         body: |
