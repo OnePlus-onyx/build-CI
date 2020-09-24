@@ -134,7 +134,7 @@ jobs:
     steps:
     - name: Send Start Notify To Telegram
       run: |
-        touch test
+        echo 1223 >>  ~/test.txt
         pwd
         echo ${outversion}
         today=$(date +%Y-%m-%d)
@@ -159,8 +159,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./test
-          asset_name: test
+          asset_path: /Users/runner/test.txt
+          asset_name: test.txt
           asset_content_type: text/plain
 
     - name: tesd
