@@ -134,45 +134,9 @@ jobs:
     steps:
     - name: Send Start Notify To Telegram
       run: |
-        echo 1223 >>  ~/test1.txt
-        pwd
         echo ${outversion}
         today=$(date +%Y-%m-%d)
-        #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
-        echo "::set-env name=RELEASE_REF::b2g_onyx_$(date +%Y-%m-%d)"
-        echo "::set-env name=CPU_S::$(echo 'x86')"
-        echo %%%%%% $RELEASE_REF
-        #echo "::set-env name=RELEASE_TAG::${TAG}"
-        #tag: "${{ env.RELEASE_TAG }}"
-        
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.RELEASE_REF }}
-        #release_name: release_${{ env.RELEASE_REF }}
-        draft: false
-        prerelease: false
-        body: |
-          # Release Notes
-          test.txt - test
-          
-    - name: test
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          #upload_url: https://uploads.github.com/repos/OnePlus-onyx/build-CI/releases/31737473/assets{?name,label}
-          asset_path: /Users/runner/test1.txt
-          asset_name: test1.txt
-          asset_content_type: text/plain
-
-    - name: tesd
-      run: |
-        exit 1
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
 
     - name: Checkout
       uses: actions/checkout@v1       
@@ -188,6 +152,10 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
+        #####
+        echo "::set-env name=RELEASE_REF::b2g_onyx_$(date +%Y-%m-%d)"
+        
+        ####
         more /System/Library/CoreServices/SystemVersion.plist
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         
@@ -374,15 +342,22 @@ jobs:
         name: img.zip
         path: ~/img.zip
         
-#     - name: Create Release
-#       if: github.event.action == 'onyx_b2g_build'
-#       id: create_release
-#       uses: actions/create-release@v1
-#       env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#       with:
-#           tag_name: ${{ github.ref }}
-#           release_name: Release ${{ github.ref }}
+  
+    - name: Create Release
+      id: create_release
+      if: github.event.action == 'onyx_b2g_build'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.RELEASE_REF }}
+        #release_name: release_${{ env.RELEASE_REF }}
+        draft: false
+        prerelease: false
+        body: |
+          # Release Notes
+          B2G OTA ROM - onyx_b2g_ota_update.zip
+          B2G systim.img & boot.img - B2G_systemimage.zip
 
     - name: Update Release Asset - system & boot
       continue-on-error: true
@@ -391,9 +366,9 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: /Users/runner/img.zip
-          asset_name: B2G_image.zip
+          asset_name: B2G_systemimage.zip
           asset_content_type: application/zip
 
     - name: Update Release Asset - onyx-ota
@@ -403,7 +378,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          upload_url: ${{ secrets.B2G_ONYX_RELAESE_UPLOAD_URL }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: /Users/runner/onyx_b2g_ota_update.zip
           asset_name: onyx_b2g_ota_update.zip
           asset_content_type: application/zip
