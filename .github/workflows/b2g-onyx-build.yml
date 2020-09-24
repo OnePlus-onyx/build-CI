@@ -139,7 +139,7 @@ jobs:
         echo ${outversion}
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
-        echo "::set-env name=release_vision::$(date +%Y-%m-%d)"
+        echo "::set-env name=RELEASE_REF::$(date +%Y-%m-%d)"
         echo "::set-env name=CPU_S::$(echo 'x86')"
         echo $CPU_S
         #echo "::set-env name=RELEASE_TAG::${TAG}"
@@ -151,8 +151,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.release_vision }}
-        release_name: release_${{ env.release_vision }}
+        tag_name: ${{ env.RELEASE_REF }}
+        release_name: release_${{ env.RELEASE_REF }}
         draft: false
         prerelease: false
         body: |
