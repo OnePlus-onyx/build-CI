@@ -630,6 +630,7 @@ jobs:
 
 
   test:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
