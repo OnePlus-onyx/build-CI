@@ -147,8 +147,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ release_vision }}
-        release_name: ${{ release_vision }}
+        tag_name: ${{ env.release_vision }}
+        release_name: ${{ env.release_vision }}
         draft: false
         prerelease: false
         body: |
