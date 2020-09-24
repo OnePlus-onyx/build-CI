@@ -11,7 +11,7 @@ on:
       - onyx_kernel_build
         
   release:
-    types: [published]
+    types: [created]
     tag:
     - 'b2g-onyx-v*'
       
