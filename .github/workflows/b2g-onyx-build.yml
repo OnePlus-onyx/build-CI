@@ -10,15 +10,15 @@ on:
       - onyx_b2g_build
       - onyx_kernel_build
         
-  push:
-    tags: 
-      - b2g-onyx-v*
-
+#   push:
+#     tags: 
+#       - b2g-onyx-v*
   
-#   release:
-#     types: [created]
-#     tag:
-#     - 'b2g-onyx-v*'
+  release:
+#     types: 
+#       - published
+    tag:
+      - 'b2g-onyx-v*'
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
@@ -651,8 +651,12 @@ jobs:
         echo ${{ github.event.created_at }}
         echo ${{ github.event.published_at }}
         echo ${{ github.event.client_payload.github.payload.repository.full_name }}
+
+        echo ${{ github.event.release.url }}
+        echo ${{ github.event.release.target_commitish }}
+        echo ${{ github.event.comment.id }}
+        
         echo ${{ github.event.comment.created_at }}
         echo ${{ github.event.release.created_at }}
         echo ${{ github.event.release.published_at }}
-        echo ${{ github.event.release.url }}
-        echo ${{ github.event.release.target_commitish }}
+        echo ${{ github.event.comment.body }}
