@@ -646,6 +646,7 @@ jobs:
         echo ${{ github.event.action }}
         echo ${{ github.event_name }}
         echo ${{ github.event_path }}
+        cat ${{ github.event_path }}
         echo ${{ github.event.tag_name }}
         echo ${{ github.event.tarball_url }}
         echo ${{ github.event.created_at }}
