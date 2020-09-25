@@ -15,8 +15,8 @@ on:
 #       - b2g-onyx-v*
   
   release:
-#     types: 
-#       - published
+    types: 
+      - published
     tag:
       - 'b2g-onyx-v*'
       
