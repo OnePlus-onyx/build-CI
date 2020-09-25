@@ -10,10 +10,15 @@ on:
       - onyx_b2g_build
       - onyx_kernel_build
         
-  release:
-    types: [created]
-    tag:
-    - 'b2g-onyx-v*'
+  push:
+    tags: 
+      - b2g-onyx-v*
+
+  
+#   release:
+#     types: [created]
+#     tag:
+#     - 'b2g-onyx-v*'
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
