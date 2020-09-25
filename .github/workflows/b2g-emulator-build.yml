@@ -327,6 +327,8 @@ jobs:
       run: |
         df -h
         sudo apt install git make mercurial  yasm  libncurses5
+        
+        ####nasm
         wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
         tar xfj nasm-2.14.02.tar.bz2
         cd nasm-2.14.02/
@@ -336,13 +338,20 @@ jobs:
         sudo make install
         #hash -d nasm
         nasm -v
+        cd ../
+        sudo rm -rf nasm-2.14.02
+        sudo rm -rf nasm-2.14.02.tar.bz2
+        
+        ####git
         cd ~
         git config --global user.name "ci"
         git config --global user.email "ci@github.com"
-        #ssh
+        
+        ####ssh
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+        
         #rclone
         mkdir -p ~/.config/rclone
         git clone git@github.com:ittat/tmp.git
