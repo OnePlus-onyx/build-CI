@@ -645,6 +645,7 @@ jobs:
       run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
   
     - name: Run a one-line script
+      if:  steps.get_version.outputs.VERSION == 'b2g*'
       run: |
         echo Hello, world!
         echo ${{ steps.get_version.outputs.VERSION }}
