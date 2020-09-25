@@ -639,9 +639,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
+
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+  
     - name: Run a one-line script
       run: |
         echo Hello, world!
+        echo ${{ steps.get_version.outputs.VERSION }}
         echo ${{ github.event }}
         echo ${{ github.event.action }}
         echo ${{ github.event_name }}
