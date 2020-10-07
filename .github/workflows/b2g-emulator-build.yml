@@ -357,7 +357,7 @@ jobs:
         git clone git@github.com:ittat/tmp.git
         cd tmp
         mv ./rclone.conf ~/.config/rclone
-        brew install rclone
+        sudo apt install rclone
         rclone ls itd:test
         
     - uses: hecrj/setup-rust-action@v1
