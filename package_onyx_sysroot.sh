@@ -51,6 +51,7 @@ out/target/product/onyx/system/lib/android.hardware.wifi.hostapd@1.1.so
 out/target/product/onyx/system/lib/android.hardware.wifi.supplicant@1.0.so
 out/target/product/onyx/system/lib/android.hardware.wifi.supplicant@1.1.so
 out/target/product/onyx/system/lib/android.hardware.wifi.supplicant@1.2.so
+out/target/product/onyx/system/lib/android.system.wifi.keystore@1.0.so
 out/target/product/onyx/system/lib/binder_b2g_connectivity_interface-cpp.so
 out/target/product/onyx/system/lib/binder_b2g_telephony_interface-cpp.so
 out/target/product/onyx/system/lib/dnsresolver_aidl_interface-V2-cpp.so
@@ -166,7 +167,8 @@ out/soong/.intermediates/hardware/interfaces/wifi/hostapd/1.0/android.hardware.w
 out/soong/.intermediates/hardware/interfaces/wifi/hostapd/1.1/android.hardware.wifi.hostapd@1.1_genc++_headers/gen
 out/soong/.intermediates/hardware/interfaces/wifi/supplicant/1.0/android.hardware.wifi.supplicant@1.0_genc++_headers/gen
 out/soong/.intermediates/hardware/interfaces/wifi/supplicant/1.1/android.hardware.wifi.supplicant@1.1_genc++_headers/gen
-out/soong/.intermediates/hardware/interfaces/wifi/supplicant/1.2/android.hardware.wifi.supplicant@1.2_genc++_headers/gen"
+out/soong/.intermediates/hardware/interfaces/wifi/supplicant/1.2/android.hardware.wifi.supplicant@1.2_genc++_headers/gen
+out/soong/.intermediates/system/hardware/interfaces/wifi/keystore/1.0/android.system.wifi.keystore@1.0_genc++_headers/gen"
 
 copy_to_sysroot "${GENERATED_HIDL_HEADERS}" "include"
 
