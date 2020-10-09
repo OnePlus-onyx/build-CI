@@ -176,6 +176,7 @@ jobs:
         mv ./rclone.conf ~/.config/rclone
         brew install rclone
         rclone ls itd:test
+        #rclone -v
         
         
     - name: Fetch Source
@@ -475,7 +476,7 @@ jobs:
         cd tmp
         mv ./rclone.conf ~/.config/rclone
         sudo apt install rclone
-        rclone ls itd:test
+        #rclone ls itd:test
         
     - uses: hecrj/setup-rust-action@v1
       with:
