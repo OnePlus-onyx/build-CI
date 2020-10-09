@@ -476,8 +476,8 @@ jobs:
         cd tmp
         mv ./rclone.conf ~/.config/rclone
         sudo apt install rclone
-        rclone -v
-        rclone ls itd:test
+        #rclone -v
+        rclone ls itd:
         
     - uses: hecrj/setup-rust-action@v1
       with:
