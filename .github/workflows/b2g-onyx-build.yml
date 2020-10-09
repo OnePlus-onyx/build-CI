@@ -453,7 +453,7 @@ jobs:
         #####
         echo "::set-env name=RELEASE_REF::b2g-core_onyx_$(date +%Y-%m-%d)"
 
-        sudo apt install git make mercurial  yasm  libncurses5
+        sudo apt install git make mercurial  yasm  libncurses5 libfuse-dev
         wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
         tar xfj nasm-2.14.02.tar.bz2
         cd nasm-2.14.02/
