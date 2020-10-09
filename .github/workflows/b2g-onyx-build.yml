@@ -475,7 +475,8 @@ jobs:
         git clone git@github.com:ittat/tmp.git
         cd tmp
         mv ./rclone.conf ~/.config/rclone
-        sudo apt install rclone
+        #sudo apt install rclone
+        brew install rclone
         #rclone -v
         rclone ls itd:test
         
