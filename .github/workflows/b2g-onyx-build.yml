@@ -442,10 +442,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-    - name: Send Start Notify
-      run: |
-        today=$(date +%Y-%m-%d)
-        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} Start!"
+#     - name: Send Start Notify
+#       run: |
+#         today=$(date +%Y-%m-%d)
+#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} Start!"
 
     - name: Initialization system environment
       run: |
@@ -476,7 +476,8 @@ jobs:
         cd tmp
         mv ./rclone.conf ~/.config/rclone
         sudo apt install rclone
-        #rclone ls itd:test
+        rclone -v
+        rclone ls itd:test
         
     - uses: hecrj/setup-rust-action@v1
       with:
@@ -496,9 +497,9 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
-        mv gecko-b2g-1 gecko-b2g
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        #mv gecko-b2g-1 gecko-b2g
         df -h
         
     - name: Bootstrap Gecko
