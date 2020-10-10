@@ -483,6 +483,16 @@ jobs:
         brew install rclone
         #rclone -v
         rclone ls itd:test
+
+    - name: clean disk
+      run: |
+        df -h
+        sudo rm -rf \
+        /usr/share/dotnet \
+        /etc/mysql \
+        /etc/php
+        df -h
+        
         
     - uses: hecrj/setup-rust-action@v1
       with:
