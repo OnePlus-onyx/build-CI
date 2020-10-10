@@ -442,10 +442,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-#     - name: Send Start Notify
-#       run: |
-#         today=$(date +%Y-%m-%d)
-#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} Start!"
+    - name: Send Start Notify
+      run: |
+        today=$(date +%Y-%m-%d)
+        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} Start!"
 
     - name: Initialization system environment
       run: |
@@ -552,19 +552,26 @@ jobs:
         ./build-b2g.sh package
         df -h
         ls ${GECKO_OBJDIR}/dist
-         
+
+    - name: Get Gecko Version
+      run: |
+        cd ~/gecko-b2g
+        echo `cat browser/config/version.txt`
+        export version=`cat browser/config/version.txt`
+        echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-androideabi-arm.tar.gz"
+
     - name: Upload Artifact
       if: github.event_name == 'schedule'
       uses: actions/upload-artifact@master
       with:
-        name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
-        path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+        name: ${{ env.B2G_OUT }}
+        path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/${{ env.B2G_OUT }}
 
     - name: Upload to Gdrive
       run: |
         df -h
         cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
-        rclone copy ./b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz itd:ci/${image} 
+        rclone copy ${{ env.B2G_OUT }} itd:ci/${image} 
         df -h
 
     - name: Create Release
@@ -580,7 +587,7 @@ jobs:
         prerelease: false
         body: |
           # Release Notes
-          b2g-en-US.linux-androideabi-arm-onyx
+          ${{ env.B2G_OUT }}
 
     - name: Update Release Asset 
       if: github.event_name != 'schedule'
@@ -590,8 +597,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
-          asset_name: b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz
+          asset_path: /home/runner/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/${{ env.B2G_OUT }}
+          asset_name: ${{ env.B2G_OUT }}
           asset_content_type: application/gzip
 
     - name: Send "kernel_build" WebHook
