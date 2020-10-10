@@ -13,6 +13,7 @@ on:
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
   image: ${{github.event.client_payload.image}}  
+  IMAGE: ${{github.event.client_payload.image}} 
   work: /Volumes/${{github.event.client_payload.image}} 
   action_type: ${{ github.event.action }} 
 
@@ -447,6 +448,12 @@ jobs:
         today=$(date +%Y-%m-%d)
         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} Start!"
 
+    - name: Set env
+      if: github.event_name == 'schedule' 
+      run: |
+        echo "::set-env name=IMAGE::b2g_onyx"
+        echo ${{ env.IMAGE }}
+        
     - name: Initialization system environment
       run: |
         df -h
@@ -514,7 +521,7 @@ jobs:
       run: |
         df -h
         cd ~
-        rclone copy  itd:ci/${image}/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/${{ env.IMAGE }}/b2g-sysroot.tar.zst ./
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
         tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
@@ -571,7 +578,7 @@ jobs:
       run: |
         df -h
         cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
-        rclone copy ${{ env.B2G_OUT }} itd:ci/${image} 
+        rclone copy ${{ env.B2G_OUT }} itd:ci/${{ env.IMAGE }}
         df -h
 
     - name: Create Release
