@@ -13,7 +13,7 @@ on:
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
   image: ${{github.event.client_payload.image}}  
-  IMAGE: ${{github.event.client_payload.image}} 
+  PROIMAGE: ${{github.event.client_payload.image}} 
   work: /Volumes/${{github.event.client_payload.image}} 
   action_type: ${{ github.event.action }} 
 
@@ -451,8 +451,8 @@ jobs:
     - name: Set env
       if: github.event_name == 'schedule' 
       run: |
-        echo "::set-env name=IMAGE::b2g_onyx"
-        echo ${{ env.IMAGE }}
+        echo "::set-env name=PROIMAGE::b2g_onyx"
+        echo ${{ env.PROIMAGE }}
         
     - name: Initialization system environment
       run: |
@@ -521,7 +521,7 @@ jobs:
       run: |
         df -h
         cd ~
-        rclone copy  itd:ci/${{ env.IMAGE }}/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/${{ env.PROIMAGE }}/b2g-sysroot.tar.zst ./
         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
         tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
@@ -578,7 +578,7 @@ jobs:
       run: |
         df -h
         cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
-        rclone copy ${{ env.B2G_OUT }} itd:ci/${{ env.IMAGE }}
+        rclone copy ${{ env.B2G_OUT }} itd:ci/${{ env.PROIMAGE }}
         df -h
 
     - name: Create Release
