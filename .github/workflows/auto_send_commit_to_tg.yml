@@ -15,14 +15,19 @@ jobs:
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g  -b gonk
         git clone https://github.com/kaiostech/gonk-misc -b main
+        git clone https://github.com/kaiostech/api-daemon -b main
         cd ~/gecko-b2g
         #today
         export today=$(date +%Y-%m-%d)
         #yesterday 
         export yesterday=$(date -d "yesterday" +%Y-%m-%d)
         git log --since=${yesterday} >> ~/log.gecko
+        
         cd ~/gonk-misc
         git log --since=${yesterday} --until=${yesterday} >> ~/log.gonk
+        
+        cd ~/api-daemon
+        git log --since=${yesterday} --until=${yesterday} >> ~/log.api-daemon
         echo $yesterday
         
     - name: Send Gecko Commit
@@ -64,6 +69,32 @@ jobs:
         export mess=`cat ~/log.gonk`
         export yesterday=$(date -d "yesterday" +%Y-%m-%d)
         export title="gonk - commits date: $yesterday"
+        echo $title
+        if [ -s ~/log.gonk ]; then
+           curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$title"
+           mess=${mess//commit/|commit}
+           mess="$mess |commit"
+           mess=${mess/|commit}
+           while :
+            do
+              if [ ! -n "$mess" ]; then
+               exit 0
+              fi
+              subcommit=${mess%%|*}
+              curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$subcommit"
+              mess=${mess#*|commit}
+           done
+        else
+         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=commits:gonk:Null"
+        fi
+        
+        
+    - name: Send api-daemon Commit
+      run: |
+        cd ~
+        export mess=`cat ~/log.api-daemon`
+        export yesterday=$(date -d "yesterday" +%Y-%m-%d)
+        export title="api-daemon - commits date: $yesterday"
         echo $title
         if [ -s ~/log.gonk ]; then
            curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=$title"
