@@ -485,12 +485,15 @@ jobs:
         rclone ls itd:test
 
     - name: clean disk
+      continue-on-error: true
       run: |
         df -h
         sudo rm -rf \
         /usr/share/dotnet \
         /etc/mysql \
         /etc/php
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
         df -h
         
         
@@ -540,9 +543,6 @@ jobs:
         export TARGET_CPU_VARIANT=krait
         export MOZ_DISABLE_LTO=1
         ./build-b2g.sh
-        df -h
-        sudo rm -r $HOME/.mozbuild/android-ndk-r20b-canary
-        df -h
         ./build-b2g.sh package
         df -h
         ls ${GECKO_OBJDIR}/dist
