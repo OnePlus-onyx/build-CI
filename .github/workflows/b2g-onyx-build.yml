@@ -528,9 +528,9 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        #git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-1 --depth=1
-        #mv gecko-b2g-1 gecko-b2g
+        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-2 --depth=1
+        mv gecko-b2g-1 gecko-b2g
         df -h
         
     - name: Bootstrap Gecko
@@ -568,7 +568,7 @@ jobs:
         echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-androideabi-arm.tar.gz"
 
     - name: Upload Artifact
-      if: github.event_name == 'schedule'
+#       if: github.event_name == 'schedule'
       uses: actions/upload-artifact@master
       with:
         name: ${{ env.B2G_OUT }}
@@ -608,15 +608,15 @@ jobs:
           asset_name: ${{ env.B2G_OUT }}
           asset_content_type: application/gzip
 
-    - name: Send "kernel_build" WebHook
-      if: github.event.action == 'onyx_gecko_build'
-      run: |
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_kernel_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+#     - name: Send "kernel_build" WebHook
+#       if: github.event.action == 'onyx_gecko_build'
+#       run: |
+#         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_kernel_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
   
-    - name: Send Done Notify 
-      run: |
-        today=$(date +%Y-%m-%d)
-        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-build-gecko PASS!"
+#     - name: Send Done Notify 
+#       run: |
+#         today=$(date +%Y-%m-%d)
+#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-build-gecko PASS!"
 
 
   kernel_build:
