@@ -1,7 +1,7 @@
 name: onyx_build
 on: 
   schedule:
-    - cron: '0 23 */3 * *'
+    - cron: '0 23 */5 * *'
   repository_dispatch:
       types: 
       - onyx_repack_aosp
@@ -528,9 +528,9 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-1 --depth=1
-        mv gecko-b2g-1 gecko-b2g
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-1 --depth=1
+        #mv gecko-b2g-1 gecko-b2g
         df -h
         
     - name: Bootstrap Gecko
@@ -632,7 +632,7 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        sudo apt install git make gcc g++
+        sudo apt install git make gcc g++ libfuse-dev
         cd ~
         git config --global user.name "ci"
         git config --global user.email "ci@github.com"
@@ -647,6 +647,24 @@ jobs:
         mv ./rclone.conf ~/.config/rclone
         brew install rclone
         rclone ls itd:test
+        
+    - name: clean disk
+      #continue-on-error: true
+      run: |
+        df -h
+        echo ————————————————————————————————————
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        sudo apt remove -y 'php.*'
+        sudo apt-get remove -y '^ghc-8.*'
+        sudo apt-get remove -y '^dotnet-.*'
+        sudo apt-get autoremove -y
+        sudo apt-get clean
+        sudo rm -rf /etc/mysql 
+        echo "Removing large directories"
+        # deleting 15GB
+        rm -rf /usr/share/dotnet/
+        df -h
         
     - name: Download Source
       run: |
