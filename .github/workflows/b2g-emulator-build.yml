@@ -326,7 +326,7 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        sudo apt install git make mercurial  yasm  libncurses5
+        sudo apt install git make mercurial  yasm  libncurses5  libfuse-dev
         
         ####nasm
         wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
@@ -378,9 +378,9 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
-        mv gecko-b2g-1 gecko-b2g
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #git clone https://github.com/ittat/gecko-b2g-1 -b gonk --depth=1
+        #mv gecko-b2g-1 gecko-b2g
         df -h
         
     - name: Bootstrap Gecko
