@@ -528,9 +528,9 @@ jobs:
         sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
-        #git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-        git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-2 --depth=1
-        mv gecko-b2g-1 gecko-b2g
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-2 --depth=1
+        #mv gecko-b2g-1 gecko-b2g
         df -h
         
     - name: Bootstrap Gecko
