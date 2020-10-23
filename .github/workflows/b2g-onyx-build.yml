@@ -179,6 +179,8 @@ jobs:
       continue-on-error: true
       run: |
         cd ~
+        #test
+        port select --summary 
         hdiutil detach ${work}
         rm ${image}.dmg.sparseimage
         df -h
