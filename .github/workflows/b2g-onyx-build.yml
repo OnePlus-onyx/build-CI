@@ -74,7 +74,7 @@ jobs:
         df -h
 
     - name: Fix soucre
-      run: |
+      run: |    
         ####
         echo apply patch
         cd ${work}/B2G
@@ -83,30 +83,61 @@ jobs:
         ####
         cd ${work}/B2G
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
-        
+      
         ####
+        cd ${work}
+        cp B2G/gonk-misc/Android.mk ./Android.mk.gonk.old
+        cp B2G/gonk-misc/api-daemon/Android.mk ./Android.mk.api-daemon.old
+        
+        export CI_WORK=${work}
         cd ~
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        sudo chmod +x ~/build-CI/patch-b2g-aosp.sh
+        ~/build-CI/patch-b2g-aosp.sh
+        
         cd ${work}
-        cp B2G/gonk-misc/Android.mk ./
-        mv Android.mk Android.mk.old
-        cd ${work}/B2G/gonk-misc
-        git am ~/build-CI/0001-err.patch
-        cp Android.mk  ${work}
-        cd ${work}
-        mv Android.mk Android.mk.patch
+        cp B2G/gonk-misc/Android.mk ./Android.mk.gonk.patch
+        cp B2G/gonk-misc/api-daemon/Android.mk ./Android.mk.api-daemon.patch
         
         ####
-        cd  ${work}/B2G
-        # Force compressing debug symbols
-        cd build/soong
-        git am ~/build-CI/0001-gz.patch
-        
-        ####
-        df -h
-        cd ${work}/B2G
+        #export CI_WORK=${work}
+        cd ${CI_WORK}/B2G
         sudo rm -rf .repo
-        df -h
+        
+#     - name: Fix soucre
+#       run: |
+#         ####
+#         echo apply patch
+#         cd ${work}/B2G
+#         ./patcher/patcher.sh 
+        
+#         ####
+#         cd ${work}/B2G
+#         sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        
+#         ####
+#         cd ~
+#         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+#         cd ${work}
+#         cp B2G/gonk-misc/Android.mk ./
+#         mv Android.mk Android.mk.old
+#         cd ${work}/B2G/gonk-misc
+#         git am ~/build-CI/0001-err.patch
+#         cp Android.mk  ${work}
+#         cd ${work}
+#         mv Android.mk Android.mk.patch
+        
+#         ####
+#         cd  ${work}/B2G
+#         # Force compressing debug symbols
+#         cd build/soong
+#         git am ~/build-CI/0001-gz.patch
+        
+#         ####
+#         df -h
+#         cd ${work}/B2G
+#         sudo rm -rf .repo
+#         df -h
            
     - name: Compress Soucre
       run: |
@@ -212,7 +243,10 @@ jobs:
         ####
         cd ${work}
         sudo rm -rf ./B2G/gonk-misc/Android.mk
-        cp ./Android.mk.patch B2G/gonk-misc/Android.mk 
+        cp ./Android.mk.gonk.patch B2G/gonk-misc/Android.mk 
+        
+        sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
+        cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
         
         ####
         export CCACHE_DIR=~/.ccache
@@ -232,8 +266,11 @@ jobs:
         ####
         cd ${work}
         sudo rm -rf ./B2G/gonk-misc/Android.mk
-        cp ./Android.mk.old B2G/gonk-misc/Android.mk 
+        cp ./Android.mk.gonk.old B2G/gonk-misc/Android.mk 
         
+        sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
+        cp ./Android.mk.api-daemon.old B2G/gonk-misc/api-daemon/Android.mk 
+
         ####
         cd ${work}
         mkdir pre-gecko
