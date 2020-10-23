@@ -166,11 +166,11 @@ jobs:
     #runs-on: macos-11.0
     timeout-minutes: 360
     steps:
-    - name: Send Start Notify To Telegram
-      run: |
-        echo ${outversion}
-        today=$(date +%Y-%m-%d)
-        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
+#     - name: Send Start Notify To Telegram
+#       run: |
+#         echo ${outversion}
+#         today=$(date +%Y-%m-%d)
+#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
 
     - name: Checkout
       uses: actions/checkout@v1       
@@ -195,9 +195,9 @@ jobs:
         
         ####brew
         #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache coreutils zstd
-        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
+        brew install expect  gnu-sed ccache coreutils zstd gcc
+        #ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        #ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         
         #####ssh
         mkdir -p ~/.ssh
