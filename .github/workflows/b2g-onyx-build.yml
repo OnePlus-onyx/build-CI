@@ -327,15 +327,16 @@ jobs:
       id: sysroot
       if: github.event.action == 'onyx_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
-        cd ~
-        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
-        chmod +x ~/build-CI/package_onyx_sysroot.sh
         df -h
         cd ${work}/B2G
-        cp ~/build-CI/package_onyx_sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
-        ./package_onyx_sysroot.sh
+        export TARGET_ARCH=arm
+        export TARGET_ARCH_VARIANT=armv7-a-neon
+        export TARGET_CPU_VARIANT=krait
+        export GONK_PRODUCT_NAME=onyx
+        gecko/taskcluster/scripts/misc/create-b2g-sysroot.sh
+        ls -al
         sudo rm -rf ./b2g-sysroot
         ls -al
         mv b2g-sysroot.tar.zst ${work}
@@ -528,6 +529,9 @@ jobs:
         brew install rclone
         #rclone -v
         rclone ls itd:test
+        # yarn
+        sudo apt-get install yarnpkg
+        sudo ln -snf /usr/bin/yarnpkg /usr/bin/yarn
 
     - name: clean disk
       #continue-on-error: true
