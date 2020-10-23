@@ -41,13 +41,8 @@ jobs:
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        ####mount
-        cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 400g ~/${image}.dmg
-        ls
-        hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
         ####zstd
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install zstd  
         #####ssh
         mkdir -p ~/.ssh
@@ -60,6 +55,12 @@ jobs:
         mv ./rclone.conf ~/.config/rclone
         brew install rclone
         rclone ls itd:test
+        
+        ####mount
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 400g ~/${image}.dmg
+        ls
+        hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
            
     - name: Fetch source
       run: |
