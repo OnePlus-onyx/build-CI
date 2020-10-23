@@ -162,7 +162,8 @@ jobs:
    
   aosp_build:
     if: github.event.action == 'onyx_aosp_build' || github.event.action == 'onyx_b2g_build' 
-    runs-on: macos-latest
+    #runs-on: macos-latest
+    runs-on: macos-11.0
     timeout-minutes: 360
     steps:
     - name: Send Start Notify To Telegram
@@ -190,7 +191,7 @@ jobs:
         
         ####
         more /System/Library/CoreServices/SystemVersion.plist
-        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        #sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         
         ####brew
         #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
