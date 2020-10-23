@@ -193,7 +193,7 @@ jobs:
         sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
         
         ####brew
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install expect  gnu-sed ccache coreutils zstd
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
