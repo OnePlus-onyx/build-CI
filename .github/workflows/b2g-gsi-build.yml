@@ -21,7 +21,7 @@ env:
 
 jobs: 
   Download:
-    if: github.event_name == 'pushed' 
+    if: github.event_name == 'push' 
 #     if: env.action_type == 'gsi_repack_aosp'
     runs-on: macos-latest
     timeout-minutes: 360
