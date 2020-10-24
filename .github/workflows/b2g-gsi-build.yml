@@ -214,6 +214,18 @@ jobs:
 
     - name: Check The Previous “error.log”
       run: |
+        cd ${work}/B2G/system
+        rm -r ./netd
+        git clone https://github.com/ittat/platform_system_netd -b ittat-patch-gsi
+        mv platform_system_netd netd
+        
+        cd ${work}/B2G/frameworks
+        rm -r ./base
+        git clone https://github.com/ittat/platform_frameworks_base -b ittat-patch-gsi
+        mv platform_frameworks_base base
+        
+    - name: Check The Previous “error.log”
+      run: |
         if [ -d "${work}/B2G/out" ];then
           ls -al ${work}/B2G/out/error*
           echo "old error.log:"
