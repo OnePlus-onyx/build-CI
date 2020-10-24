@@ -111,7 +111,20 @@ jobs:
         sudo rm -rf .repo
         df -h
         
-           
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        cd ~
+        hdiutil detach ${work}
+        df -h
+        
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        cd ~
+        hdiutil detach ${work}
+        df -h
+        
     - name: Compress Soucre
       run: |
         hdiutil detach ${work}
@@ -124,7 +137,7 @@ jobs:
       run: |
         df -h
         rclone copy ~/${image}.dmg.sparseimage.zst itd:ci/${image}
-        sudo rm -rf android.dmg.sparseimage.zst
+        sudo rm -rf ${image}.dmg.sparseimage.zst
         df -h
         
 #     - name: Send "onyx_aosp_build" WebHook          
