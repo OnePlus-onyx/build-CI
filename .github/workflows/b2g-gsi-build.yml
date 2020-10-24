@@ -21,8 +21,8 @@ env:
 
 jobs: 
   Download:
-#     if: github.event_name == 'push' 
-    if: github.event_name == 'gsi_repack_aosp'
+    if: github.event_name == 'push' 
+#     if: github.event_name == 'gsi_repack_aosp'
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
@@ -145,8 +145,8 @@ jobs:
    
    
   aosp_build:
-    if: github.event_name == 'push' 
-#     if: github.event.action == 'onyx_aosp_build' || github.event.action == 'onyx_b2g_build' 
+#     if: github.event_name == 'push' 
+    if: github.event.action == 'onyx_aosp_build' || github.event.action == 'onyx_b2g_build' 
     runs-on: macos-latest
     #runs-on: macos-11.0
     timeout-minutes: 360
@@ -212,17 +212,17 @@ jobs:
         hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
         df -h
 
-    - name: Check The Previous “error.log”
-      run: |
-        cd ${work}/B2G/system
-        rm -r ./netd
-        git clone https://github.com/ittat/platform_system_netd -b ittat-patch-gsi
-        mv platform_system_netd netd
+#     - name: Check The Previous “error.log”
+#       run: |
+#         cd ${work}/B2G/system
+#         rm -r ./netd
+#         git clone https://github.com/ittat/platform_system_netd -b ittat-patch-gsi
+#         mv platform_system_netd netd
         
-        cd ${work}/B2G/frameworks
-        rm -r ./base
-        git clone https://github.com/ittat/platform_frameworks_base -b ittat-patch-gsi
-        mv platform_frameworks_base base
+#         cd ${work}/B2G/frameworks
+#         rm -r ./base
+#         git clone https://github.com/ittat/platform_frameworks_base -b ittat-patch-gsi
+#         mv platform_frameworks_base base
         
     - name: Check The Previous “error.log”
       run: |
