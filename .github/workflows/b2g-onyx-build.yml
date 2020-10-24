@@ -84,6 +84,7 @@ jobs:
         ####
         cd ${work}/B2G
         sed -i '' '14d'  system/sepolicy/tests/Android.bp
+        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
       
         ####
         cd ${work}
