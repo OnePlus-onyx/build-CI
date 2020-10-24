@@ -127,7 +127,6 @@ jobs:
         
     - name: Compress Soucre
       run: |
-        hdiutil detach ${work}
         cd ~
         zstd ${image}.dmg.sparseimage
         rm ${image}.dmg.sparseimage
