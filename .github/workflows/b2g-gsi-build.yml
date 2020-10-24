@@ -1,10 +1,12 @@
-name: onyx_build
+name: b2g_build
 on: 
+  push:
+    branches: b2g-gsi
   schedule:
     - cron: '0 23 */5 * *'
   repository_dispatch:
       types: 
-      - onyx_repack_aosp
+      - gsi_repack_aosp
       - onyx_aosp_build
       - onyx_gecko_build
       - onyx_b2g_build
@@ -12,14 +14,14 @@ on:
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
-  image: ${{github.event.client_payload.image}}  
-  PROIMAGE: ${{github.event.client_payload.image}} 
-  work: /Volumes/${{github.event.client_payload.image}} 
-  action_type: ${{ github.event.action }} 
+  image: b2g_gsi
+  PROIMAGE: b2g_gsi
+  work: /Volumes/b2g_gsi
+  action_type: gsi_repack_aosp
 
 jobs: 
   Download:
-    if: github.event.action == 'onyx_repack_aosp' 
+    if: env.action_type == 'onyx_repack_aosp' 
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
@@ -68,18 +70,19 @@ jobs:
         git config --global user.name "ci"
         git config --global user.email "ci@github.com"
         cd ${work}
-        git clone https://github.com/b2gOS/B2G -b master  --depth=1 
+        git clone https://github.com/ittat/B2G -b ittat-patch-gsi  --depth=1 
         cd ./B2G
         echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh onyx
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh phhgsi_arm_ab
         df -h
 
     - name: Fix soucre
-      run: |    
+      run: | 
+        df -h   
         ####
-        echo apply patch
-        cd ${work}/B2G
-        ./patcher/patcher.sh 
+        #echo apply patch
+        #cd ${work}/B2G
+        #./patcher/patcher.sh 
         
         ####
         cd ${work}/B2G
@@ -105,41 +108,8 @@ jobs:
         #export CI_WORK=${work}
         cd ${CI_WORK}/B2G
         sudo rm -rf .repo
+        df -h
         
-#     - name: Fix soucre
-#       run: |
-#         ####
-#         echo apply patch
-#         cd ${work}/B2G
-#         ./patcher/patcher.sh 
-        
-#         ####
-#         cd ${work}/B2G
-#         sed -i '' '14d'  system/sepolicy/tests/Android.bp
-        
-#         ####
-#         cd ~
-#         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
-#         cd ${work}
-#         cp B2G/gonk-misc/Android.mk ./
-#         mv Android.mk Android.mk.old
-#         cd ${work}/B2G/gonk-misc
-#         git am ~/build-CI/0001-err.patch
-#         cp Android.mk  ${work}
-#         cd ${work}
-#         mv Android.mk Android.mk.patch
-        
-#         ####
-#         cd  ${work}/B2G
-#         # Force compressing debug symbols
-#         cd build/soong
-#         git am ~/build-CI/0001-gz.patch
-        
-#         ####
-#         df -h
-#         cd ${work}/B2G
-#         sudo rm -rf .repo
-#         df -h
            
     - name: Compress Soucre
       run: |
@@ -156,9 +126,9 @@ jobs:
         sudo rm -rf android.dmg.sparseimage.zst
         df -h
         
-    - name: Send "onyx_aosp_build" WebHook          
-      run: |
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+#     - name: Send "onyx_aosp_build" WebHook          
+#       run: |
+#         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
    
    
   aosp_build:
