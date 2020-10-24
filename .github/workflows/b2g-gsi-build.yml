@@ -212,8 +212,13 @@ jobs:
         hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
         df -h
 
-#     - name: Check The Previous “error.log”
-#       run: |
+    - name: Check The Previous “error.log”
+      run: |
+         cd ${work}/B2G/system
+         rm -r ./vold
+         git clone https://github.com/ittat/platform_system_vold -b ittat-patch-gsi
+         mv platform_system_vold vold
+
 #         cd ${work}/B2G/system
 #         rm -r ./netd
 #         git clone https://github.com/ittat/platform_system_netd -b ittat-patch-gsi
