@@ -244,7 +244,7 @@ jobs:
          
          echo 111111111111111111111111111111111111
          cd ${work}/B2G/
-         development/vndk/tools/header-checker/utils/create_reference_dumps.py  -l libaaudio
+         development/vndk/tools/header-checker/utils/create_reference_dumps.py  -l libaaudio  -products treble_arm_bvN
 
 #         cd ${work}/B2G/system
 #         rm -r ./netd
