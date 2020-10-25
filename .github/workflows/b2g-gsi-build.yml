@@ -243,9 +243,14 @@ jobs:
          sudo rm -r gonk-misc/api-daemon
          
          echo 111111111111111111111111111111111111
-         cd ${work}/B2G/
-         export ANDROID_BUILD_TOP=${work}/B2G
-         development/vndk/tools/header-checker/utils/create_reference_dumps.py  -l libaaudio 
+         cd ${work}/B2G/device/phh
+         sudo rm -r treble
+         
+         git clone https://github.com/ittat/device_phh_treble -b gonk-android-10.0
+         mv device_phh_treble treble
+         
+         #export ANDROID_BUILD_TOP=${work}/B2G
+         #development/vndk/tools/header-checker/utils/create_reference_dumps.py  -l libaaudio 
 
 #         cd ${work}/B2G/system
 #         rm -r ./netd
