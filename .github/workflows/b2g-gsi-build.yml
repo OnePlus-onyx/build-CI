@@ -215,6 +215,9 @@ jobs:
         #rclone -v
         
         
+        ####
+        rustup target add aarch64-linux-android armv7-linux-androideabi
+        
     - name: Fetch Source
       run: |
         df -h
