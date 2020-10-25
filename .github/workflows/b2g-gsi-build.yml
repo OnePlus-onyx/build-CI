@@ -295,7 +295,7 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
-        gtimeout 275m ./build.sh -j4 WITHOUT_CHECK_API=true
+        gtimeout 275m ./build.sh -j4 WITHOUT_CHECK_API=true systemimage
         df -h
         
     - name: B2G Build - Build Source include Gecko
