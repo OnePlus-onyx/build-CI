@@ -216,7 +216,7 @@ jobs:
         
         
         ####
-        rustup target add aarch64-linux-android armv7-linux-androideabi
+        #rustup target add aarch64-linux-android armv7-linux-androideabi
         
     - name: Fetch Source
       run: |
@@ -237,6 +237,10 @@ jobs:
          rm -r ./vold
          git clone https://github.com/ittat/platform_system_vold -b ittat-patch-gsi
          mv platform_system_vold vold
+         
+         
+         cd ${work}/B2G/
+         sudo rm -r gonk-misc/api-daemon
 
 #         cd ${work}/B2G/system
 #         rm -r ./netd
@@ -466,14 +470,14 @@ jobs:
         hdiutil detach ${work}
 
     - name: Compress Soucre
-#       if: steps.check.conclusion == 'success'
+      if: steps.check.conclusion == 'success'
       run: |
         cd ~
         zstd ${image}.dmg.sparseimage
         df -h
                
     - name: Update Build Source
-#       if: steps.check.conclusion == 'success'
+      if: steps.check.conclusion == 'success'
       run: |
         df -h
         cd ~
