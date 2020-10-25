@@ -274,8 +274,8 @@ jobs:
         sudo rm -rf ./B2G/gonk-misc/Android.mk
         cp ./Android.mk.gonk.patch B2G/gonk-misc/Android.mk 
         
-        sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
-        cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
+        #sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
+        #cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
         
         ####
         export CCACHE_DIR=~/.ccache
