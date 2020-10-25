@@ -181,7 +181,8 @@ jobs:
         
         ####brew
         #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install expect  gnu-sed ccache coreutils zstd gcc
+        brew install expect  gnu-sed ccache coreutils zstd gcc perl cpanm
+        sudo cpan LWP::UserAgent
         #ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         #ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         
