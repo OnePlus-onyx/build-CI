@@ -341,15 +341,20 @@ jobs:
       id: sysroot
       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
+        cd ~
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        chmod +x ~/build-CI/create-b2g-sysroot.sh
         df -h
         cd ${work}/B2G
+        cp ~/build-CI/api_sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
         export TARGET_ARCH=arm
         export TARGET_ARCH_VARIANT=armv7-a-neon
         export TARGET_CPU_VARIANT=generic
         export GONK_PRODUCT_NAME=treble_arm_bvN
-        gecko/taskcluster/scripts/misc/create-b2g-sysroot.sh
+        #gecko/taskcluster/scripts/misc/create-b2g-sysroot.sh
+        ./create-b2g-sysroot.sh
         ls -al
         sudo rm -rf ./b2g-sysroot
         ls -al
@@ -367,11 +372,6 @@ jobs:
       id: gsi_sysroot
       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
-        df -h
-        ####
-        cd ~
-        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
-        chmod +x ~/build-CI/api_sysroot.sh
         df -h
         cd ${work}/B2G
         cp ~/build-CI/api_sysroot.sh ./
