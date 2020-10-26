@@ -231,6 +231,7 @@ jobs:
         df -h
 
     - name: fix
+      continue-on-error: true
       run: |
          cd ${work}/B2G/
          sudo rm -r gonk-misc/api-daemon
