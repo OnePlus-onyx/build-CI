@@ -225,10 +225,10 @@ jobs:
       run: |
          cd ${work}/B2G/gonk-misc
          sudo rm -r api-daemon
-         git clone https://github.com/ittat/api-daemon -b ittat-patch-mac
-         cd ${work}
-         sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
-         cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
+         #git clone https://github.com/ittat/api-daemon -b ittat-patch-mac
+         #cd ${work}
+         #sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
+         #cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
          
          
 #         cd ${work}/B2G/system
@@ -337,7 +337,7 @@ jobs:
         fi
         
         
-    - name: Repack “b2g-sysroot” for onyx 
+    - name: Repack “b2g-sysroot” for gsi
       id: sysroot
       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
@@ -362,6 +362,38 @@ jobs:
         cd ${work}
         rclone copy b2g-sysroot.tar.zst itd:ci/${image}
         sudo rm b2g-sysroot.tar.zst
+
+    - name: Repack “api-sysroot” for gsi 
+      id: gsi_sysroot
+      if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+        df -h
+        ####
+        cd ~
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        chmod +x ~/build-CI/api_sysroot.sh
+        df -h
+        cd ${work}/B2G
+        cp ~/build-CI/api_sysroot.sh ./
+        pip3 install zstandard
+        pip install zstandard
+        export TARGET_ARCH=arm
+        export TARGET_ARCH_VARIANT=armv7-a-neon
+        export TARGET_CPU_VARIANT=generic
+        export GONK_PRODUCT_NAME=treble_arm_bvN
+        ./api_sysroot.sh
+        sudo rm -rf ./api-sysroot
+        ls -al
+        mv api-sysroot.tar.zst ${work}
+        df -h
+
+    - name: Upload “api-sysroot”
+      if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+        cd ${work}
+        rclone copy api-sysroot.tar.zst itd:ci/${image}
+        sudo rm api-sysroot.tar.zst
+
 
     - name: Update b2g-ota.zip  !!!!
       if:  github.event.action == 'gsi_b2g_build' 
