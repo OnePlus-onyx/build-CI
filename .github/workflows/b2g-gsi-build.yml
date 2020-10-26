@@ -694,20 +694,21 @@ jobs:
 #         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-build-gecko PASS!"
 
 
-  kernel_build:
+  api-daemon_build:
     if: github.event.action == 'onyx_kernel_build'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-    - name: Send Start Notify
-      run: |
-        today=$(date +%Y-%m-%d)
-        curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} Start!"
+#     - name: Send Start Notify
+#       run: |
+#         today=$(date +%Y-%m-%d)
+#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}} Start!"
 
     - name: Initialization system environment
       run: |
         df -h
         sudo apt install git make gcc g++ libfuse-dev
+        rustup target add aarch64-linux-android armv7-linux-androideabi
         cd ~
         git config --global user.name "ci"
         git config --global user.email "ci@github.com"
@@ -744,14 +745,20 @@ jobs:
     - name: Download Source
       run: |
         cd ~
-        git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8
-        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx -b gonk_android-10.0.0_r11  --depth=1
-        cd ~/kernel_oneplus_onyx 
-        make onyx_defconfig ARCH=arm CROSS_COMPILE=/home/runner/arm-eabi-4.8/bin/arm-eabi-
-        ls -al ./.config
-        make ARCH=arm CROSS_COMPILE=/home/runner/arm-eabi-4.8/bin/arm-eabi-  CONFIG_NO_ERROR_ON_MISMATCH=y zImage-dtb
-        ls -al arch/arm/boot/
-        rclone copy arch/arm/boot/zImage-dtb itd:ci/${image}
+        git clone https://github.com/kaiostech/api-daemon
+        cd api-daemon
+        
+        RUST_TARGET := armv7-linux-androideabi
+        RUST_TARGET := aarch64-linux-android
+        LOCAL_NDK := $(HOME)/.mozbuild/android-ndk-r20b-canary
+        GONK_DIR
+        TARGET_DEVICE
+        
+        export TARGET_ARCH=$(RUST_TARGET) && \
+        export BUILD_WITH_NDK_DIR=$(LOCAL_NDK) && \
+        export GONK_DIR=$(GONK_DIR) && \
+        export GONK_PRODUCT=$(TARGET_DEVICE) && \
+        (cd $(DAEMON_ROOT) ; $(SHELL) update-prebuilts.sh)
 
     - name: Send Done Notify && Send "onyx_b2g_build" WebHook
       run: |
