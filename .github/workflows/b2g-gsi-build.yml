@@ -82,6 +82,7 @@ jobs:
         ####
         echo apply patch
         cd ${work}/B2G
+        chmod +x ./patcher/patcher.sh 
         ./patcher/patcher.sh 
         
         ####
