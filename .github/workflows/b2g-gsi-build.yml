@@ -269,7 +269,7 @@ jobs:
       run: |
         df -h
         ####
-        #cd ${work}
+        cd ${work}
         sudo rm -rf ./B2G/gonk-misc/Android.mk
         cp ./Android.mk.gonk.patch B2G/gonk-misc/Android.mk 
         
