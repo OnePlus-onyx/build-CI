@@ -317,7 +317,7 @@ jobs:
         ./build.sh -j4 systemimage
         
     - name: Check Current ”error.log“ Status
-      continue-on-error: true
+#       continue-on-error: true
       id: check
       run: |
         if [ -s ${work}/B2G/out/error.log ]; then
