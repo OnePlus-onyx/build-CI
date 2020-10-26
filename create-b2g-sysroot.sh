@@ -14,7 +14,8 @@ function copy_to_sysroot() {
       rsync --times --exclude=Android.bp --exclude=AndroidTest.xml -r --copy-links --exclude=".git" "${path}/" "${dest}/b2g-sysroot/${2}/"
     else
       mkdir -p "${dest}/b2g-sysroot/${2}"
-      cp --preserve=timestamps "${path}" "${dest}/b2g-sysroot/${2}/"
+      #cp --preserve=timestamps "${path}" "${dest}/b2g-sysroot/${2}/"
+      cp "${path}" "${dest}/b2g-sysroot/${2}/"
     fi
   done
 }
