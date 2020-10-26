@@ -21,7 +21,7 @@ env:
 
 jobs: 
   Download:
-    if: github.event_name == 'gsi_repack_aosp'
+    if: github.event.action == 'gsi_repack_aosp'
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
