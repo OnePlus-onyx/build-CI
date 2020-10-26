@@ -181,26 +181,15 @@ jobs:
         #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install expect  gnu-sed ccache coreutils zstd gcc perl cpanm unzip
         
-        ####
+        ####api-daemon
         cd ~
-        #curl -LO https://dl.google.com/android/repository/android-ndk-r20b-darwin-x86_64.zip
-        #unzip -qq android-ndk-r20b-darwin-x86_64.zip -d ~/.mozbuild/
-        echo ####################################
-        #ls ~/.mozbuild/
-        #mv ~/.mozbuild/android-ndk-r20b ~/.mozbuild/android-ndk-r20b-canary
-        echo ####################################
-        #ls ~/.mozbuild/android-ndk-r20b-canary
-        
-        ####
-        #sudo cpan LWP::UserAgent
-        #ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-        #ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        
-        ####
-        #rustup target add aarch64-linux-android armv7-linux-androideabi
-        
-
-
+        curl -LO https://dl.google.com/android/repository/android-ndk-r20b-darwin-x86_64.zip
+        unzip -qq android-ndk-r20b-darwin-x86_64.zip -d ~/.mozbuild/
+        rm android-ndk-r20b-darwin-x86_64.zip
+        mv ~/.mozbuild/android-ndk-r20b ~/.mozbuild/android-ndk-r20b-canary
+        ls ~/.mozbuild/android-ndk-r20b-canary
+        sudo cpan LWP::UserAgent
+        rustup target add aarch64-linux-android armv7-linux-androideabi
 
         #####ssh
         mkdir -p ~/.ssh
@@ -234,8 +223,13 @@ jobs:
     - name: fix
       continue-on-error: true
       run: |
-         cd ${work}/B2G/
-         sudo rm -r gonk-misc/api-daemon
+         cd ${work}/B2G/gonk-misc
+         sudo rm -r api-daemon
+         git clone https://github.com/ittat/api-daemon -b ittat-patch-mac
+         cd ${work}
+         sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
+         cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
+         
          
 #         cd ${work}/B2G/system
 #         rm -r ./vold
@@ -276,11 +270,8 @@ jobs:
         df -h
         ####
         #cd ${work}
-        #sudo rm -rf ./B2G/gonk-misc/Android.mk
-        #cp ./Android.mk.gonk.patch B2G/gonk-misc/Android.mk 
-        
-        #sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
-        #cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
+        sudo rm -rf ./B2G/gonk-misc/Android.mk
+        cp ./Android.mk.gonk.patch B2G/gonk-misc/Android.mk 
         
         ####
         export CCACHE_DIR=~/.ccache
