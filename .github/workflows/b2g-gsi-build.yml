@@ -283,6 +283,7 @@ jobs:
         export DISABLE_SOURCES_XML=true
         #export SKIP_ABI_CHECKS=true
         gtimeout 275m ./build.sh -j4 systemimage
+        #./build.sh -j4 vndk-test-sepolicy
         df -h
         
 #     - name: B2G Build - Build Source include Gecko
@@ -409,6 +410,7 @@ jobs:
         mv img.zip ~
         cd ~
         rclone copy img.zip itd:ci/${image}
+        xz -c  B2G/out/target/product/phhgsi_arm_ab/system.img > ~/system.img.xz
         
  
     
@@ -420,7 +422,14 @@ jobs:
         name: img.zip
         path: ~/img.zip
         
-  
+    - name: Upload system.img.xz artifact
+      continue-on-error: true
+      if: github.event.action == 'gsi_b2g_build' 
+      uses: actions/upload-artifact@master
+      with:
+        name: system.img.xz
+        path: ~/system.img.xz
+ 
 #     - name: Create Release
 #       id: create_release
 #       if: github.event.action == 'onyx_b2g_build'
