@@ -18,6 +18,7 @@ env:
   PROIMAGE: ${{github.event.client_payload.image}} 
   work: /Volumes/${{github.event.client_payload.image}} 
   action_type: ${{ github.event.action }} 
+#   gecko_version:  
 
 jobs: 
   Download:
@@ -298,7 +299,7 @@ jobs:
         cd ${work}
         mkdir pre-gecko
         cd pre-gecko
-        rclone copy itd:ci/${image}/b2g-83.0a1.en-US.linux-androideabi-arm.tar.gz ./
+        rclone copy itd:ci/${image}/b2g-84.0a1.en-US.linux-androideabi-arm.tar.gz ./
           
 
         ####  build
@@ -310,7 +311,7 @@ jobs:
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
         export USE_PREBUILT_B2G=1
-        export PREFERRED_B2G="${work}/pre-gecko/b2g-83.0a1.en-US.linux-androideabi-arm.tar.gz"
+        export PREFERRED_B2G="${work}/pre-gecko/b2g-84.0a1.en-US.linux-androideabi-arm.tar.gz"
         ./build.sh -j16 systemimage
         
     - name: Check Current ”error.log“ Status
