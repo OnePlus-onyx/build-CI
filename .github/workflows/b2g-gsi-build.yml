@@ -476,13 +476,13 @@ jobs:
         sleep 20
         hdiutil detach ${work}
         
-    - name: Reject Build Image Again
-      continue-on-error: true
-      id: reject_img_again
-      run: |
-        cd ~
-        sleep 20
-        hdiutil detach ${work}
+#     - name: Reject Build Image Again
+#       continue-on-error: true
+#       id: reject_img_again
+#       run: |
+#         cd ~
+#         sleep 20
+#         hdiutil detach ${work}
 
     - name: Compress Soucre
       if: steps.check.conclusion == 'success'
@@ -496,8 +496,15 @@ jobs:
       run: |
         df -h
         cd ~
-        rclone copy ./${image}.dmg.sparseimage.zst itd:ci/${image}
-        sudo rm  -rf ./${image}.dmg.sparseimage.zst
+        echo ${{github.event.action}}
+        if [ ${{github.event.action}} == "gsi_b2g_build" ]; then
+          mv ./${image}.dmg.sparseimage.zst ./${image}.dmg.sparseimage.zst.complete
+          rclone copy ./${image}.dmg.sparseimage.zst.complete itd:ci/${image}
+          sudo rm  -rf ./${image}.dmg.sparseimage.zst.complete
+        else
+          rclone copy ./${image}.dmg.sparseimage.zst itd:ci/${image}
+          sudo rm  -rf ./${image}.dmg.sparseimage.zst
+        fi
         ls -al ${image}.dmg.sparseimage*
         sudo rm ${image}.dmg.sparseimage*
         df -h
