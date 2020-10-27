@@ -339,7 +339,7 @@ jobs:
         
     - name: Repack “b2g-sysroot” for gsi
       id: sysroot
-      if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      #if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ~
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
@@ -362,7 +362,7 @@ jobs:
         df -h
 
     - name: Upload “b2g-sysroot”
-      if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      #if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
         rclone copy b2g-sysroot.tar.zst itd:ci/${image}
@@ -370,7 +370,7 @@ jobs:
 
     - name: Repack “api-sysroot” for gsi 
       id: gsi_sysroot
-      if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      #if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         df -h
         cd ${work}/B2G
@@ -388,7 +388,7 @@ jobs:
         df -h
 
     - name: Upload “api-sysroot”
-      if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      #if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
         rclone copy api-sysroot.tar.zst itd:ci/${image}
