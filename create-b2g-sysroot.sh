@@ -225,3 +225,5 @@ out/soong/.intermediates/gonk-misc/gonk-binder/binder_b2g_telephony_interface-cp
 copy_to_sysroot "${KOOST_FILES}" "include"
 
 fi
+
+tar -c b2g-sysroot | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > "b2g-sysroot.tar.zst"
