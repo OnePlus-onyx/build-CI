@@ -758,13 +758,14 @@ jobs:
         #sudo rm api-sysroot.tar.zst
         #sudo rm mozbuild.tar.bz2
         ls ~/.mozbuild/api-sysroot
+        
+        cd ~
+        git clone https://github.com/kaiostech/api-daemon --depth=1
+        ls -al
 
     - name: build Source
       run: |
         ####
-        git clone https://github.com/kaiostech/api-daemon
-        cd api-daemon
-        
         #RUST_TARGET := armv7-linux-androideabi
         #RUST_TARGET := aarch64-linux-android
         
@@ -772,7 +773,7 @@ jobs:
         export BUILD_WITH_NDK_DIR=~/.mozbuild/android-ndk-r20b-canary
         export GONK_DIR=~/.mozbuild/api-sysroot
         export GONK_PRODUCT=phhgsi_arm_ab
-        cd api-daemon
+        cd ~/api-daemon
         ./update-prebuilts.sh
         
     - name: Upload Artifact
