@@ -601,11 +601,8 @@ jobs:
       run: |
         df -h
         cd ~
-        rclone copy  itd:ci/${{ env.PROIMAGE }}/b2g-sysroot.tar.zst ./
         curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 -o mozbuild.tar.bz2
         tar -xvf mozbuild.tar.bz2
-        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
-        sudo rm b2g-sysroot.tar.zst
         sudo rm mozbuild.tar.bz2
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
@@ -622,21 +619,36 @@ jobs:
         ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
         df -h
        
-    - name: Build Gecko for onyx
+    - name: Build Gecko for gsi
       run: |
         df -h
+        ####
+        cd ~
+        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
+        chmod +x ~/build-CI/build-gsi-b2g.sh
+        cp ~/build-CI/build-gsi-b2g.sh ~/gecko-b2g
+        
+        rclone copy  itd:ci/${{ env.PROIMAGE }}/b2g-sysroot.tar.zst ./
+        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        
+        mkdir ~/objdir-gsi-gecko
+        tar -C "$HOME/objdir-gsi-gecko" -I zstd -x -a -f b2g-sysroot.tar.zst
+        ls ~/objdir-gsi-gecko
+        
+        sudo rm b2g-sysroot.tar.zst
+        
         cd ~/gecko-b2g
         export SHELL=/bin/bash
         export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
         export GONK_PRODUCT_NAME=phhgsi_arm_ab
-        export GECKO_OBJDIR=${GONK_PATH}/objdir-gsi-gecko
+        export GECKO_OBJDIR=${HOME}/objdir-gsi-gecko
         export PLATFORM_VERSION=29
         export TARGET_ARCH=arm
         export TARGET_ARCH_VARIANT=armv7-a-neon
         export TARGET_CPU_VARIANT=generic
         export MOZ_DISABLE_LTO=1
-        ./build-b2g.sh
-        ./build-b2g.sh package
+        ./build-gsi-b2g.sh
+        ./build-gsi-b2g.sh package
         df -h
         ls ${GECKO_OBJDIR}/dist
       
@@ -652,12 +664,12 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: ${{ env.B2G_OUT }}
-        path: ~/.mozbuild/b2g-sysroot/objdir-gsi-gecko/dist/${{ env.B2G_OUT }}
+        path: ~/objdir-gsi-gecko/dist/${{ env.B2G_OUT }}
 
     - name: Upload to Gdrive
       run: |
         df -h
-        cd ~/.mozbuild/b2g-sysroot/objdir-gsi-gecko/dist
+        cd ~/objdir-gsi-gecko/dist
         rclone copy ${{ env.B2G_OUT }} itd:ci/${{ env.PROIMAGE }}
         df -h
 
@@ -684,7 +696,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/.mozbuild/b2g-sysroot/objdir-gsi-gecko/dist/${{ env.B2G_OUT }}
+          asset_path: /home/runner/objdir-gsi-gecko/dist/${{ env.B2G_OUT }}
           asset_name: ${{ env.B2G_OUT }}
           asset_content_type: application/gzip
 
