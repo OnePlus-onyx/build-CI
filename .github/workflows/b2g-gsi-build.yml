@@ -282,8 +282,8 @@ jobs:
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
         #export SKIP_ABI_CHECKS=true
-        #gtimeout 275m ./build.sh -j4 systemimage
-        gtimeout 275m ./build.sh -j16
+        gtimeout 275m ./build.sh -j4 systemimage
+        #gtimeout 275m ./build.sh -j16
         #./build.sh -j4 vndk-test-sepolicy
         df -h
         
