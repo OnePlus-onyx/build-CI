@@ -817,7 +817,7 @@ jobs:
 
     - name: zip Artifact
       run: |
-        cd ¬
+        cd ~
         sudo apt install zstd
         zstd -D ~/api-daemon/prebuilts ~/api-prebuilts.zst
         rclone copy ~/api-prebuilts.zst itd:ci/${{ env.PROIMAGE }} 
