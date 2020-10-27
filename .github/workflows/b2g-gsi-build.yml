@@ -355,7 +355,7 @@ jobs:
         export TARGET_ARCH=arm
         export TARGET_ARCH_VARIANT=armv7-a-neon
         export TARGET_CPU_VARIANT=generic
-        export GONK_PRODUCT_NAME=treble_arm_bvN
+        export GONK_PRODUCT_NAME=phhgsi_arm_ab
         #gecko/taskcluster/scripts/misc/create-b2g-sysroot.sh
         ./create-b2g-sysroot.sh
         ls -al
@@ -386,7 +386,7 @@ jobs:
         export TARGET_ARCH=arm
         export TARGET_ARCH_VARIANT=armv7-a-neon
         export TARGET_CPU_VARIANT=generic
-        export GONK_PRODUCT_NAME=treble_arm_bvN
+        export GONK_PRODUCT_NAME=phhgsi_arm_ab
         ./api_sysroot.sh
         sudo rm -rf ./api-sysroot
         ls -al
