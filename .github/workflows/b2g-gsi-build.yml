@@ -567,8 +567,9 @@ jobs:
         #rclone -v
         rclone ls itd:test
         # yarn
-        sudo apt-get install yarnpkg
-        sudo ln -snf /usr/bin/yarnpkg /usr/bin/yarn
+        #sudo apt-get install yarnpkg
+        yarn
+        #sudo ln -snf /usr/bin/yarnpkg /usr/bin/yarn
 
     - name: clean disk
       #continue-on-error: true
