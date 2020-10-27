@@ -19,6 +19,7 @@ env:
   work: /Volumes/${{github.event.client_payload.image}} 
   action_type: ${{ github.event.action }} 
 #   gecko_version:  
+#   device_name:
 
 jobs: 
   Download:
@@ -171,7 +172,7 @@ jobs:
       run: |
         df -h
         #####
-        echo "::set-env name=RELEASE_REF::b2g_onyx_$(date +%Y-%m-%d)"
+        echo "::set-env name=RELEASE_REF::b2g_gsi_$(date +%Y-%m-%d)"
         
         ####
         more /System/Library/CoreServices/SystemVersion.plist
@@ -226,27 +227,7 @@ jobs:
          cd ${work}/B2G/gecko
          ./mach python2.7 python/mozboot/mozboot/android.py --ndk-only --no-interactive
          
-        
-#         cd ${work}/B2G/system
-#         rm -r ./vold
-#         git clone https://github.com/ittat/platform_system_vold -b ittat-patch-gsi
-#         mv platform_system_vold vold
-         
-#          echo 111111111111111111111111111111111111
-#          cd ${work}/B2G/device/phh
-#          sudo rm -r treble
-#          git clone https://github.com/ittat/device_phh_treble -b gonk-android-10.0
-#          mv device_phh_treble treble
 
-#         cd ${work}/B2G/system
-#         rm -r ./netd
-#         git clone https://github.com/ittat/platform_system_netd -b ittat-patch-gsi
-#         mv platform_system_netd netd
-        
-#         cd ${work}/B2G/frameworks
-#         rm -r ./base
-#         git clone https://github.com/ittat/platform_frameworks_base -b ittat-patch-gsi
-#         mv platform_frameworks_base base
         
     - name: Check The Previous “error.log”
       run: |
@@ -282,7 +263,44 @@ jobs:
         #gtimeout 275m ./build.sh -j16
         #./build.sh -j4 vndk-test-sepolicy
         df -h
+
+    - name: Add prebuilt api daemon
+      continue-on-error: true
+      if: github.event.action == 'gsi_b2g_build'
+      run: |
+        cd ${work}
+        mkdir pre-api
+        cd pre-api
+        rclone copy itd:ci/${image}/api-prebuilts.zst ./
+        zstd -D prebuilts --decompress api-prebuilts.zst
+        ls
+        ####
+        TARGET_OUT=${work}/B2G/out/target/product/phhgsi_arm_ab/system
+        path_api=${TARGET_OUT}/api-daemon
+        if [ -d "${path_api}" ]; then
+           sudo rm -r "${path_api}"
+        fi
         
+        path_b2g=${TARGET_OUT}/b2g
+        if [ -d "${path_b2g}" ]; then
+           sudo rm -r "${path_b2g}"
+        fi
+        
+        mkdir -p ${path_api}
+        mkdir -p ${path_b2g}/defaults
+        
+        cp -r prebuilts/http_root  ${TARGET_OUT}/api-daemon
+        cp prebuilts/armv7-linux-androideabi/api-daemon ${TARGET_OUT}/bin
+        chmod +x ${TARGET_OUT}/bin/api-daemon
+        
+        ##
+        DAEMON_ROOT=${work}/B2G/gonk-misc/api-daemon
+        cp $(DAEMON_ROOT)/daemon/config-device.toml  $(TARGET_OUT)/api-daemon/config.toml
+        cp $(DAEMON_ROOT)/vhost/cert.pem   $(TARGET_OUT)/b2g/defaults/local-cert.pem
+        cp $(DAEMON_ROOT)/vhost/key.pem   $(TARGET_OUT)/b2g/defaults/local-key.pem
+        cp $(DAEMON_ROOT)/services/devicecapability/devicecapability.json  $(TARGET_OUT)/b2g/defaults/devicecapability.json
+        cp $(HOME)/.mozbuild/android-ndk-r20b-canary/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/armv7-linux-androideabi/libc++_shared.so $(TARGET_OUT)/lib
+
     - name: B2G Build - Build Source include Gecko
       if: github.event.action == 'gsi_b2g_build'
       run: |
@@ -409,6 +427,7 @@ jobs:
         mv img.zip ~
         cd ~
         rclone copy img.zip itd:ci/${image}
+        cd  ${work}
         xz -c  B2G/out/target/product/phhgsi_arm_ab/system.img > ~/system.img.xz
         cd ~
         rclone copy system.img.xz itd:ci/${image}
@@ -427,7 +446,7 @@ jobs:
       if: github.event.action == 'gsi_b2g_build' 
       uses: actions/upload-artifact@master
       with:
-        name: system.img.xz
+        name: gsi_arm_ab_system.img.xz
         path: ~/system.img.xz
  
     - name: Create Release
@@ -443,7 +462,7 @@ jobs:
         prerelease: false
         body: |
           # Release Notes
-          gsi_arm_ab - system.img.xz
+          gsi_arm_ab - gsi_arm_ab_system.img.xz
 
     - name: Update Release Asset - system & boot
       continue-on-error: true
@@ -454,7 +473,7 @@ jobs:
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: /Users/runner/system.img.xz
-          asset_name: system.img.xz
+          asset_name: gsi_arm_ab_system.img.xz
           asset_content_type: application/x-xz
 
 #     - name: Update Release Asset - onyx-ota
@@ -795,13 +814,21 @@ jobs:
         export GONK_PRODUCT=phhgsi_arm_ab
         cd ~/api-daemon
         ./update-prebuilts.sh
+
+    - name: zip Artifact
+      run: |
+        cd ¬
+        sudo apt install zstd
+        zstd -D ~/api-daemon/prebuilts ~/api-prebuilts.zst
+        rclone copy ~/api-prebuilts.zst itd:ci/${{ env.PROIMAGE }} 
+        ls -al -h
         
     - name: Upload Artifact
       continue-on-error: true
       uses: actions/upload-artifact@master
       with:
         name: gsi_arm_ab_api-daemon_prebuilts
-        path: ~/api-daemon/prebuilts
+        path: ~/api-prebuilts.zst
 
     - name: Send Done Notify && Send "gsi_b2g_build" WebHook
       run: |
