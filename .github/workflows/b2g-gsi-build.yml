@@ -10,7 +10,7 @@ on:
       - gsi_aosp_build
       - gsi_gecko_build
       - gsi_b2g_build
-      - gsi_kernel_build
+      - gsi_api_daemon_build
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
@@ -522,11 +522,11 @@ jobs:
        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_gecko_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
    
    
-#   gecko_build:
-#     if: github.event.action == 'gsi_gecko_build' || github.event_name == 'schedule' 
-#     runs-on: ubuntu-latest
-#     timeout-minutes: 360
-#     steps:
+  gecko_build:
+    if: github.event.action == 'gsi_gecko_build' || github.event_name == 'schedule' 
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
 #     - name: Send Start Notify
 #       run: |
 #         today=$(date +%Y-%m-%d)
@@ -538,167 +538,167 @@ jobs:
 #         echo "::set-env name=PROIMAGE::b2g_onyx"
 #         echo ${{ env.PROIMAGE }}
         
-#     - name: Initialization system environment
-#       run: |
-#         df -h
-#         #####
-#         echo "::set-env name=RELEASE_REF::b2g-core_onyx_$(date +%Y-%m-%d)"
+    - name: Initialization system environment
+      run: |
+        df -h
+        #####
+        echo "::set-env name=RELEASE_REF::b2g-core_gsi_$(date +%Y-%m-%d)"
 
-#         sudo apt install git make mercurial  yasm  libncurses5 libfuse-dev
-#         wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
-#         tar xfj nasm-2.14.02.tar.bz2
-#         rm nasm-2.14.02.tar.bz2
-#         cd nasm-2.14.02/
-#         ./autogen.sh
-#         ./configure --prefix=/usr/local/ 
-#         make 
-#         sudo make install
-#         nasm -v
-#         cd ../
-#         rm -r nasm-2.14.02/
+        sudo apt install git make mercurial  yasm  libncurses5 libfuse-dev
+        wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
+        tar xfj nasm-2.14.02.tar.bz2
+        rm nasm-2.14.02.tar.bz2
+        cd nasm-2.14.02/
+        ./autogen.sh
+        ./configure --prefix=/usr/local/ 
+        make 
+        sudo make install
+        nasm -v
+        cd ../
+        rm -r nasm-2.14.02/
         
-#         ####
-#         cd ~
-#         git config --global user.name "ci"
-#         git config --global user.email "ci@github.com"
-#         #ssh
-#         mkdir -p ~/.ssh
-#         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-#         chmod 600 ~/.ssh/id_rsa
-#         #rclone
-#         mkdir -p ~/.config/rclone
-#         git clone git@github.com:ittat/tmp.git
-#         cd tmp
-#         mv ./rclone.conf ~/.config/rclone
-#         #sudo apt install rclone
-#         brew install rclone
-#         #rclone -v
-#         rclone ls itd:test
-#         # yarn
-#         sudo apt-get install yarnpkg
-#         sudo ln -snf /usr/bin/yarnpkg /usr/bin/yarn
+        ####
+        cd ~
+        git config --global user.name "ci"
+        git config --global user.email "ci@github.com"
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        #sudo apt install rclone
+        brew install rclone
+        #rclone -v
+        rclone ls itd:test
+        # yarn
+        sudo apt-get install yarnpkg
+        sudo ln -snf /usr/bin/yarnpkg /usr/bin/yarn
 
-#     - name: clean disk
-#       #continue-on-error: true
-#       run: |
-#         df -h
-#         echo ————————————————————————————————————
-#         sudo rm -rf "/usr/local/share/boost"
-#         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-#         sudo apt remove -y 'php.*'
-#         sudo apt-get remove -y '^ghc-8.*'
-#         sudo apt-get remove -y '^dotnet-.*'
-#         sudo apt-get autoremove -y
-#         sudo apt-get clean
-#         sudo rm -rf /etc/mysql 
-#         echo "Removing large directories"
-#         # deleting 15GB
-#         rm -rf /usr/share/dotnet/
-#         df -h
+    - name: clean disk
+      #continue-on-error: true
+      run: |
+        df -h
+        echo ————————————————————————————————————
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        sudo apt remove -y 'php.*'
+        sudo apt-get remove -y '^ghc-8.*'
+        sudo apt-get remove -y '^dotnet-.*'
+        sudo apt-get autoremove -y
+        sudo apt-get clean
+        sudo rm -rf /etc/mysql 
+        echo "Removing large directories"
+        # deleting 15GB
+        rm -rf /usr/share/dotnet/
+        df -h
         
         
-#     - uses: hecrj/setup-rust-action@v1
-#       with:
-#         rust-version: stable
-#     - uses: actions/checkout@master
-#     - name: Install sccache
-#       run: cargo install sccache
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: stable
+    - uses: actions/checkout@master
+    - name: Install sccache
+      run: cargo install sccache
 
-#     - name: Fetch Source
-#       run: |
-#         df -h
-#         cd ~
-#         rclone copy  itd:ci/${{ env.PROIMAGE }}/b2g-sysroot.tar.zst ./
-#         curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
-#         tar -xvf mozbuild.tar.bz2
-#         tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
-#         sudo rm b2g-sysroot.tar.zst
-#         sudo rm mozbuild.tar.bz2
-#         cd ~
-#         git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
-#         #git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-2 --depth=1
-#         #mv gecko-b2g-1 gecko-b2g
-#         df -h
+    - name: Fetch Source
+      run: |
+        df -h
+        cd ~
+        rclone copy  itd:ci/${{ env.PROIMAGE }}/b2g-sysroot.tar.zst ./
+        curl https://packages.preprod.kaiostech.com/ndk/v2/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        tar -xvf mozbuild.tar.bz2
+        tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
+        sudo rm b2g-sysroot.tar.zst
+        sudo rm mozbuild.tar.bz2
+        cd ~
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk --depth=1
+        #git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-2 --depth=1
+        #mv gecko-b2g-1 gecko-b2g
+        df -h
         
-#     - name: Bootstrap Gecko
-#       run: |
-#         df -h
-#         cd ~/gecko-b2g
-#         export SHELL=/bin/bash
-#         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-#         ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
-#         df -h
+    - name: Bootstrap Gecko
+      run: |
+        df -h
+        cd ~/gecko-b2g
+        export SHELL=/bin/bash
+        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
+        df -h
        
-#     - name: Build Gecko for onyx
-#       run: |
-#         df -h
-#         cd ~/gecko-b2g
-#         export SHELL=/bin/bash
-#         export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
-#         export GONK_PRODUCT_NAME=onyx
-#         export GECKO_OBJDIR=${GONK_PATH}/objdir-onyx-gecko
-#         export PLATFORM_VERSION=29
-#         export TARGET_ARCH=arm
-#         export TARGET_ARCH_VARIANT=armv7-a-neon
-#         export TARGET_CPU_VARIANT=krait
-#         export MOZ_DISABLE_LTO=1
-#         ./build-b2g.sh
-#         ./build-b2g.sh package
-#         df -h
-#         ls ${GECKO_OBJDIR}/dist
+    - name: Build Gecko for onyx
+      run: |
+        df -h
+        cd ~/gecko-b2g
+        export SHELL=/bin/bash
+        export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
+        export GONK_PRODUCT_NAME=phhgsi_arm_ab
+        export GECKO_OBJDIR=${GONK_PATH}/objdir-gsi-gecko
+        export PLATFORM_VERSION=29
+        export TARGET_ARCH=arm
+        export TARGET_ARCH_VARIANT=armv7-a-neon
+        export TARGET_CPU_VARIANT=generic
+        export MOZ_DISABLE_LTO=1
+        ./build-b2g.sh
+        ./build-b2g.sh package
+        df -h
+        ls ${GECKO_OBJDIR}/dist
+      
+    - name: Get Gecko Version
+      run: |
+        cd ~/gecko-b2g
+        echo `cat browser/config/version.txt`
+        export version=`cat browser/config/version.txt`
+        echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-androideabi-arm.tar.gz"
 
-#     - name: Get Gecko Version
-#       run: |
-#         cd ~/gecko-b2g
-#         echo `cat browser/config/version.txt`
-#         export version=`cat browser/config/version.txt`
-#         echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-androideabi-arm.tar.gz"
+    - name: Upload Artifact
+#       if: github.event_name == 'schedule'
+      uses: actions/upload-artifact@master
+      with:
+        name: ${{ env.B2G_OUT }}
+        path: ~/.mozbuild/b2g-sysroot/objdir-gsi-gecko/dist/${{ env.B2G_OUT }}
 
-#     - name: Upload Artifact
-# #       if: github.event_name == 'schedule'
-#       uses: actions/upload-artifact@master
-#       with:
-#         name: ${{ env.B2G_OUT }}
-#         path: ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/${{ env.B2G_OUT }}
+    - name: Upload to Gdrive
+      run: |
+        df -h
+        cd ~/.mozbuild/b2g-sysroot/objdir-gsi-gecko/dist
+        rclone copy ${{ env.B2G_OUT }} itd:ci/${{ env.PROIMAGE }}
+        df -h
 
-#     - name: Upload to Gdrive
-#       run: |
-#         df -h
-#         cd ~/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist
-#         rclone copy ${{ env.B2G_OUT }} itd:ci/${{ env.PROIMAGE }}
-#         df -h
+    - name: Create Release
+      if: github.event_name != 'schedule'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: gecko_${{ env.RELEASE_REF }}
+        #release_name: release_${{ env.RELEASE_REF }}
+        draft: false
+        prerelease: false
+        body: |
+          # Release Notes
+          ${{ env.B2G_OUT }}
 
-#     - name: Create Release
-#       if: github.event_name != 'schedule'
-#       id: create_release
-#       uses: actions/create-release@v1
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#       with:
-#         tag_name: gecko_${{ env.RELEASE_REF }}
-#         #release_name: release_${{ env.RELEASE_REF }}
-#         draft: false
-#         prerelease: false
-#         body: |
-#           # Release Notes
-#           ${{ env.B2G_OUT }}
+    - name: Update Release Asset 
+      if: github.event_name != 'schedule'
+      continue-on-error: true
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /home/runner/.mozbuild/b2g-sysroot/objdir-gsi-gecko/dist/${{ env.B2G_OUT }}
+          asset_name: ${{ env.B2G_OUT }}
+          asset_content_type: application/gzip
 
-#     - name: Update Release Asset 
-#       if: github.event_name != 'schedule'
-#       continue-on-error: true
-#       uses: actions/upload-release-asset@v1.0.1
-#       env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#       with:
-#           upload_url: ${{ steps.create_release.outputs.upload_url }}
-#           asset_path: /home/runner/.mozbuild/b2g-sysroot/objdir-onyx-gecko/dist/${{ env.B2G_OUT }}
-#           asset_name: ${{ env.B2G_OUT }}
-#           asset_content_type: application/gzip
-
-#     - name: Send "kernel_build" WebHook
-#       if: github.event.action == 'onyx_gecko_build'
-#       run: |
-#         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "onyx_kernel_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+    - name: Send "api-daemon_build" WebHook
+      if: github.event.action == 'gsi_gecko_build'
+      run: |
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_api_daemon_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
   
 #     - name: Send Done Notify 
 #       run: |
