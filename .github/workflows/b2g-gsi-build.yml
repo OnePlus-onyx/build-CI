@@ -273,6 +273,8 @@ jobs:
         cd pre-api
         rclone copy itd:ci/${image}/prebuilts.zip ./
         unzip ./prebuilts.zip
+        APIDeamon_PreBuild="home/runner/api-daemon/prebuilts"
+        cd ${APIDeamon_PreBuild}
         ls
         ####
         TARGET_OUT=${work}/B2G/out/target/product/phhgsi_arm_ab/system
@@ -289,8 +291,8 @@ jobs:
         mkdir -p ${path_api}
         mkdir -p ${path_b2g}/defaults
         
-        cp -r prebuilts/http_root  ${TARGET_OUT}/api-daemon
-        cp prebuilts/armv7-linux-androideabi/api-daemon ${TARGET_OUT}/bin
+        cp -r  ${APIDeamon_PreBuild}/http_root  ${TARGET_OUT}/api-daemon
+        cp ${APIDeamon_PreBuild}/armv7-linux-androideabi/api-daemon ${TARGET_OUT}/bin
         chmod +x ${TARGET_OUT}/bin/api-daemon
         
         ##
