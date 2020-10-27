@@ -265,14 +265,14 @@ jobs:
         df -h
 
     - name: Add prebuilt api daemon
-      continue-on-error: true
+#       continue-on-error: true
       if: github.event.action == 'gsi_b2g_build'
       run: |
         cd ${work}
         mkdir pre-api
         cd pre-api
         rclone copy itd:ci/${image}/prebuilts.zip ./
-        unzip ./prebuilts.zip ./
+        unzip ./prebuilts.zip
         ls
         ####
         TARGET_OUT=${work}/B2G/out/target/product/phhgsi_arm_ab/system
