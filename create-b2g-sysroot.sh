@@ -226,4 +226,8 @@ copy_to_sysroot "${KOOST_FILES}" "include"
 
 fi
 
+
+export GONK_PATH=`pwd`
+export GECKO_PATH=${GONK_PATH}/gecko
+
 tar -c b2g-sysroot | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > "b2g-sysroot.tar.zst"
