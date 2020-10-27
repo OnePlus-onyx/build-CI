@@ -252,40 +252,40 @@ jobs:
 #         git clone https://github.com/ittat/platform_frameworks_base -b ittat-patch-gsi
 #         mv platform_frameworks_base base
         
-    - name: Check The Previous “error.log”
-      run: |
-        if [ -d "${work}/B2G/out" ];then
-          ls -al ${work}/B2G/out/error*
-          echo "old error.log:"
-          cat ${work}/B2G/out/error.log
-          sudo rm ${work}/B2G/out/error.log
-          touch ${work}/B2G/out/error.log
-        fi
+#     - name: Check The Previous “error.log”
+#       run: |
+#         if [ -d "${work}/B2G/out" ];then
+#           ls -al ${work}/B2G/out/error*
+#           echo "old error.log:"
+#           cat ${work}/B2G/out/error.log
+#           sudo rm ${work}/B2G/out/error.log
+#           touch ${work}/B2G/out/error.log
+#         fi
         
-    - name: Build Source Without Gecko
-      if: github.event.action == 'gsi_aosp_build'
-      continue-on-error: true
-      id: build
-      run: |
-        df -h
-        ####
-        cd ${work}
-        sudo rm -rf ./B2G/gonk-misc/Android.mk
-        cp ./Android.mk.gonk.patch B2G/gonk-misc/Android.mk 
+#     - name: Build Source Without Gecko
+#       if: github.event.action == 'gsi_aosp_build'
+#       continue-on-error: true
+#       id: build
+#       run: |
+#         df -h
+#         ####
+#         cd ${work}
+#         sudo rm -rf ./B2G/gonk-misc/Android.mk
+#         cp ./Android.mk.gonk.patch B2G/gonk-misc/Android.mk 
         
-        ####
-        export CCACHE_DIR=~/.ccache
-        /usr/local/bin/ccache  -M 20G
-        /usr/local/bin/ccache -s
-        export USE_CCACHE=1
-        sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
-        cd ${work}/B2G
-        export DISABLE_SOURCES_XML=true
-        #export SKIP_ABI_CHECKS=true
-        gtimeout 275m ./build.sh -j4 systemimage
-        #gtimeout 275m ./build.sh -j16
-        #./build.sh -j4 vndk-test-sepolicy
-        df -h
+#         ####
+#         export CCACHE_DIR=~/.ccache
+#         /usr/local/bin/ccache  -M 20G
+#         /usr/local/bin/ccache -s
+#         export USE_CCACHE=1
+#         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
+#         cd ${work}/B2G
+#         export DISABLE_SOURCES_XML=true
+#         #export SKIP_ABI_CHECKS=true
+#         gtimeout 275m ./build.sh -j4 systemimage
+#         #gtimeout 275m ./build.sh -j16
+#         #./build.sh -j4 vndk-test-sepolicy
+#         df -h
         
 #     - name: B2G Build - Build Source include Gecko
 #       if: github.event.action == 'gsi_b2g_build'
@@ -318,31 +318,31 @@ jobs:
 #         export PREFERRED_B2G="${work}/pre-gecko/b2g-82.0a1.en-US.linux-androideabi-arm.tar.gz"
 #         ./build.sh -j4 systemimage
         
-    - name: Check Current ”error.log“ Status
-#       continue-on-error: true
-      id: check
-      run: |
-        if [ -s ${work}/B2G/out/error.log ]; then
-          echo Error!
-          cat ${work}/B2G/out/error.log
-          today=$(date +%Y-%m-%d)
-          curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
-          cd ~
-          hdiutil detach ${work}
-          sleep 20
-          hdiutil detach ${work}
-          sudo rm -rf ${image}.dmg.sparseimage*
-          df -h
-          exit 211
-        else
-          exit 0
-        fi
+#     - name: Check Current ”error.log“ Status
+# #       continue-on-error: true
+#       id: check
+#       run: |
+#         if [ -s ${work}/B2G/out/error.log ]; then
+#           echo Error!
+#           cat ${work}/B2G/out/error.log
+#           today=$(date +%Y-%m-%d)
+#           curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
+#           cd ~
+#           hdiutil detach ${work}
+#           sleep 20
+#           hdiutil detach ${work}
+#           sudo rm -rf ${image}.dmg.sparseimage*
+#           df -h
+#           exit 211
+#         else
+#           exit 0
+#         fi
         
         
     - name: Repack “b2g-sysroot” for gsi
       id: sysroot
       continue-on-error: true
-      if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+#       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ~
         git clone https://github.com/OnePlus-onyx/build-CI -b b2g
@@ -366,7 +366,7 @@ jobs:
 
     - name: Upload “b2g-sysroot”
       continue-on-error: true
-      if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+#       if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
         rclone copy b2g-sysroot.tar.zst itd:ci/${image}
@@ -375,7 +375,7 @@ jobs:
     - name: Repack “api-sysroot” for gsi 
       id: gsi_sysroot
       continue-on-error: true
-      if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+#       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         df -h
         cd ${work}/B2G
@@ -395,7 +395,7 @@ jobs:
 
     - name: Upload “api-sysroot”
       continue-on-error: true
-      if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+#       if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
         rclone copy api-sysroot.tar.zst itd:ci/${image}
