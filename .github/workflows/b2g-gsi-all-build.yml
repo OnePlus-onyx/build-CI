@@ -14,7 +14,7 @@ on:
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
-  image: ${{github.event.client_payload.image}}_${{github.event.client_payload.device_name}}
+  image: ${{github.event.client_payload.image}}
   PROIMAGE: ${{github.event.client_payload.image}}_${{github.event.client_payload.device_name}}
   work: /Volumes/${{github.event.client_payload.image}} 
   action_type: ${{ github.event.action }} 
@@ -42,7 +42,7 @@ jobs:
       run: |
         cd ~
         hdiutil detach ${work}
-        rm ${image}.dmg.sparseimage*
+        rm ${PROIMAGE}.dmg.sparseimage*
         df -h
     - name: Initialization system environment
       run: |
@@ -68,9 +68,9 @@ jobs:
         
         ####mount
         cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 400g ~/${image}.dmg
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 400g ~/${PROIMAGE}.dmg
         ls
-        hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
+        hdiutil attach /Users/runner/${PROIMAGE}.dmg.sparseimage -mountpoint ${work}
            
     - name: Fetch source
       run: |
@@ -134,15 +134,15 @@ jobs:
     - name: Compress Soucre
       run: |
         cd ~
-        zstd ${image}.dmg.sparseimage
-        rm ${image}.dmg.sparseimage
-        ls -al ${image}.dmg.sparseimage*
+        zstd ${PROIMAGE}.dmg.sparseimage
+        rm ${PROIMAGE}.dmg.sparseimage
+        ls -al ${PROIMAGE}.dmg.sparseimage*
         
     - name: Uplaod Source 
       run: |
         df -h
-        rclone copy ~/${image}.dmg.sparseimage.zst itd:ci/${image}
-        sudo rm -rf ${image}.dmg.sparseimage.zst
+        rclone copy ~/${PROIMAGE}.dmg.sparseimage.zst itd:ci/${PROIMAGE}
+        sudo rm -rf ${PROIMAGE}.dmg.sparseimage.zst
         df -h
         
     - name: Send "gsi_all_aosp_build" WebHook          
@@ -169,7 +169,7 @@ jobs:
       run: |
         cd ~
         hdiutil detach ${work}
-        rm ${image}.dmg.sparseimage*
+        rm ${PROIMAGE}.dmg.sparseimage*
         df -h
     - name: Initialization system environment
       run: |
@@ -203,11 +203,11 @@ jobs:
         git config --global user.name "ci"
         git config --global user.email "ci@github.com"
         cd ~
-        rclone copy itd:ci/${image}/${image}.dmg.sparseimage.zst ./
-        zstd --decompress  ${image}.dmg.sparseimage.zst
-        sudo rm -r ./${image}.dmg.sparseimage.zst
+        rclone copy itd:ci/${PROIMAGE}/${PROIMAGE}.dmg.sparseimage.zst ./
+        zstd --decompress  ${PROIMAGE}.dmg.sparseimage.zst
+        sudo rm -r ./${PROIMAGE}.dmg.sparseimage.zst
         #####mount
-        hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
+        hdiutil attach /Users/runner/${PROIMAGE}.dmg.sparseimage -mountpoint ${work}
         df -h
         
     - name: fix
@@ -267,8 +267,8 @@ jobs:
         cd ${work}
         mkdir pre-api
         cd pre-api
-        rclone copy itd:ci/${image}/prebuilts.zip ./
-        unzip ./prebuilts.zip ./
+        rclone copy itd:ci/${PROIMAGE}/prebuilts.zip ./
+        unzip ./prebuilts.zip
         ls
         ####
         TARGET_OUT=${work}/B2G/out/target/product/${device_name}/system
@@ -319,7 +319,7 @@ jobs:
         cd ${work}
         mkdir pre-gecko
         cd pre-gecko
-        rclone copy itd:ci/${image}/${gecko_version} ./
+        rclone copy itd:ci/${PROIMAGE}/${gecko_version} ./
           
         ####  build
         export CCACHE_DIR=~/.ccache
@@ -346,7 +346,7 @@ jobs:
           hdiutil detach ${work}
           sleep 20
           hdiutil detach ${work}
-          sudo rm -rf ${image}.dmg.sparseimage*
+          sudo rm -rf ${PROIMAGE}.dmg.sparseimage*
           df -h
           exit 211
         else
@@ -391,7 +391,7 @@ jobs:
       if:  github.event.action == 'gsi_all_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
-        rclone copy b2g-sysroot.tar.zst itd:ci/${image}
+        rclone copy b2g-sysroot.tar.zst itd:ci/${PROIMAGE}
         sudo rm b2g-sysroot.tar.zst
         
     - name: Repack “api-sysroot” for gsi 
@@ -427,7 +427,7 @@ jobs:
       if:  github.event.action == 'gsi_all_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
-        rclone copy api-sysroot.tar.zst itd:ci/${image}
+        rclone copy api-sysroot.tar.zst itd:ci/${PROIMAGE}
         sudo rm api-sysroot.tar.zst
         
     - name: Update b2g-gsi  !!!!
@@ -440,11 +440,11 @@ jobs:
         zip -r img.zip B2G/out/target/product/${device_name}/system.img
         mv img.zip ~
         cd ~
-        rclone copy img.zip itd:ci/${image}
+        rclone copy img.zip itd:ci/${PROIMAGE}
         cd  ${work}
         xz -c  B2G/out/target/product/${device_name}/system.img > ~/system.img.xz
         cd ~
-        rclone copy system.img.xz itd:ci/${image}
+        rclone copy system.img.xz itd:ci/${PROIMAGE}
         
  
     #TODO
@@ -521,7 +521,7 @@ jobs:
       if: steps.check.conclusion == 'success'
       run: |
         cd ~
-        zstd ${image}.dmg.sparseimage
+        zstd ${PROIMAGE}.dmg.sparseimage
         df -h
                
     - name: Update Build Source
@@ -531,15 +531,15 @@ jobs:
         cd ~
         echo ${{github.event.action}}
         if [ ${{github.event.action}} == "gsi_all_b2g_build" ]; then
-          mv ./${image}.dmg.sparseimage.zst ./${image}.dmg.sparseimage.zst.complete
-          rclone copy ./${image}.dmg.sparseimage.zst.complete itd:ci/${image}
-          sudo rm  -rf ./${image}.dmg.sparseimage.zst.complete
+          mv ./${PROIMAGE}.dmg.sparseimage.zst ./${PROIMAGE}.dmg.sparseimage.zst.complete
+          rclone copy ./${PROIMAGE}.dmg.sparseimage.zst.complete itd:ci/${PROIMAGE}
+          sudo rm  -rf ./${PROIMAGE}.dmg.sparseimage.zst.complete
         else
-          rclone copy ./${image}.dmg.sparseimage.zst itd:ci/${image}
-          sudo rm  -rf ./${image}.dmg.sparseimage.zst
+          rclone copy ./${PROIMAGE}.dmg.sparseimage.zst itd:ci/${PROIMAGE}
+          sudo rm  -rf ./${PROIMAGE}.dmg.sparseimage.zst
         fi
-        ls -al ${image}.dmg.sparseimage*
-        sudo rm ${image}.dmg.sparseimage*
+        ls -al ${PROIMAGE}.dmg.sparseimage*
+        sudo rm ${PROIMAGE}.dmg.sparseimage*
         df -h
             
     - name: Send "gsi_aosp_build" WebHook Again
@@ -666,7 +666,7 @@ jobs:
         chmod +x ~/build-CI/build-gsi-b2g.sh
         cp ~/build-CI/build-gsi-b2g.sh ~/gecko-b2g
         
-        rclone copy  itd:ci/${{ env.PROIMAGE }}/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/${PROIMAGE}/b2g-sysroot.tar.zst ./
         tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
         
         mkdir ~/objdir-gsi-gecko
@@ -720,7 +720,7 @@ jobs:
       run: |
         df -h
         cd ~/objdir-gsi-gecko/dist
-        rclone copy ${{ env.B2G_OUT }} itd:ci/${{ env.PROIMAGE }}
+        rclone copy ${{ env.B2G_OUT }} itd:ci/${PROIMAGE}
         df -h
         
     - name: Create Release
@@ -813,7 +813,7 @@ jobs:
         rustup target add aarch64-linux-android armv7-linux-androideabi
         cd ~
         curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 | tar -C ${HOME}/ -xj
-        rclone copy  itd:ci/${{ env.PROIMAGE }}/api-sysroot.tar.zst ./
+        rclone copy  itd:ci/${PROIMAGE}/api-sysroot.tar.zst ./
         mkdir ~/.mozbuild/api-sysroot
         tar -C "$HOME/.mozbuild/api-sysroot" -I zstd -x -a -f api-sysroot.tar.zst
         #sudo rm api-sysroot.tar.zst
@@ -837,7 +837,7 @@ jobs:
       run: |
         cd ~
         zip -r ~/prebuilts.zip ~/api-daemon/prebuilts 
-        rclone copy ~/prebuilts.zip itd:ci/${{ env.PROIMAGE }} 
+        rclone copy ~/prebuilts.zip itd:ci/${PROIMAGE} 
         ls -al -h
         
     - name: Upload Artifact
