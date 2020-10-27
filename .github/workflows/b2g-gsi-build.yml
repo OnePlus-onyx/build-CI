@@ -727,23 +727,23 @@ jobs:
         brew install rclone
         rclone ls itd:test
         
-    - name: clean disk
-      #continue-on-error: true
-      run: |
-        df -h
-        echo ————————————————————————————————————
-        sudo rm -rf "/usr/local/share/boost"
-        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        sudo apt remove -y 'php.*'
-        sudo apt-get remove -y '^ghc-8.*'
-        sudo apt-get remove -y '^dotnet-.*'
-        sudo apt-get autoremove -y
-        sudo apt-get clean
-        sudo rm -rf /etc/mysql 
-        echo "Removing large directories"
-        # deleting 15GB
-        rm -rf /usr/share/dotnet/
-        df -h
+#     - name: clean disk
+#       #continue-on-error: true
+#       run: |
+#         df -h
+#         echo ————————————————————————————————————
+#         sudo rm -rf "/usr/local/share/boost"
+#         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+#         sudo apt remove -y 'php.*'
+#         sudo apt-get remove -y '^ghc-8.*'
+#         sudo apt-get remove -y '^dotnet-.*'
+#         sudo apt-get autoremove -y
+#         sudo apt-get clean
+#         sudo rm -rf /etc/mysql 
+#         echo "Removing large directories"
+#         # deleting 15GB
+#         rm -rf /usr/share/dotnet/
+#         df -h
         
     - name: Download Source
       run: |
@@ -755,10 +755,12 @@ jobs:
         rclone copy  itd:ci/${{ env.PROIMAGE }}/api-sysroot.tar.zst ./
         mkdir ~/.mozbuild/api-sysroot
         tar -C "$HOME/.mozbuild/api-sysroot" -I zstd -x -a -f api-sysroot.tar.zst
-        sudo rm api-sysroot.tar.zst
-        sudo rm mozbuild.tar.bz2
+        #sudo rm api-sysroot.tar.zst
+        #sudo rm mozbuild.tar.bz2
         ls ~/.mozbuild/api-sysroot
-        
+
+    - name: build Source
+      run: |
         ####
         git clone https://github.com/kaiostech/api-daemon
         cd api-daemon
