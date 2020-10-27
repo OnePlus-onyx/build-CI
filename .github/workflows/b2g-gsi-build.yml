@@ -346,7 +346,7 @@ jobs:
         chmod +x ~/build-CI/create-b2g-sysroot.sh
         df -h
         cd ${work}/B2G
-        cp ~/build-CI/api_sysroot.sh ./
+        cp ~/build-CI/create-b2g-sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
         export TARGET_ARCH=arm
