@@ -271,8 +271,8 @@ jobs:
         cd ${work}
         mkdir pre-api
         cd pre-api
-        rclone copy itd:ci/${image}/api-prebuilts.zst ./
-        zstd -D prebuilts --decompress api-prebuilts.zst
+        rclone copy itd:ci/${image}/prebuilts.zip ./
+        unzip ./prebuilts.zip ./
         ls
         ####
         TARGET_OUT=${work}/B2G/out/target/product/phhgsi_arm_ab/system
@@ -818,9 +818,8 @@ jobs:
     - name: zip Artifact
       run: |
         cd ~
-        sudo apt install zstd
-        zstd -D ~/api-daemon/prebuilts ~/api-prebuilts.zst
-        rclone copy ~/api-prebuilts.zst itd:ci/${{ env.PROIMAGE }} 
+        zip -r ~/prebuilts.zip ~/api-daemon/prebuilts 
+        rclone copy ~/prebuilts.zip itd:ci/${{ env.PROIMAGE }} 
         ls -al -h
         
     - name: Upload Artifact
