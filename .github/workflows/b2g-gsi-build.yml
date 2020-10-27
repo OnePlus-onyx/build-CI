@@ -827,7 +827,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: gsi_arm_ab_api-daemon_prebuilts
-        path: ~/api-prebuilts.zst
+        path: ~/prebuilts.zip
 
     - name: Send Done Notify && Send "gsi_b2g_build" WebHook
       run: |
