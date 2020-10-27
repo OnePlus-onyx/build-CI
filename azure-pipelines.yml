@@ -16,7 +16,7 @@ jobs:
 - job: build
 
   pool:
-    vmImage: 'macos-latest'
+    vmImage: 'ubuntu-latest'
   timeoutInMinutes: 360
 
 
