@@ -282,7 +282,8 @@ jobs:
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
         #export SKIP_ABI_CHECKS=true
-        gtimeout 275m ./build.sh -j4 systemimage
+        #gtimeout 275m ./build.sh -j4 systemimage
+        gtimeout 275m ./build.sh -j16
         #./build.sh -j4 vndk-test-sepolicy
         df -h
         
@@ -378,6 +379,7 @@ jobs:
       run: |
         df -h
         cd ${work}/B2G
+        chmod +x ~/build-CI/api_sysroot.sh
         cp ~/build-CI/api_sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
