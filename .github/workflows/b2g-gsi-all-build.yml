@@ -211,19 +211,25 @@ jobs:
         df -h
         
     - name: fix
-      continue-on-error: true
+#       continue-on-error: true
       run: |
          cd ${work}/B2G/gonk-misc
-         sudo rm -r api-daemon
+         if [ -d "${work}/B2G/gonk-misc/api-daemon" ];then
+          sudo rm -r ${work}/B2G/gonk-misc/api-daemon
+         fi
          git clone https://github.com/ittat/api-daemon -b ittat-patch-without-api-daemon
          cd ${work}
          #sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
          #cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
          
+         brew install cpanm 
+         sudo cpan LWP::UserAgent
+         
          ####pre-api-daemon
-         export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
-         cd ${work}/B2G/gecko
-         ./mach python2.7 python/mozboot/mozboot/android.py --ndk-only --no-interactive
+         cd ~
+         curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+         tar -xvf mozbuild.tar.bz2
+         sudo rm mozbuild.tar.bz2
          
         
     - name: Check The Previous “error.log”
@@ -261,7 +267,7 @@ jobs:
         df -h
         
     - name: Add prebuilt api daemon
-      continue-on-error: true
+#       continue-on-error: true
       if: github.event.action == 'gsi_all_b2g_build'
       run: |
         cd ${work}
@@ -269,9 +275,11 @@ jobs:
         cd pre-api
         rclone copy itd:ci/${PROIMAGE}/prebuilts.zip ./
         unzip ./prebuilts.zip
-        ls
+        APIDeamon_PreBuild="${work}/pre-api/home/runner/api-daemon/prebuilts"
+        ls ${APIDeamon_PreBuild}
+        
         ####
-        TARGET_OUT=${work}/B2G/out/target/product/${device_name}/system
+        TARGET_OUT=${work}/B2G/out/target/product/phhgsi_arm_ab/system
         path_api=${TARGET_OUT}/api-daemon
         if [ -d "${path_api}" ]; then
            sudo rm -r "${path_api}"
@@ -285,25 +293,19 @@ jobs:
         mkdir -p ${path_api}
         mkdir -p ${path_b2g}/defaults
         
-        cp -r prebuilts/http_root  ${TARGET_OUT}/api-daemon
-        cp prebuilts/armv7-linux-androideabi/api-daemon ${TARGET_OUT}/bin
+        cp -r  ${APIDeamon_PreBuild}/http_root  ${TARGET_OUT}/api-daemon
+        cp ${APIDeamon_PreBuild}/armv7-linux-androideabi/api-daemon ${TARGET_OUT}/bin
         chmod +x ${TARGET_OUT}/bin/api-daemon
         
         ##
         DAEMON_ROOT=${work}/B2G/gonk-misc/api-daemon
-        
-        if [ "$device_arch" == "aarch64-linux-android" ]; then
-          BIT="64"
-        else
-          BIT=""
-        fi
-        
-        cp $(DAEMON_ROOT)/daemon/config-device.toml  $(TARGET_OUT)/api-daemon/config.toml
-        cp $(DAEMON_ROOT)/vhost/cert.pem   $(TARGET_OUT)/b2g/defaults/local-cert.pem
-        cp $(DAEMON_ROOT)/vhost/key.pem   $(TARGET_OUT)/b2g/defaults/local-key.pem
-        cp $(DAEMON_ROOT)/services/devicecapability/devicecapability.json  $(TARGET_OUT)/b2g/defaults/devicecapability.json
-        cp $(HOME)/.mozbuild/android-ndk-r20b-canary/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/${device_arch}/libc++_shared.so $(TARGET_OUT)/lib${BIT}
-        
+        cp ${DAEMON_ROOT}/daemon/config-device.toml  ${TARGET_OUT}/api-daemon/config.toml
+        cp ${DAEMON_ROOT}/vhost/cert.pem   ${TARGET_OUT}/b2g/defaults/local-cert.pem
+        cp ${DAEMON_ROOT}/vhost/key.pem   ${TARGET_OUT}/b2g/defaults/local-key.pem
+        cp ${DAEMON_ROOT}/services/devicecapability/devicecapability.json  ${TARGET_OUT}/b2g/defaults/devicecapability.json
+        #cp ~/.mozbuild/android-ndk-r20b-canary/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so ${TARGET_OUT}/lib
+
+
     - name: B2G Build - Build Source include Gecko
       if: github.event.action == 'gsi_all_b2g_build'
       run: |
