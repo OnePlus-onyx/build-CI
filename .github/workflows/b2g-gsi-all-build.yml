@@ -279,7 +279,7 @@ jobs:
         ls ${APIDeamon_PreBuild}
         
         ####
-        TARGET_OUT=${work}/B2G/out/target/product/phhgsi_arm_ab/system
+        TARGET_OUT=${work}/B2G/out/target/product/${device_name}/system
         path_api=${TARGET_OUT}/api-daemon
         if [ -d "${path_api}" ]; then
            sudo rm -r "${path_api}"
@@ -303,6 +303,7 @@ jobs:
         cp ${DAEMON_ROOT}/vhost/cert.pem   ${TARGET_OUT}/b2g/defaults/local-cert.pem
         cp ${DAEMON_ROOT}/vhost/key.pem   ${TARGET_OUT}/b2g/defaults/local-key.pem
         cp ${DAEMON_ROOT}/services/devicecapability/devicecapability.json  ${TARGET_OUT}/b2g/defaults/devicecapability.json
+        #TODO
         #cp ~/.mozbuild/android-ndk-r20b-canary/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so ${TARGET_OUT}/lib
 
 
