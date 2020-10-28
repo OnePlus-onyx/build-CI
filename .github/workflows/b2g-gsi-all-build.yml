@@ -511,6 +511,13 @@ jobs:
         sleep 20
         hdiutil detach ${work}
         
+    - name: Clear space
+      run: |        
+        df -h
+        cd ~ 
+        sudo rm -r ~/.mozbuild
+        df -h
+        
 #     - name: Reject Build Image Again
 #       continue-on-error: true
 #       id: reject_img_again
