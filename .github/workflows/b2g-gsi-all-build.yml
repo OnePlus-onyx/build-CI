@@ -48,7 +48,7 @@ jobs:
       run: |
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
-        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        sudo xcode-select --switch /Applications/Xcode_11.app/Contents/Developer
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         ####zstd
@@ -171,6 +171,16 @@ jobs:
         hdiutil detach ${work}
         rm ${PROIMAGE}.dmg.sparseimage*
         df -h
+        
+    - name: Clean  environment
+      run: |
+        ls -al -h /Applications 
+        df -h
+        sudo rm -r  /Applications/Xcode_10*
+        sudo rm -r  /Applications/Xcode_12*
+        #Firefox* Julia* Microsoft* R* Visual* 
+        df -h
+
     - name: Initialization system environment
       run: |
         df -h
@@ -261,7 +271,7 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
-        gtimeout 275m ./build.sh -j16 systemimage
+        gtimeout 245m ./build.sh -j16 systemimage
         #gtimeout 275m ./build.sh -j16
         #./build.sh -j4 vndk-test-sepolicy
         df -h
@@ -511,14 +521,6 @@ jobs:
         sleep 20
         hdiutil detach ${work}
         
-    - name: Clear space
-      run: |        
-        df -h
-        cd ~ 
-        sudo rm -r ~/.mozbuild
-        sudo rm  /Applications/Xcode_11*
-        sudo rm  /Applications/Xcode_12*
-        df -h
         
 #     - name: Reject Build Image Again
 #       continue-on-error: true
@@ -527,6 +529,8 @@ jobs:
 #         cd ~
 #         sleep 20
 #         hdiutil detach ${work}
+
+
 
     - name: Compress Soucre
       if: steps.check.conclusion == 'success'
