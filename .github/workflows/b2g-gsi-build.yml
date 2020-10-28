@@ -213,10 +213,10 @@ jobs:
         df -h
 
     - name: fix
-      continue-on-error: true
+#       continue-on-error: true
       run: |
          cd ${work}/B2G/gonk-misc
-         if [ -d "${work}/B2G/gonk-misc" ];then
+         if [ -d "${work}/B2G/gonk-misc/api-daemon" ];then
           sudo rm -r ${work}/B2G/gonk-misc/api-daemon
          fi
          git clone https://github.com/ittat/api-daemon -b ittat-patch-without-api-daemon
