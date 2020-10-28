@@ -516,6 +516,8 @@ jobs:
         df -h
         cd ~ 
         sudo rm -r ~/.mozbuild
+        sudo rm  /Applications/Xcode_11*
+        sudo rm  /Applications/Xcode_12*
         df -h
         
 #     - name: Reject Build Image Again
