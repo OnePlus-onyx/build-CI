@@ -532,7 +532,7 @@ jobs:
         df -h
         cd ~
         echo ${{github.event.action}}
-        if [ ${{github.event.action}} == "gsi_all_b2g_build" ]; then
+        if [ "${{github.event.action}}" == "gsi_all_b2g_build" ]; then
           mv ./${PROIMAGE}.dmg.sparseimage.zst ./${PROIMAGE}.dmg.sparseimage.zst.complete
           rclone copy ./${PROIMAGE}.dmg.sparseimage.zst.complete itd:ci/${PROIMAGE}
           sudo rm  -rf ./${PROIMAGE}.dmg.sparseimage.zst.complete
