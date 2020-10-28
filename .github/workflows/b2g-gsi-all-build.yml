@@ -298,12 +298,11 @@ jobs:
         chmod +x ${TARGET_OUT}/bin/api-daemon
         
         ##
-        DAEMON_ROOT=${work}/B2G/gonk-misc/api-daemon
-        cp ${DAEMON_ROOT}/daemon/config-device.toml  ${TARGET_OUT}/api-daemon/config.toml
-        cp ${DAEMON_ROOT}/vhost/cert.pem   ${TARGET_OUT}/b2g/defaults/local-cert.pem
-        cp ${DAEMON_ROOT}/vhost/key.pem   ${TARGET_OUT}/b2g/defaults/local-key.pem
-        cp ${DAEMON_ROOT}/services/devicecapability/devicecapability.json  ${TARGET_OUT}/b2g/defaults/devicecapability.json
-        #TODO
+        #DAEMON_ROOT=${work}/B2G/gonk-misc/api-daemon
+        #cp ${DAEMON_ROOT}/daemon/config-device.toml  ${TARGET_OUT}/api-daemon/config.toml
+        #cp ${DAEMON_ROOT}/vhost/cert.pem   ${TARGET_OUT}/b2g/defaults/local-cert.pem
+        #cp ${DAEMON_ROOT}/vhost/key.pem   ${TARGET_OUT}/b2g/defaults/local-key.pem
+        #cp ${DAEMON_ROOT}/services/devicecapability/devicecapability.json  ${TARGET_OUT}/b2g/defaults/devicecapability.json
         #cp ~/.mozbuild/android-ndk-r20b-canary/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so ${TARGET_OUT}/lib
 
 
