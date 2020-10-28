@@ -702,12 +702,15 @@ jobs:
         cd ~/gecko-b2g
         echo `cat browser/config/version.txt`
         export version=`cat browser/config/version.txt`
+        
         if [ "$device_arch" == "aarch64-linux-android" ]; then
-          export TARGET_ARCH=arm64
+          TARGET_ARCH=aarch64
+          ARCH_ABI="android"
         else
-          export TARGET_ARCH=arm
+          TARGET_ARCH=arm
+          ARCH_ABI="androideabi"
         fi
-        echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-androideabi-${TARGET_ARCH}.tar.gz"
+        echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-${ARCH_ABI}-${TARGET_ARCH}.tar.gz"
         
     - name: Upload Artifact
 #       if: github.event_name == 'schedule'
