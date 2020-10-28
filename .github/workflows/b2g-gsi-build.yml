@@ -216,7 +216,9 @@ jobs:
       continue-on-error: true
       run: |
          cd ${work}/B2G/gonk-misc
-         sudo rm -r api-daemon
+         if [ -d "${work}/B2G/gonk-misc" ];then
+          sudo rm -r ${work}/B2G/gonk-misc/api-daemon
+         fi
          git clone https://github.com/ittat/api-daemon -b ittat-patch-without-api-daemon
          cd ${work}
          #sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
