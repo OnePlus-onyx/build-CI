@@ -273,7 +273,7 @@ jobs:
         cd pre-api
         rclone copy itd:ci/${image}/prebuilts.zip ./
         unzip ./prebuilts.zip
-        APIDeamon_PreBuild="${work}/home/runner/api-daemon/prebuilts"
+        APIDeamon_PreBuild="${work}/pre-api/home/runner/api-daemon/prebuilts"
         ls ${APIDeamon_PreBuild}
         
         ####
