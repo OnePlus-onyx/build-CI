@@ -227,7 +227,8 @@ jobs:
          ####pre-api-daemon
          export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
          cd ${work}/B2G/gecko
-         ./mach python2.7 python/mozboot/mozboot/android.py --ndk-only --no-interactive
+         ./mach create-mach-environment
+         ./mach python python/mozboot/mozboot/android.py --ndk-only --no-interactive
          
 
         
