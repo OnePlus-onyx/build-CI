@@ -556,6 +556,7 @@ jobs:
       run: |
         df -h
         #####
+        sudo apt update
         sudo apt install git make mercurial  yasm  libncurses5 libfuse-dev
         wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
         tar xfj nasm-2.14.02.tar.bz2
