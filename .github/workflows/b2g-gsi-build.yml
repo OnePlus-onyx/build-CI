@@ -140,7 +140,7 @@ jobs:
     - name: Compress sourceimage Soucre
       run: |
         cd ~ 
-        zstd ${sourceimage}.dmg.sparseimage
+        zstd  --fast=7 ${sourceimage}.dmg.sparseimage
         rm ${sourceimage}.dmg.sparseimage
         ls -al ${sourceimage}.dmg.sparseimage*
         
@@ -151,7 +151,7 @@ jobs:
         cd ~ 
         cd /Users/runner
         hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 300g ~/${outimage}.dmg
-        zstd ${outimage}.dmg.sparseimage
+        zstd  --fast=7 ${outimage}.dmg.sparseimage
         rm ${outimage}.dmg.sparseimage
         ls -al ${outimage}.dmg.sparseimage*
         
@@ -536,7 +536,7 @@ jobs:
       if: steps.check.conclusion == 'success' && github.event.action == 'gsi_aosp_build' 
       run: |
         cd ~
-        zstd ${outimage}.dmg.sparseimage
+        zstd  --fast=7 ${outimage}.dmg.sparseimage
         df -h
 
     - name: Update Build Source
