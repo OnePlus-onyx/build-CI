@@ -345,6 +345,7 @@ jobs:
         export USE_PREBUILT_B2G=1
         export PREFERRED_B2G="${work}/pre-gecko/${gecko_version}"
         ./build.sh -j16 systemimage
+        ./build.sh -j16 vndk-test-sepolicy
         
     - name: Check Current ”error.log“ Status
 #       continue-on-error: true
