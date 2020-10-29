@@ -11,7 +11,7 @@ on:
       - gsi_gecko_build
       - gsi_b2g_build
       - gsi_api_daemon_build
-      - gsi_release1
+      - release
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
@@ -262,6 +262,14 @@ jobs:
          tar -xvf mozbuild.tar.bz2
          sudo rm mozbuild.tar.bz2
          
+         cd ${work}/B2G/vendor
+         ls
+         sudo rm -r vndk-tests
+         git clone https://github.com/ittat/vendor_vndk-tests -b ittat-patch-mac
+         mv vendor_vndk-tests vndk-tests
+         echo vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+         ls ${work}/B2G/out/host/darwin-x86/bin
+         
         
     - name: Check The Previous “error.log”
       run: |
@@ -326,7 +334,7 @@ jobs:
         mkdir -p ${path_b2g}/defaults
         
         cp -r  ${APIDeamon_PreBuild}/http_root  ${TARGET_OUT}/api-daemon
-        cp ${APIDeamon_PreBuild}/armv7-linux-androideabi/api-daemon ${TARGET_OUT}/bin
+        cp ${APIDeamon_PreBuild}/${device_arch}/api-daemon ${TARGET_OUT}/bin
         chmod +x ${TARGET_OUT}/bin/api-daemon
         
         ##
@@ -470,23 +478,23 @@ jobs:
         ####   ####
         cd  ${work}
         #TODO
-        zip -r img.zip B2G/out/target/product/${device_name}/system.img
-        mv img.zip ~
-        cd ~
-        rclone copy img.zip itd:ci/${remotepath}
+        #zip -r img.zip B2G/out/target/product/${device_name}/system.img
+        #mv img.zip ~
+        #cd ~
+        #rclone copy img.zip itd:ci/${remotepath}
         cd  ${work}
-        xz -c  B2G/out/target/product/${device_name}/system.img > ~/system.img.xz
+        xz -c  B2G/out/target/product/${device_name}/system.img > ~/${systemimage}
         cd ~
         rclone copy system.img.xz itd:ci/${remotepath}
         
  
     #TODO
-    - name: Upload img.zip artifact
-      if: github.event.action == 'gsi_b2g_build' 
-      uses: actions/upload-artifact@master
-      with:
-        name: img.zip
-        path: ~/img.zip
+#     - name: Upload img.zip artifact
+#       if: github.event.action == 'gsi_b2g_build' 
+#       uses: actions/upload-artifact@master
+#       with:
+#         name: img.zip
+#         path: ~/img.zip
         
     - name: Upload system.img.xz artifact
       continue-on-error: true
@@ -556,7 +564,7 @@ jobs:
   
    
   gecko_build:
-    if: github.event.action == 'gsi_all_gecko_build' || github.event_name == 'schedule' 
+    if: github.event.action == 'gsi_gecko_build' || github.event_name == 'schedule' 
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -667,7 +675,7 @@ jobs:
         chmod +x ~/build-CI/build-gsi-b2g.sh
         cp ~/build-CI/build-gsi-b2g.sh ~/gecko-b2g
         
-        rclone copy  itd:ci/${PROIMAGE}/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/${remotepath}/b2g-sysroot.tar.zst ./
         tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
         
         mkdir ~/objdir-gsi-gecko
@@ -724,7 +732,7 @@ jobs:
       run: |
         df -h
         cd ~/objdir-gsi-gecko/dist
-        rclone copy ${{ env.B2G_OUT }} itd:ci/${PROIMAGE}
+        rclone copy ${{ env.B2G_OUT }} itd:ci/${remotepath}
         df -h
         
     - name: Send "api-daemon_build" WebHook
@@ -738,7 +746,7 @@ jobs:
 
 
   api-daemon_build:
-    if: github.event.action == 'gsi_all_api_daemon_build'
+    if: github.event.action == 'gsi_api_daemon_build'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -790,7 +798,7 @@ jobs:
         rustup target add aarch64-linux-android armv7-linux-androideabi
         cd ~
         curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 | tar -C ${HOME}/ -xj
-        rclone copy  itd:ci/${PROIMAGE}/api-sysroot.tar.zst ./
+        rclone copy  itd:ci/${remotepath}/api-sysroot.tar.zst ./
         mkdir ~/.mozbuild/api-sysroot
         tar -C "$HOME/.mozbuild/api-sysroot" -I zstd -x -a -f api-sysroot.tar.zst
         #sudo rm api-sysroot.tar.zst
@@ -814,7 +822,7 @@ jobs:
       run: |
         cd ~
         zip -r ~/prebuilts.zip ~/api-daemon/prebuilts 
-        rclone copy ~/prebuilts.zip itd:ci/${PROIMAGE} 
+        rclone copy ~/prebuilts.zip itd:ci/${remotepath} 
         ls -al -h
         
     - name: Upload Artifact
@@ -830,7 +838,7 @@ jobs:
         #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-kernel-gecko PASS!"
         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_all_b2g_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
   release:
-    if: github.event.action == 'gsi_release'
+    if: github.event.action == 'release'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -857,12 +865,13 @@ jobs:
     - name: Download
       run: |
         pwd
-        rclone copy  itd:ci/${PROIMAGE}/system.img.xz ./
-        rclone copy  itd:ci/${PROIMAGE}/${gecko_version} ./
+        rclone copy  itd:ci/${remotepath}/${systemimage} ./
+        rclone copy  itd:ci/${remotepath}/${gecko_version} ./
         ls -al -h
         
         
     - name: Create Release
+      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
