@@ -509,19 +509,12 @@ jobs:
         df -h
                
     - name: Update Build Source
-      if: steps.check.conclusion == 'success'
+      if: steps.check.conclusion == 'success' && github.event.action == 'gsi_all_aosp_build'
       run: |
         df -h
         cd ~
-        echo ${{github.event.action}}
-        if [ "${{github.event.action}}" == "gsi_all_b2g_build" ]; then
-          mv ./${PROIMAGE}.dmg.sparseimage.zst ./${PROIMAGE}.dmg.sparseimage.zst.complete
-          rclone copy ./${PROIMAGE}.dmg.sparseimage.zst.complete itd:ci/${PROIMAGE}
-          sudo rm  -rf ./${PROIMAGE}.dmg.sparseimage.zst.complete
-        else
-          rclone copy ./${PROIMAGE}.dmg.sparseimage.zst itd:ci/${PROIMAGE}
-          sudo rm  -rf ./${PROIMAGE}.dmg.sparseimage.zst
-        fi
+        rclone copy ./${PROIMAGE}.dmg.sparseimage.zst itd:ci/${PROIMAGE}
+        sudo rm  -rf ./${PROIMAGE}.dmg.sparseimage.zst
         ls -al ${PROIMAGE}.dmg.sparseimage*
         sudo rm ${PROIMAGE}.dmg.sparseimage*
         df -h
