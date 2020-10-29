@@ -7,11 +7,11 @@ on:
   repository_dispatch:
       types: 
       - gsi_repack_aosp
-      - gsi_all_aosp_build
-      - gsi_all_gecko_build
-      - gsi_all_b2g_build
-      - gsi_all_api_daemon_build
-      - gsi_release
+      - gsi_aosp_build
+      - gsi_gecko_build
+      - gsi_b2g_build
+      - gsi_api_daemon_build
+      - gsi_release1
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
