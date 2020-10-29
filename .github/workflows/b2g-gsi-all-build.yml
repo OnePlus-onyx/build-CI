@@ -188,9 +188,6 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        #####
-        echo "::set-env name=RELEASE_REF::gsi_${device_name}_$(date +%Y-%m-%d)"
-        
         ####
         more /System/Library/CoreServices/SystemVersion.plist
         ls /Applications/Xcode_*
