@@ -7,22 +7,35 @@ on:
   repository_dispatch:
       types: 
       - gsi_repack_aosp
-      - gsi_aosp_build
-      - gsi_gecko_build
-      - gsi_b2g_build
-      - gsi_api_daemon_build
+      - gsi_all_aosp_build
+      - gsi_all_gecko_build
+      - gsi_all_b2g_build
+      - gsi_all_api_daemon_build
+      - gsi_release
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
-  image: ${{github.event.client_payload.image}}  
-  PROIMAGE: ${{github.event.client_payload.image}} 
+  image: ${{github.event.client_payload.image}}
+  PROIMAGE: ${{github.event.client_payload.image}}_${{github.event.client_payload.device_name}}
+  remotepath: ${{github.event.client_payload.image}}_${{github.event.client_payload.device_name}}
   work: /Volumes/${{github.event.client_payload.image}} 
+  out_work: /Volumes/out
   action_type: ${{ github.event.action }} 
-#   gecko_version:  
-#   device_name:
+  gecko_version:  ${{github.event.client_payload.gecko_version}} 
+  device_name: ${{github.event.client_payload.device_name}} 
+  device_arch: ${{github.event.client_payload.device_arch}} 
+  systemimage: system.img.xz
+  sourceimage: source
+  outimage: out
+#phhgsi_arm64_a  
+#phhgsi_arm64_ab
+#phhgsi_arm_a 
+#phhgsi_arm_ab  
+#RUST_TARGET := armv7-linux-androideabi
+#RUST_TARGET := aarch64-linux-android
 
 jobs: 
-  Download:
+  gsi_repack_aosp:
     if: github.event.action == 'gsi_repack_aosp'
     runs-on: macos-latest
     timeout-minutes: 360
@@ -35,14 +48,13 @@ jobs:
       run: |
         cd ~
         hdiutil detach ${work}
-        rm ${image}.dmg.sparseimage*
+        rm ${PROIMAGE}.dmg.sparseimage*
         df -h
-
     - name: Initialization system environment
       run: |
         df -h
         more /System/Library/CoreServices/SystemVersion.plist
-        sudo xcode-select --switch /Applications/Xcode_10.3.app/Contents/Developer
+        sudo xcode-select --switch /Applications/Xcode_11.app/Contents/Developer
         ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
         ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
         ####zstd
@@ -62,9 +74,9 @@ jobs:
         
         ####mount
         cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 400g ~/${image}.dmg
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 170g ~/${sourceimage}.dmg
         ls
-        hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
+        hdiutil attach /Users/runner/${sourceimage}.dmg.sparseimage -mountpoint ${work}
            
     - name: Fetch source
       run: |
@@ -75,9 +87,8 @@ jobs:
         git clone https://github.com/ittat/B2G -b ittat-patch-gsi  --depth=1 
         cd ./B2G
         echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh phhgsi_arm_ab
+        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh ${device_name}
         df -h
-
     - name: Fix soucre
       run: | 
         df -h   
@@ -126,37 +137,43 @@ jobs:
         hdiutil detach ${work}
         df -h
         
-    - name: Compress Soucre
+    - name: Compress sourceimage Soucre
       run: |
-        cd ~
-        zstd ${image}.dmg.sparseimage
-        rm ${image}.dmg.sparseimage
-        ls -al ${image}.dmg.sparseimage*
+        cd ~ 
+        zstd ${sourceimage}.dmg.sparseimage
+        rm ${sourceimage}.dmg.sparseimage
+        ls -al ${sourceimage}.dmg.sparseimage*
+        
+        
+    - name: create sourceimage Soucre
+      if: 
+      run: |
+        cd ~ 
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 300g ~/${outimage}.dmg
+        zstd ${outimage}.dmg.sparseimage
+        rm ${outimage}.dmg.sparseimage
+        ls -al ${outimage}.dmg.sparseimage*
         
     - name: Uplaod Source 
       run: |
         df -h
-        rclone copy ~/${image}.dmg.sparseimage.zst itd:ci/${image}
-        sudo rm -rf ${image}.dmg.sparseimage.zst
+        rclone copy ~/${sourceimage}.dmg.sparseimage.zst itd:ci/${remotepath}
+        sudo rm -rf ${sourceimage}.dmg.sparseimage.zst
+        rclone copy ~/${outimage}.dmg.sparseimage.zst itd:ci/${remotepath}
+        sudo rm -rf ${outimage}.dmg.sparseimage.zst
         df -h
         
     - name: Send "gsi_aosp_build" WebHook          
       run: |
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
-   
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_aosp_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
    
   aosp_build:
     if: github.event.action == 'gsi_aosp_build' || github.event.action == 'gsi_b2g_build' 
     runs-on: macos-latest
-    #runs-on: macos-11.0
     timeout-minutes: 360
     steps:
-#     - name: Send Start Notify To Telegram
-#       run: |
-#         echo ${outversion}
-#         today=$(date +%Y-%m-%d)
-#         curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion} Start!"
-
+      
     - name: Checkout
       uses: actions/checkout@v1       
 
@@ -165,24 +182,30 @@ jobs:
       run: |
         cd ~
         hdiutil detach ${work}
-        rm ${image}.dmg.sparseimage*
+        rm ${sourceimage}.dmg.sparseimage*
+        rm ${outimage}.dmg.sparseimage*
         df -h
-
+        
+    - name: Clean  environment
+      run: |
+        ls -al -h /Applications 
+        df -h
+        sudo rm -r  /Applications/Xcode_10*
+        sudo rm -r  /Applications/Xcode_12*
+        sudo rm -r  /Applications/Xcode_11.*.app
+        #Firefox* Julia* Microsoft* R* Visual* 
+        ls -al -h /Applications
+        df -h
     - name: Initialization system environment
       run: |
         df -h
-        #####
-        echo "::set-env name=RELEASE_REF::b2g_gsi_$(date +%Y-%m-%d)"
-        
         ####
         more /System/Library/CoreServices/SystemVersion.plist
         ls /Applications/Xcode_*
         sudo xcode-select --switch /Applications/Xcode_11.app/Contents/Developer
         
         ####brew
-        #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install expect  gnu-sed ccache coreutils zstd gcc perl cpanm unzip
-
         #####ssh
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
@@ -194,24 +217,30 @@ jobs:
         mv ./rclone.conf ~/.config/rclone
         brew install rclone
         rclone ls itd:test
-        #rclone -v
-        
-        
-
-        
+      
+            
     - name: Fetch Source
       run: |
         df -h
         git config --global user.name "ci"
         git config --global user.email "ci@github.com"
         cd ~
-        rclone copy itd:ci/${image}/${image}.dmg.sparseimage.zst ./
-        zstd --decompress  ${image}.dmg.sparseimage.zst
-        sudo rm -r ./${image}.dmg.sparseimage.zst
+        rclone copy itd:ci/${remotepath}/${sourceimage}.dmg.sparseimage.zst ./
+        zstd --decompress  ${sourceimage}.dmg.sparseimage.zst
+        sudo rm -r ./${sourceimage}.dmg.sparseimage.zst
+        rclone copy itd:ci/${remotepath}/${outimage}.dmg.sparseimage.zst ./
+        zstd --decompress  ${outimage}.dmg.sparseimage.zst
+        sudo rm -r ./${outimage}.dmg.sparseimage.zst
         #####mount
-        hdiutil attach /Users/runner/${image}.dmg.sparseimage -mountpoint ${work}
+        hdiutil attach /Users/runner/${sourceimage}.dmg.sparseimage -mountpoint ${work}
+        if [ -d "${work}/B2G/out" ];then
+          sudo rm -r ${work}/B2G/out
+        fi
+        hdiutil attach /Users/runner/${outimage}.dmg.sparseimage -mountpoint  ${out_work}
+        sudo ln -s  ${out_work}  ${work}/B2G/out
+        ls -al ${work}/B2G
         df -h
-
+ 
     - name: fix
 #       continue-on-error: true
       run: |
@@ -233,7 +262,6 @@ jobs:
          tar -xvf mozbuild.tar.bz2
          sudo rm mozbuild.tar.bz2
          
-
         
     - name: Check The Previous “error.log”
       run: |
@@ -264,12 +292,11 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
-        #export SKIP_ABI_CHECKS=true
-        gtimeout 275m ./build.sh -j16 systemimage
+        gtimeout 245m ./build.sh -j16 systemimage
         #gtimeout 275m ./build.sh -j16
         #./build.sh -j4 vndk-test-sepolicy
         df -h
-
+        
     - name: Add prebuilt api daemon
 #       continue-on-error: true
       if: github.event.action == 'gsi_b2g_build'
@@ -277,13 +304,13 @@ jobs:
         cd ${work}
         mkdir pre-api
         cd pre-api
-        rclone copy itd:ci/${image}/prebuilts.zip ./
+        rclone copy itd:ci/${remotepath}/prebuilts.zip ./
         unzip ./prebuilts.zip
         APIDeamon_PreBuild="${work}/pre-api/home/runner/api-daemon/prebuilts"
         ls ${APIDeamon_PreBuild}
         
         ####
-        TARGET_OUT=${work}/B2G/out/target/product/phhgsi_arm_ab/system
+        TARGET_OUT=${work}/B2G/out/target/product/${device_name}/system
         path_api=${TARGET_OUT}/api-daemon
         if [ -d "${path_api}" ]; then
            sudo rm -r "${path_api}"
@@ -308,7 +335,6 @@ jobs:
         #cp ${DAEMON_ROOT}/vhost/key.pem   ${TARGET_OUT}/b2g/defaults/local-key.pem
         #cp ${DAEMON_ROOT}/services/devicecapability/devicecapability.json  ${TARGET_OUT}/b2g/defaults/devicecapability.json
         #cp ~/.mozbuild/android-ndk-r20b-canary/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so ${TARGET_OUT}/lib
-
     - name: B2G Build - Build Source include Gecko
       if: github.event.action == 'gsi_b2g_build'
       run: |
@@ -320,14 +346,12 @@ jobs:
         
         #sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
         #cp ./Android.mk.api-daemon.old B2G/gonk-misc/api-daemon/Android.mk 
-
         ####
         cd ${work}
         mkdir pre-gecko
         cd pre-gecko
-        rclone copy itd:ci/${image}/b2g-84.0a1.en-US.linux-androideabi-arm.tar.gz ./
+        rclone copy itd:ci/${remotepath}/${gecko_version} ./
           
-
         ####  build
         export CCACHE_DIR=~/.ccache
         /usr/local/bin/ccache  -M 20G
@@ -337,9 +361,9 @@ jobs:
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
         export USE_PREBUILT_B2G=1
-        export PREFERRED_B2G="${work}/pre-gecko/b2g-84.0a1.en-US.linux-androideabi-arm.tar.gz"
+        export PREFERRED_B2G="${work}/pre-gecko/${gecko_version}"
         ./build.sh -j16 systemimage
-        ls ./out/target/product/phhgsi_arm_ab/system/bin
+        ./build.sh -j16 vndk-test-sepolicy
         
     - name: Check Current ”error.log“ Status
 #       continue-on-error: true
@@ -354,7 +378,7 @@ jobs:
           hdiutil detach ${work}
           sleep 20
           hdiutil detach ${work}
-          sudo rm -rf ${image}.dmg.sparseimage*
+          sudo rm -rf ${PROIMAGE}.dmg.sparseimage*
           df -h
           exit 211
         else
@@ -375,10 +399,16 @@ jobs:
         cp ~/build-CI/create-b2g-sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
-        export TARGET_ARCH=arm
-        export TARGET_ARCH_VARIANT=armv7-a-neon
+        if [ "$device_arch" == "aarch64-linux-android" ]; then
+          export TARGET_ARCH=arm64
+          export TARGET_ARCH_VARIANT=armv8-a
+        else
+          export TARGET_ARCH=arm
+          export TARGET_ARCH_VARIANT=armv7-a-neon
+        fi
+        
         export TARGET_CPU_VARIANT=generic
-        export GONK_PRODUCT_NAME=phhgsi_arm_ab
+        export GONK_PRODUCT_NAME=${device_name}
         #gecko/taskcluster/scripts/misc/create-b2g-sysroot.sh
         ./create-b2g-sysroot.sh
         ls -al
@@ -386,15 +416,15 @@ jobs:
         ls -al
         mv b2g-sysroot.tar.zst ${work}
         df -h
-
+        
     - name: Upload “b2g-sysroot”
 #       continue-on-error: true
       if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
-        rclone copy b2g-sysroot.tar.zst itd:ci/${image}
+        rclone copy b2g-sysroot.tar.zst itd:ci/${remotepath}
         sudo rm b2g-sysroot.tar.zst
-
+        
     - name: Repack “api-sysroot” for gsi 
       id: gsi_sysroot
 #       continue-on-error: true
@@ -406,25 +436,31 @@ jobs:
         cp ~/build-CI/api_sysroot.sh ./
         pip3 install zstandard
         pip install zstandard
-        export TARGET_ARCH=arm
-        export TARGET_ARCH_VARIANT=armv7-a-neon
+        
+        if [ "$device_arch" == "aarch64-linux-android" ]; then
+          export TARGET_ARCH=arm64
+          export TARGET_ARCH_VARIANT=armv8-a
+        else
+          export TARGET_ARCH=arm
+          export TARGET_ARCH_VARIANT=armv7-a-neon
+        fi
+        
         export TARGET_CPU_VARIANT=generic
-        export GONK_PRODUCT_NAME=phhgsi_arm_ab
+        export GONK_PRODUCT_NAME=${device_name}
         ./api_sysroot.sh
         sudo rm -rf ./api-sysroot
         ls -al
         mv api-sysroot.tar.zst ${work}
         df -h
-
+        
     - name: Upload “api-sysroot”
 #       continue-on-error: true
       if:  github.event.action == 'gsi_aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         cd ${work}
-        rclone copy api-sysroot.tar.zst itd:ci/${image}
+        rclone copy api-sysroot.tar.zst itd:ci/${remotepath}
         sudo rm api-sysroot.tar.zst
-
-
+        
     - name: Update b2g-gsi  !!!!
       if:  github.event.action == 'gsi_b2g_build' 
       continue-on-error: true
@@ -432,17 +468,17 @@ jobs:
         ####   ####
         cd  ${work}
         #TODO
-        zip -r img.zip B2G/out/target/product/phhgsi_arm_ab/system.img
+        zip -r img.zip B2G/out/target/product/${device_name}/system.img
         mv img.zip ~
         cd ~
-        rclone copy img.zip itd:ci/${image}
+        rclone copy img.zip itd:ci/${remotepath}
         cd  ${work}
-        xz -c  B2G/out/target/product/phhgsi_arm_ab/system.img > ~/system.img.xz
+        xz -c  B2G/out/target/product/${device_name}/system.img > ~/system.img.xz
         cd ~
-        rclone copy system.img.xz itd:ci/${image}
+        rclone copy system.img.xz itd:ci/${remotepath}
         
  
-    
+    #TODO
     - name: Upload img.zip artifact
       if: github.event.action == 'gsi_b2g_build' 
       uses: actions/upload-artifact@master
@@ -455,47 +491,9 @@ jobs:
       if: github.event.action == 'gsi_b2g_build' 
       uses: actions/upload-artifact@master
       with:
-        name: gsi_arm_ab_system.img.xz
+        name: system.img.xz
         path: ~/system.img.xz
- 
-    - name: Create Release
-      id: create_release
-      if: github.event.action == 'gsi_b2g_build'
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.RELEASE_REF }}
-        #release_name: release_${{ env.RELEASE_REF }}
-        draft: false
-        prerelease: false
-        body: |
-          # Release Notes
-          gsi_arm_ab - gsi_arm_ab_system.img.xz
 
-    - name: Update Release Asset - system & boot
-      continue-on-error: true
-      if: github.event.action == 'gsi_b2g_build'
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /Users/runner/system.img.xz
-          asset_name: gsi_arm_ab_system.img.xz
-          asset_content_type: application/x-xz
-
-#     - name: Update Release Asset - onyx-ota
-#       continue-on-error: true
-#       if: github.event.action == 'onyx_b2g_build'
-#       uses: actions/upload-release-asset@v1.0.1
-#       env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#       with:
-#           upload_url: ${{ steps.create_release.outputs.upload_url }}
-#           asset_path: /Users/runner/onyx_b2g_ota_update.zip
-#           asset_name: onyx_b2g_ota_update.zip
-#           asset_content_type: application/zip
 
     - name: Reject Build Image
       continue-on-error: true
@@ -505,53 +503,58 @@ jobs:
         sleep 20
         hdiutil detach ${work}
         
-#     - name: Reject Build Image Again
-#       continue-on-error: true
-#       id: reject_img_again
-#       run: |
-#         cd ~
-#         sleep 20
-#         hdiutil detach ${work}
-
+    - name: Reject Build Image
+      continue-on-error: true
+      run: |
+        cd ~
+        sleep 20
+        hdiutil detach ${work_out}
+        
+    - name: Send "gsi_build_gecko" WebHook
+      if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+       #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
+       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_gecko_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+ 
+    - name: gsi_release WebHook
+      if: github.event.action == 'gsi_b2g_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+       #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
+       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_release","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+   
     - name: Compress Soucre
       if: steps.check.conclusion == 'success'
       run: |
         cd ~
-        zstd ${image}.dmg.sparseimage
+        zstd ${outimage}.dmg.sparseimage
         df -h
-               
+
     - name: Update Build Source
       if: steps.check.conclusion == 'success'
       run: |
         df -h
         cd ~
         echo ${{github.event.action}}
-        if [ ${{github.event.action}} == "gsi_b2g_build" ]; then
-          mv ./${image}.dmg.sparseimage.zst ./${image}.dmg.sparseimage.zst.complete
-          rclone copy ./${image}.dmg.sparseimage.zst.complete itd:ci/${image}
-          sudo rm  -rf ./${image}.dmg.sparseimage.zst.complete
+        if [ "${{github.event.action}}" == "gsi_b2g_build" ]; then
+          mv ./${outimage}.dmg.sparseimage.zst ./${outimage}.dmg.sparseimage.zst.complete
+          rclone copy ./${outimage}.dmg.sparseimage.zst.complete itd:ci/${remotepath}
+          sudo rm  -rf ./${outimage}.dmg.sparseimage.zst.complete
         else
-          rclone copy ./${image}.dmg.sparseimage.zst itd:ci/${image}
-          sudo rm  -rf ./${image}.dmg.sparseimage.zst
+          rclone copy ./${outimage}.dmg.sparseimage.zst itd:ci/${remotepath}
+          sudo rm  -rf ./${outimage}.dmg.sparseimage.zst
         fi
-        ls -al ${image}.dmg.sparseimage*
-        sudo rm ${image}.dmg.sparseimage*
+        ls -al ${outimage}.dmg.sparseimage*
+        sudo rm ${outimage}.dmg.sparseimage*
         df -h
             
     - name: Send "gsi_aosp_build" WebHook Again
       if: github.event.action == 'gsi_aosp_build' && steps.build.outcome == 'failure' && steps.build.conclusion == 'success'  &&  steps.check.conclusion == 'success'         
       run: |
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_aosp_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
-
-    - name: Send Done Notify & Send "gsi_build_gecko" WebHook
-      if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
-      run: |
-       #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
-       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_gecko_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
-   
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_aosp_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+  
    
   gecko_build:
-    if: github.event.action == 'gsi_gecko_build' || github.event_name == 'schedule' 
+    if: github.event.action == 'gsi_all_gecko_build' || github.event_name == 'schedule' 
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -570,8 +573,6 @@ jobs:
       run: |
         df -h
         #####
-        echo "::set-env name=RELEASE_REF::b2g-core_gsi_$(date +%Y-%m-%d)"
-
         sudo apt install git make mercurial  yasm  libncurses5 libfuse-dev
         wget http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
         tar xfj nasm-2.14.02.tar.bz2
@@ -606,7 +607,7 @@ jobs:
         #sudo apt-get install yarnpkg
         yarn
         #sudo ln -snf /usr/bin/yarnpkg /usr/bin/yarn
-
+        
     - name: clean disk
       #continue-on-error: true
       run: |
@@ -664,7 +665,7 @@ jobs:
         chmod +x ~/build-CI/build-gsi-b2g.sh
         cp ~/build-CI/build-gsi-b2g.sh ~/gecko-b2g
         
-        rclone copy  itd:ci/${{ env.PROIMAGE }}/b2g-sysroot.tar.zst ./
+        rclone copy  itd:ci/${PROIMAGE}/b2g-sysroot.tar.zst ./
         tar -C "$HOME/.mozbuild" -I zstd -x -a -f b2g-sysroot.tar.zst
         
         mkdir ~/objdir-gsi-gecko
@@ -676,11 +677,18 @@ jobs:
         cd ~/gecko-b2g
         export SHELL=/bin/bash
         export GONK_PATH=${HOME}/.mozbuild/b2g-sysroot
-        export GONK_PRODUCT_NAME=phhgsi_arm_ab
+        
+        if [ "$device_arch" == "aarch64-linux-android" ]; then
+          export TARGET_ARCH=arm64
+          export TARGET_ARCH_VARIANT=armv8-a
+        else
+          export TARGET_ARCH=arm
+          export TARGET_ARCH_VARIANT=armv7-a-neon
+        fi
+        
+        export GONK_PRODUCT_NAME=${device_name}
         export GECKO_OBJDIR=${HOME}/objdir-gsi-gecko
         export PLATFORM_VERSION=29
-        export TARGET_ARCH=arm
-        export TARGET_ARCH_VARIANT=armv7-a-neon
         export TARGET_CPU_VARIANT=generic
         export MOZ_DISABLE_LTO=1
         ./build-gsi-b2g.sh
@@ -693,8 +701,16 @@ jobs:
         cd ~/gecko-b2g
         echo `cat browser/config/version.txt`
         export version=`cat browser/config/version.txt`
-        echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-androideabi-arm.tar.gz"
-
+        
+        if [ "$device_arch" == "aarch64-linux-android" ]; then
+          TARGET_ARCH=aarch64
+          ARCH_ABI="android"
+        else
+          TARGET_ARCH=arm
+          ARCH_ABI="androideabi"
+        fi
+        echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-${ARCH_ABI}-${TARGET_ARCH}.tar.gz"
+        
     - name: Upload Artifact
 #       if: github.event_name == 'schedule'
       uses: actions/upload-artifact@master
@@ -706,40 +722,12 @@ jobs:
       run: |
         df -h
         cd ~/objdir-gsi-gecko/dist
-        rclone copy ${{ env.B2G_OUT }} itd:ci/${{ env.PROIMAGE }}
+        rclone copy ${{ env.B2G_OUT }} itd:ci/${PROIMAGE}
         df -h
-
-    - name: Create Release
-      if: github.event_name != 'schedule'
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: gecko_${{ env.RELEASE_REF }}
-        #release_name: release_${{ env.RELEASE_REF }}
-        draft: false
-        prerelease: false
-        body: |
-          # Release Notes
-          ${{ env.B2G_OUT }}
-
-    - name: Update Release Asset 
-      if: github.event_name != 'schedule'
-      continue-on-error: true
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/objdir-gsi-gecko/dist/${{ env.B2G_OUT }}
-          asset_name: ${{ env.B2G_OUT }}
-          asset_content_type: application/gzip
-
+        
     - name: Send "api-daemon_build" WebHook
-      if: github.event.action == 'gsi_gecko_build'
       run: |
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_api_daemon_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_all_api_daemon_build","client_payload": {"image":"'${image}'", "gecko_version":"'${B2G_OUT}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
   
 #     - name: Send Done Notify 
 #       run: |
@@ -748,7 +736,7 @@ jobs:
 
 
   api-daemon_build:
-    if: github.event.action == 'gsi_api_daemon_build'
+    if: github.event.action == 'gsi_all_api_daemon_build'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -800,7 +788,7 @@ jobs:
         rustup target add aarch64-linux-android armv7-linux-androideabi
         cd ~
         curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 | tar -C ${HOME}/ -xj
-        rclone copy  itd:ci/${{ env.PROIMAGE }}/api-sysroot.tar.zst ./
+        rclone copy  itd:ci/${PROIMAGE}/api-sysroot.tar.zst ./
         mkdir ~/.mozbuild/api-sysroot
         tar -C "$HOME/.mozbuild/api-sysroot" -I zstd -x -a -f api-sysroot.tar.zst
         #sudo rm api-sysroot.tar.zst
@@ -810,37 +798,100 @@ jobs:
         cd ~
         git clone https://github.com/kaiostech/api-daemon --depth=1
         ls -al
-
     - name: build Source
       run: |
         ####
-        #RUST_TARGET := armv7-linux-androideabi
-        #RUST_TARGET := aarch64-linux-android
-        
-        export TARGET_ARCH=armv7-linux-androideabi
+        export TARGET_ARCH=${device_arch}
         export BUILD_WITH_NDK_DIR=~/.mozbuild/android-ndk-r20b-canary
         export GONK_DIR=~/.mozbuild/api-sysroot
-        export GONK_PRODUCT=phhgsi_arm_ab
+        export GONK_PRODUCT=${device_name}
         cd ~/api-daemon
         ./update-prebuilts.sh
-
+        
     - name: zip Artifact
       run: |
         cd ~
         zip -r ~/prebuilts.zip ~/api-daemon/prebuilts 
-        rclone copy ~/prebuilts.zip itd:ci/${{ env.PROIMAGE }} 
+        rclone copy ~/prebuilts.zip itd:ci/${PROIMAGE} 
         ls -al -h
         
     - name: Upload Artifact
       continue-on-error: true
       uses: actions/upload-artifact@master
       with:
-        name: gsi_arm_ab_api-daemon_prebuilts
+        name: prebuilts.zip
         path: ~/prebuilts.zip
 
-    - name: Send Done Notify && Send "gsi_b2g_build" WebHook
+    - name: Send Done Notify && Send "gsi_all_b2g_build" WebHook
       run: |
         today=$(date +%Y-%m-%d)
         #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-kernel-gecko PASS!"
-        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_b2g_build","client_payload": {"image":"'${image}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_all_b2g_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+  release:
+    if: github.event.action == 'gsi_release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      
+    - name: Initialization system environment
+      run: |
+        df -h
+        git config --global user.name "ci"
+        git config --global user.email "ci@github.com"
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
+        
+        ####
+        echo "::set-env name=RELEASE_REF::b2g_${device_name}_$(date +%Y-%m-%d)"
+    - name: Download
+      run: |
+        pwd
+        rclone copy  itd:ci/${PROIMAGE}/system.img.xz ./
+        rclone copy  itd:ci/${PROIMAGE}/${gecko_version} ./
+        ls -al -h
+        
+        
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.RELEASE_REF }}
+        draft: false
+        prerelease: false
+        body: |
+          ## List
+          type: ${{ env.device_name }} 
+          systemimage - ${{ env.device_name }} - system.img.xz
+          b2g_core - ${{ env.device_arch }} - ${{ env.gecko_version }}
+          
+          
+    - name: Update Release Asset - system & boot
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: system.img.xz
+          asset_name: system.img.xz
+          asset_content_type: application/x-xz
 
+          
+    - name: Update Release Asset 
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.gecko_version }}
+          asset_name: ${{ env.gecko_version }}
+          asset_content_type: application/gzip
