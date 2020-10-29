@@ -243,6 +243,16 @@ jobs:
          tar -xvf mozbuild.tar.bz2
          sudo rm mozbuild.tar.bz2
          
+         cd ${work}/B2G/vendor
+         ls
+         sudo rm -r vndk-tests
+         git clone https://github.com/ittat/vendor_vndk-tests -b ittat-patch-mac
+         mv vendor_vndk-tests vndk-tests
+         echo vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+         ls ./out/host/darwin-x86/bin
+         
+         
+         
         
     - name: Check The Previous “error.log”
       run: |
@@ -345,8 +355,9 @@ jobs:
         export DISABLE_SOURCES_XML=true
         export USE_PREBUILT_B2G=1
         export PREFERRED_B2G="${work}/pre-gecko/${gecko_version}"
+        bash "${work}/B2G/vendor/vndk-tests/run.sh" "${work}/B2G/vendor/vndk-tests" "${work}/B2G/out/target/product/${device_name}"
         ./build.sh -j16 systemimage
-        ./build.sh -j16 vndk-test-sepolicy
+        #./build.sh -j16 vndk-test-sepolicy
         
     - name: Check Current ”error.log“ Status
 #       continue-on-error: true
