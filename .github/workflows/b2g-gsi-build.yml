@@ -265,7 +265,7 @@ jobs:
         
     - name: Check The Previous “error.log”
       run: |
-        if [ -d "${work}/B2G/out" ];then
+        if [ -d "${work}/B2G/out/error.log" ];then
           ls -al ${work}/B2G/out/error*
           echo "old error.log:"
           cat ${work}/B2G/out/error.log
