@@ -136,7 +136,7 @@ jobs:
     - name: Compress Soucre
       run: |
         cd ~
-        zstd ${PROIMAGE}.dmg.sparseimage
+        zstd  --fast=7  ${PROIMAGE}.dmg.sparseimage
         rm ${PROIMAGE}.dmg.sparseimage
         ls -al ${PROIMAGE}.dmg.sparseimage*
         
@@ -516,7 +516,7 @@ jobs:
       if: steps.check.conclusion == 'success'
       run: |
         cd ~
-        zstd ${PROIMAGE}.dmg.sparseimage
+        zstd  --fast=7 ${PROIMAGE}.dmg.sparseimage
         df -h
                
     - name: Update Build Source
