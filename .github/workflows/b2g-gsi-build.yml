@@ -292,6 +292,7 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
+        export OUT_DIR_COMMON_BASE=${work_out}
         gtimeout 245m ./build.sh -j16 systemimage
         #gtimeout 275m ./build.sh -j16
         #./build.sh -j4 vndk-test-sepolicy
@@ -361,6 +362,7 @@ jobs:
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
         export USE_PREBUILT_B2G=1
+        export OUT_DIR_COMMON_BASE=${work_out}
         export PREFERRED_B2G="${work}/pre-gecko/${gecko_version}"
         ./build.sh -j16 systemimage
         ./build.sh -j16 vndk-test-sepolicy
