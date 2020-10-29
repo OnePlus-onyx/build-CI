@@ -821,6 +821,7 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
+        sudo apt install libfuse-dev
         git config --global user.name "ci"
         git config --global user.email "ci@github.com"
         #ssh
