@@ -83,6 +83,7 @@ bionic/libc/kernel/uapi/asm-arm
 bionic/libc/kernel/android/scsi    
 bionic/libc/kernel/android/uapi  
 libnativehelper/include_deprecated
-out/target/product/${GONK_PRODUCT_NAME}/obj"
+out/target/product/${GONK_PRODUCT_NAME}/obj
+out/target/product/${GONK_PRODUCT_NAME}/system"
 
 tar -c $SYSROOT_PREBUILTS $SYSROOT_LIBRARIES $SYSROOT_INCLUDE_FOLDERS --transform 's,^,api-sysroot/,S' | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > "api-sysroot.tar.zst"
