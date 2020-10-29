@@ -533,14 +533,14 @@ jobs:
        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_release","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
    
     - name: Compress Soucre
-      if: steps.check.conclusion == 'success'
+      if: steps.check.conclusion == 'success' && github.event.action == 'gsi_aosp_build' 
       run: |
         cd ~
         zstd ${outimage}.dmg.sparseimage
         df -h
 
     - name: Update Build Source
-      if: steps.check.conclusion == 'success'
+      if: steps.check.conclusion == 'success' &&  github.event.action == 'gsi_aosp_build' 
       run: |
         df -h
         cd ~
