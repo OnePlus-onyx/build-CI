@@ -1,5 +1,7 @@
 name: auto_send_commit_to_tg
 on: 
+   push:
+      branches: master
    repository_dispatch:
      types: 
        - commit
@@ -12,6 +14,9 @@ jobs:
     steps:
     - name: Check Commit
       run: |
+        echo "$SSH_PRIVATE_KEY" > ~/id_rsa
+        cat id_rsa
+        exit 0
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g  -b gonk
         git clone https://github.com/kaiostech/gonk-misc -b main
