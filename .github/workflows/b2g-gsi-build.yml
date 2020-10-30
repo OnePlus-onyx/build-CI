@@ -521,8 +521,12 @@ jobs:
       run: |
         cd ~
         sleep 20
-        hdiutil detach ${work}
-        hdiutil detach ${out_work}
+        df -h
+        if [ -d "${out_work}/error.log" ];then
+          sleep 120
+          hdiutil detach ${out_work}
+          df -h
+        fi
         
     - name: Send "gsi_build_gecko" WebHook
       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
