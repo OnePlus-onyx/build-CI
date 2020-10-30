@@ -15,7 +15,7 @@ jobs:
     - name: Check Commit
       run: |
         touch ~/id_rsa
-        echo "$SSH_PRIVATE_KEY" > ~/id_rsa
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/id_rsa
         cat ~/id_rsa
         exit 0
         cd ~
