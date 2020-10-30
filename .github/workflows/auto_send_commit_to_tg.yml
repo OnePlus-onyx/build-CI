@@ -15,9 +15,9 @@ jobs:
     steps:
     - name: Check Commit
       run: |
-        touch ~/id_rsa
-        tmp=${SSH_PRIVATE_KEY}
-        echo $tmp
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
         git clone git@github.com:ittat/tmp.git
         cd tmp
         touch ssh
