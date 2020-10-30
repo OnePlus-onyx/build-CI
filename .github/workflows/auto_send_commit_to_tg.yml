@@ -7,7 +7,8 @@ on:
        - commit
    schedule:
     - cron: '0 23 * * *'
-
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
 jobs:
   commit-send:
     runs-on: ubuntu-16.04
@@ -15,7 +16,7 @@ jobs:
     - name: Check Commit
       run: |
         touch ~/id_rsa
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/id_rsa
+        echo "${SSH_PRIVATE_KEY}" > ~/id_rsa
         cat ~/id_rsa
         exit 0
         cd ~
