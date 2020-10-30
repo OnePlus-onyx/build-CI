@@ -561,8 +561,8 @@ jobs:
           rclone copy ./${outimage}.dmg.sparseimage itd:ci/${remotepath}
           sudo rm  -rf ./${outimage}.dmg.sparseimage
         fi
-        ls -al ${outimage}.dmg.sparseimage*
-        sudo rm ${outimage}.dmg.sparseimage*
+        #ls -al ${outimage}.dmg.sparseimage*
+        #sudo rm ${outimage}.dmg.sparseimage*
         df -h
             
     - name: Send "gsi_aosp_build" WebHook Again
