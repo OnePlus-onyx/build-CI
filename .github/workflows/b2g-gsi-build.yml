@@ -263,13 +263,13 @@ jobs:
          tar -xvf mozbuild.tar.bz2
          sudo rm mozbuild.tar.bz2
          
-         cd ${work}/B2G/vendor
-         ls
-         sudo rm -r vndk-tests
-         git clone https://github.com/ittat/vendor_vndk-tests -b ittat-patch-mac
-         mv vendor_vndk-tests vndk-tests
-         echo vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-         ls ${work}/B2G/out/host/darwin-x86/bin
+         #cd ${work}/B2G/vendor
+         #ls
+         #sudo rm -r vndk-tests
+         #git clone https://github.com/ittat/vendor_vndk-tests -b ittat-patch-mac
+         #mv vendor_vndk-tests vndk-tests
+         #echo vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+         #ls ${work}/B2G/out/host/darwin-x86/bin
          
         
     - name: Check The Previous “error.log”
