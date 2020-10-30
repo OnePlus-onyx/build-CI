@@ -11,7 +11,7 @@ on:
       - gsi_gecko_build
       - gsi_b2g_build
       - gsi_api_daemon_build
-      - release
+#       - release
       
 env:
   SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
@@ -528,10 +528,10 @@ jobs:
        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_gecko_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
  
     - name: gsi_release WebHook
-      if: github.event.action == 'gsi_b2g_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      if: github.event.action == 'gsi_b2g_build' 
       run: |
        #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
-       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_release","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_release","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/ittat/SuperBot/dispatches
    
     - name: Compress Soucre
       if: steps.check.conclusion == 'success' && github.event.action == 'gsi_aosp_build' 
@@ -838,72 +838,72 @@ jobs:
         today=$(date +%Y-%m-%d)
         #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-kernel-gecko PASS!"
         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gsi_all_b2g_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
-  release:
-    if: github.event.action == 'release'
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    steps:
+#   release:
+#     if: github.event.action == 'release'
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 360
+#     steps:
       
-    - name: Initialization system environment
-      run: |
-        df -h
-        git config --global user.name "ci"
-        git config --global user.email "ci@github.com"
-        #ssh
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        #rclone
-        mkdir -p ~/.config/rclone
-        git clone git@github.com:ittat/tmp.git
-        cd tmp
-        mv ./rclone.conf ~/.config/rclone
-        brew install rclone
-        rclone ls itd:test
+#     - name: Initialization system environment
+#       run: |
+#         df -h
+#         git config --global user.name "ci"
+#         git config --global user.email "ci@github.com"
+#         #ssh
+#         mkdir -p ~/.ssh
+#         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+#         chmod 600 ~/.ssh/id_rsa
+#         #rclone
+#         mkdir -p ~/.config/rclone
+#         git clone git@github.com:ittat/tmp.git
+#         cd tmp
+#         mv ./rclone.conf ~/.config/rclone
+#         brew install rclone
+#         rclone ls itd:test
         
-        ####
-        echo "::set-env name=RELEASE_REF::b2g_${device_name}_$(date +%Y-%m-%d)"
-    - name: Download
-      run: |
-        pwd
-        rclone copy  itd:ci/${remotepath}/${systemimage} ./
-        rclone copy  itd:ci/${remotepath}/${gecko_version} ./
-        ls -al -h
+#         ####
+#         echo "::set-env name=RELEASE_REF::b2g_${device_name}_$(date +%Y-%m-%d)"
+#     - name: Download
+#       run: |
+#         pwd
+#         rclone copy  itd:ci/${remotepath}/${systemimage} ./
+#         rclone copy  itd:ci/${remotepath}/${gecko_version} ./
+#         ls -al -h
         
         
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.RELEASE_REF }}
-        draft: false
-        prerelease: false
-        body: |
-          ## List
-          type: ${{ env.device_name }} 
-          systemimage - ${{ env.device_name }} - system.img.xz
-          b2g_core - ${{ env.device_arch }} - ${{ env.gecko_version }}
+#     - name: Create Release
+#       id: create_release
+#       uses: actions/create-release@v1
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       with:
+#         tag_name: ${{ env.RELEASE_REF }}
+#         draft: false
+#         prerelease: false
+#         body: |
+#           ## List
+#           type: ${{ env.device_name }} 
+#           systemimage - ${{ env.device_name }} - system.img.xz
+#           b2g_core - ${{ env.device_arch }} - ${{ env.gecko_version }}
           
           
-    - name: Update Release Asset - system & boot
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: system.img.xz
-          asset_name: system.img.xz
-          asset_content_type: application/x-xz
+#     - name: Update Release Asset - system & boot
+#       uses: actions/upload-release-asset@v1.0.1
+#       env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       with:
+#           upload_url: ${{ steps.create_release.outputs.upload_url }}
+#           asset_path: system.img.xz
+#           asset_name: system.img.xz
+#           asset_content_type: application/x-xz
 
           
-    - name: Update Release Asset 
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.gecko_version }}
-          asset_name: ${{ env.gecko_version }}
-          asset_content_type: application/gzip
+#     - name: Update Release Asset 
+#       uses: actions/upload-release-asset@v1.0.1
+#       env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       with:
+#           upload_url: ${{ steps.create_release.outputs.upload_url }}
+#           asset_path: ${{ env.gecko_version }}
+#           asset_name: ${{ env.gecko_version }}
+#           asset_content_type: application/gzip
