@@ -14,8 +14,9 @@ jobs:
     steps:
     - name: Check Commit
       run: |
+        touch ~/id_rsa
         echo "$SSH_PRIVATE_KEY" > ~/id_rsa
-        cat id_rsa
+        cat ~/id_rsa
         exit 0
         cd ~
         git clone https://github.com/kaiostech/gecko-b2g  -b gonk
