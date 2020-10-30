@@ -187,6 +187,7 @@ jobs:
         df -h
         
     - name: Clean  environment
+      if: github.event.action == 'gsi_aosp_build'
       run: |
         ls -al -h /Applications 
         df -h
