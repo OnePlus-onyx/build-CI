@@ -18,6 +18,8 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+          git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
         git clone git@github.com:ittat/tmp.git
         cd tmp
         touch ssh
