@@ -20,6 +20,7 @@ env:
   remotepath: ${{github.event.client_payload.image}}_${{github.event.client_payload.device_name}}
   work: /Volumes/${{github.event.client_payload.image}} 
   out_work: /Volumes/out
+  out_path: /Volumes/out/B2G
   action_type: ${{ github.event.action }} 
   gecko_version:  ${{github.event.client_payload.gecko_version}} 
   device_name: ${{github.event.client_payload.device_name}} 
@@ -275,12 +276,12 @@ jobs:
         
     - name: Check The Previous “error.log”
       run: |
-        if [ -d "${work}/B2G/out/error.log" ];then
-          ls -al ${work}/B2G/out/error*
+        if [ -d "${out_path}/error.log" ];then
+          ls -al ${out_path}/error*
           echo "old error.log:"
-          cat ${work}/B2G/out/error.log
-          sudo rm ${work}/B2G/out/error.log
-          touch ${work}/B2G/out/error.log
+          cat ${out_path}/error.log
+          sudo rm ${out_path}/error.log
+          touch ${out_path}/error.log
         fi
         
     - name: Build Source Without Gecko
@@ -381,9 +382,9 @@ jobs:
 #       continue-on-error: true
       id: check
       run: |
-        if [ -s ${work}/B2G/out/error.log ]; then
+        if [ -s ${out_path}/error.log ]; then
           echo Error!
-          cat ${work}/B2G/out/error.log
+          cat ${out_path}/error.log
           today=$(date +%Y-%m-%d)
           #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.error.${{steps.name.build.exitcode}} Error!"
           cd ~
@@ -525,7 +526,7 @@ jobs:
         cd ~
         sleep 120
         df -h
-        if [ -d "${work}/B2G/out/error.log" ];then
+        if [ -d "${out_path}/error.log" ];then
           sleep 120
           hdiutil detach ${out_work}
           sleep 60
