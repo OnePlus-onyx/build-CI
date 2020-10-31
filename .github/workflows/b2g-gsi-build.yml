@@ -240,7 +240,7 @@ jobs:
           sudo rm -r ${work}/B2G/out
         fi
         hdiutil attach /Users/runner/${outimage}.dmg.sparseimage -mountpoint  ${out_work}
-        sudo ln -s  ${out_work}  ${work}/B2G/out
+        sudo ln -s  ${out_path}  ${work}/B2G/out
         ls -al ${out_work}
         df -h
  
@@ -303,7 +303,7 @@ jobs:
         sudo  mv /usr/local/bin/gsed  /usr/local/bin/sed
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
-        export OUT_DIR_COMMON_BASE=${out_work}
+        #export OUT_DIR_COMMON_BASE=${out_work}
         gtimeout 245m ./build.sh -j16 systemimage
         #gtimeout 275m ./build.sh -j16
         #./build.sh -j4 vndk-test-sepolicy
@@ -373,7 +373,7 @@ jobs:
         cd ${work}/B2G
         export DISABLE_SOURCES_XML=true
         export USE_PREBUILT_B2G=1
-        export OUT_DIR_COMMON_BASE=${out_work}
+        #export OUT_DIR_COMMON_BASE=${out_work}
         export PREFERRED_B2G="${work}/pre-gecko/${gecko_version}"
         ./build.sh -j16 systemimage
         ./build.sh -j16 vndk-test-sepolicy
@@ -518,7 +518,6 @@ jobs:
         hdiutil detach ${work}
         hdiutil detach ${out_work}
         sleep 120
-        sleep 20
         
     - name: Reject Build Image
       continue-on-error: true
@@ -526,12 +525,9 @@ jobs:
         cd ~
         sleep 120
         df -h
-        if [ -d "${out_path}/error.log" ];then
-          sleep 120
-          hdiutil detach ${out_work}
-          sleep 60
-          df -h
-        fi
+        hdiutil detach ${out_work}
+        df -h
+        
         
     - name: Send "gsi_build_gecko" WebHook
       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
@@ -550,13 +546,17 @@ jobs:
       run: |
         cd ~
         #zstd  --fast=7 ${outimage}.dmg.sparseimage
+        cd ~
+        sudo rm 
+        mkdir update
+        mv ./${outimage}.dmg.sparseimage.complete ./update
         df -h
 
     - name: Update Build Source
       if: steps.check.conclusion == 'success' &&  github.event.action == 'gsi_aosp_build' 
       run: |
         df -h
-        cd ~
+        cd ~/update
         echo ${{github.event.action}}
         if [ "${{github.event.action}}" == "gsi_b2g_build" ]; then
           mv ./${outimage}.dmg.sparseimage ./${outimage}.dmg.sparseimage.complete
