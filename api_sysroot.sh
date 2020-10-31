@@ -31,6 +31,7 @@ case "${TARGET_ARCH}" in
         ;;
 esac
 
+out="/Volumes/out/B2G"
 TARGET_TRIPLE=${TARGET_TRIPLE:-$TARGET_ARCH-linux-$ARCH_ABI}
 
 if [ "$TARGET_ARCH_VARIANT" = "$TARGET_ARCH" ] ||
@@ -61,9 +62,9 @@ system/core/liblog/include
 system/core/libsystem/include  
 system/libhidl/transport/include  
 system/core/base/include  
-out/soong/.intermediates/system/libhidl/transport/manager/1.0/android.hidl.manager@1.0_genc++_headers/gen  
-out/soong/.intermediates/system/libhidl/transport/manager/1.1/android.hidl.manager@1.1_genc++_headers/gen  
-out/soong/.intermediates/system/libhidl/transport/base/1.0/android.hidl.base@1.0_genc++_headers/gen  
+${out}/soong/.intermediates/system/libhidl/transport/manager/1.0/android.hidl.manager@1.0_genc++_headers/gen  
+${out}/soong/.intermediates/system/libhidl/transport/manager/1.1/android.hidl.manager@1.1_genc++_headers/gen  
+${out}/soong/.intermediates/system/libhidl/transport/base/1.0/android.hidl.base@1.0_genc++_headers/gen  
 system/libhwbinder/include  
 external/libcxx/include  
 external/libcxxabi/include  
@@ -83,7 +84,7 @@ bionic/libc/kernel/uapi/asm-arm
 bionic/libc/kernel/android/scsi    
 bionic/libc/kernel/android/uapi  
 libnativehelper/include_deprecated
-out/target/product/${GONK_PRODUCT_NAME}/obj
-out/target/product/${GONK_PRODUCT_NAME}/system"
+${out}/target/product/${GONK_PRODUCT_NAME}/obj
+${out}/target/product/${GONK_PRODUCT_NAME}/system"
 
 tar -c $SYSROOT_PREBUILTS $SYSROOT_LIBRARIES $SYSROOT_INCLUDE_FOLDERS --transform 's,^,api-sysroot/,S' | $GECKO_PATH/taskcluster/scripts/misc/zstdpy > "api-sysroot.tar.zst"
