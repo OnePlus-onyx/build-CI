@@ -241,7 +241,7 @@ jobs:
         fi
         hdiutil attach /Users/runner/${outimage}.dmg.sparseimage -mountpoint  ${out_work}
         sudo ln -s  ${out_work}  ${work}/B2G/out
-        ls -al ${work}/B2G
+        ls -al ${out_work}
         df -h
  
     - name: fix
