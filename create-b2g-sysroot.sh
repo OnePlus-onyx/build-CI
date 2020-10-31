@@ -9,7 +9,8 @@ dest="${2-.}"
 function copy_to_sysroot() {
   mkdir -p "${dest}/b2g-sysroot/${2}"
   printf "${1}\n" | while read path; do
-    path="${src}/${path}"
+    #path="${src}/${path}"
+     path="${path}"
     if [ -d "${path}" ]; then
       rsync --times --exclude=Android.bp --exclude=AndroidTest.xml -r --copy-links --exclude=".git" "${path}/" "${dest}/b2g-sysroot/${2}/"
     else
