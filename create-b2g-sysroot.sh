@@ -48,7 +48,7 @@ case "${TARGET_ARCH}" in
         ;;
 esac
 
-out=/Volumes/out/B2G
+out="/Volumes/out/B2G"
 
 TARGET_TRIPLE=${TARGET_TRIPLE:-$TARGET_ARCH-linux-$ARCH_ABI}
 
