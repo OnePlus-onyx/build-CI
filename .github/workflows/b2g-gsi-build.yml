@@ -546,17 +546,14 @@ jobs:
       run: |
         cd ~
         #zstd  --fast=7 ${outimage}.dmg.sparseimage
-        cd ~
-        sudo rm 
-        mkdir update
-        mv ./${outimage}.dmg.sparseimage.complete ./update
+        #cd ~
         df -h
 
     - name: Update Build Source
       if: steps.check.conclusion == 'success' &&  github.event.action == 'gsi_aosp_build' 
       run: |
         df -h
-        cd ~/update
+        #cd ~/update
         echo ${{github.event.action}}
         if [ "${{github.event.action}}" == "gsi_b2g_build" ]; then
           mv ./${outimage}.dmg.sparseimage ./${outimage}.dmg.sparseimage.complete
