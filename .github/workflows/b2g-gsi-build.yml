@@ -554,6 +554,7 @@ jobs:
       run: |
         df -h
         #cd ~/update
+        
         echo ${{github.event.action}}
         if [ "${{github.event.action}}" == "gsi_b2g_build" ]; then
           mv ./${outimage}.dmg.sparseimage ./${outimage}.dmg.sparseimage.complete
