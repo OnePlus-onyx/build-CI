@@ -525,7 +525,9 @@ jobs:
         cd ~
         sleep 120
         df -h
-        hdiutil detach ${out_work}
+        if [ -d "${out_path}/error.log" ];then
+          hdiutil detach ${out_work}
+        fi
         df -h
         
         
@@ -554,7 +556,7 @@ jobs:
       run: |
         df -h
         #cd ~/update
-        
+        cd ~
         echo ${{github.event.action}}
         if [ "${{github.event.action}}" == "gsi_b2g_build" ]; then
           mv ./${outimage}.dmg.sparseimage ./${outimage}.dmg.sparseimage.complete
