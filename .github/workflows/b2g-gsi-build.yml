@@ -525,9 +525,8 @@ jobs:
         cd ~
         sleep 120
         df -h
-        if [ -d "${out_path}/error.log" ];then
-          hdiutil detach ${out_work}
-        fi
+        if [ -d "${out_work}" ]; then hdiutil detach "${out_work}"; fi
+        if [ -d "${work}" ]; then hdiutil detach "${work}"; fi
         df -h
         
         
