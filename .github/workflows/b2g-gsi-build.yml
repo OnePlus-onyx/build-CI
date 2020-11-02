@@ -515,8 +515,8 @@ jobs:
         cd ~
         sleep 20
         df -h
-        hdiutil detach ${work}
-        hdiutil detach ${out_work}
+        hdiutil detach ${work} -force
+        hdiutil detach ${out_work} -force
         sleep 120
         
     - name: Reject Build Image
