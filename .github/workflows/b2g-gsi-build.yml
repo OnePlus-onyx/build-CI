@@ -71,6 +71,7 @@ jobs:
       run: |
         df -h
         ls 
+        pwd
         ./init/docker_env_darwin.sh
         
         ####mount
