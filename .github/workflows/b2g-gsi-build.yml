@@ -44,13 +44,26 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
+    - name: link script
+      continue-on-error: true
+      run: |
+        #####ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        git clone git@github.com:ittat/CloudPower.git
+
+
     - name: Clean system environment
       continue-on-error: true
       run: |
         cd ~
-        hdiutil detach ${work}
-        rm ${PROIMAGE}.dmg.sparseimage*
-        df -h
+        cd CloudPower/gsi/init/
+        chmod +x all_unmount_darwin.sh
+        ./all_unmount_darwin.sh
+        
+        
     - name: Initialization system environment
       run: |
         df -h
@@ -61,10 +74,7 @@ jobs:
         ####zstd
         #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew install zstd  
-        #####ssh
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+
         #####rclone
         mkdir -p ~/.config/rclone
         git clone git@github.com:ittat/tmp.git
@@ -124,19 +134,27 @@ jobs:
         sudo rm -rf .repo
         df -h
         
+#     - name: Clean system environment
+#       continue-on-error: true
+#       run: |
+#         cd ~
+#         cd CloudPower/gsi/init/
+#         chmod +x all_unmount_darwin.sh
+#         ./all_unmount_darwin.sh
     - name: Clean system environment
       continue-on-error: true
       run: |
         cd ~
-        hdiutil detach ${work}
-        df -h
+        cd CloudPower/gsi/init/
+        chmod +x all_unmount_darwin.sh
+        ./all_unmount_darwin.sh
         
-    - name: Clean system environment
-      continue-on-error: true
-      run: |
-        cd ~
-        hdiutil detach ${work}
-        df -h
+#     - name: Clean system environment
+#       continue-on-error: true
+#       run: |
+#         cd ~
+#         hdiutil detach ${work}
+#         df -h
         
     - name: Compress sourceimage Soucre
       run: |
@@ -176,18 +194,36 @@ jobs:
     steps:
       
     - name: Checkout
-      uses: actions/checkout@v1       
+      uses: actions/checkout@v1   
+          
+    - name: link script
+      continue-on-error: true
+      run: |
+        #####ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        git clone git@github.com:ittat/CloudPower.git
+#     - name: Clean system environment
+#       continue-on-error: true
+#       run: |
+#         cd ~
+#         hdiutil detach ${work}
+#         hdiutil detach ${out_work}
+#         rm ${sourceimage}.dmg.sparseimage*
+#         rm ${outimage}.dmg.sparseimage*
+#         df -h
 
     - name: Clean system environment
       continue-on-error: true
       run: |
         cd ~
-        hdiutil detach ${work}
-        hdiutil detach ${out_work}
-        rm ${sourceimage}.dmg.sparseimage*
-        rm ${outimage}.dmg.sparseimage*
-        df -h
-        
+        cd CloudPower/gsi/init/
+        chmod +x all_unmount_darwin.sh
+        ./all_unmount_darwin.sh
+
+
     - name: Clean  environment
       if: github.event.action == 'gsi_aosp_build'
       run: |
@@ -508,27 +544,34 @@ jobs:
         path: ~/system.img.xz
 
 
-    - name: Reject Build Image
+#     - name: Reject Build Image
+#       continue-on-error: true
+#       id: reject_img
+#       run: |
+#         cd ~
+#         sleep 20
+#         df -h
+#         hdiutil detach ${work} -force
+#         hdiutil detach ${out_work} -force
+#         sleep 120
+        
+#     - name: Reject Build Image
+#       continue-on-error: true
+#       run: |
+#         cd ~
+#         sleep 120
+#         df -h
+#         if [ -d "${out_work}" ]; then hdiutil detach "${out_work}" -force; fi
+#         if [ -d "${work}" ]; then hdiutil detach "${work}" -force; fi
+#         df -h
+
+    - name: Clean system environment
       continue-on-error: true
-      id: reject_img
       run: |
         cd ~
-        sleep 20
-        df -h
-        hdiutil detach ${work} -force
-        hdiutil detach ${out_work} -force
-        sleep 120
-        
-    - name: Reject Build Image
-      continue-on-error: true
-      run: |
-        cd ~
-        sleep 120
-        df -h
-        if [ -d "${out_work}" ]; then hdiutil detach "${out_work}" -force; fi
-        if [ -d "${work}" ]; then hdiutil detach "${work}" -force; fi
-        df -h
-        
+        cd CloudPower/gsi/init/
+        chmod +x all_unmount_darwin.sh
+        ./all_unmount_darwin.sh
         
     - name: Send "gsi_build_gecko" WebHook
       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
