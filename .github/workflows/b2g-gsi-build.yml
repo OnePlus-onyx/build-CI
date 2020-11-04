@@ -28,6 +28,7 @@ env:
   systemimage: system.img.xz
   sourceimage: source
   outimage: out
+  CloudPower: CloudPower/gsi/
 #phhgsi_arm64_a  
 #phhgsi_arm64_ab
 #phhgsi_arm_a 
@@ -66,23 +67,11 @@ jobs:
         
         
     - name: Initialization system environment
+      working-directory: ${{ env.CloudPower }}
       run: |
         df -h
-        more /System/Library/CoreServices/SystemVersion.plist
-        sudo xcode-select --switch /Applications/Xcode_11.app/Contents/Developer
-        ln -s /usr/local/bin/gcc-9 /usr/local/bin/gcc
-        ln -s /usr/local/bin/g++-9 /usr/local/bin/g++
-        ####zstd
-        #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew install zstd  
-
-        #####rclone
-        mkdir -p ~/.config/rclone
-        git clone git@github.com:ittat/tmp.git
-        cd tmp
-        mv ./rclone.conf ~/.config/rclone
-        brew install rclone
-        rclone ls itd:test
+        ls 
+        ./init/docker_env_darwin.sh
         
         ####mount
         cd /Users/runner
@@ -229,36 +218,18 @@ jobs:
 
     - name: Clean  environment
       if: github.event.action == 'gsi_aosp_build'
-      run: |
-        ls -al -h /Applications 
-        df -h
-        sudo rm -r  /Applications/Xcode_10*
-        sudo rm -r  /Applications/Xcode_12*
-        sudo rm -r  /Applications/Xcode_11.*.app
-        #Firefox* Julia* Microsoft* R* Visual* 
-        ls -al -h /Applications
-        df -h
-    - name: Initialization system environment
+      working-directory: ${{ env.CloudPower }}
       run: |
         df -h
-        ####
-        more /System/Library/CoreServices/SystemVersion.plist
-        ls /Applications/Xcode_*
-        sudo xcode-select --switch /Applications/Xcode_11.app/Contents/Developer
+        ls 
+        ./init/clean_space_darwin.sh
         
-        ####brew
-        brew install expect  gnu-sed ccache coreutils zstd gcc perl cpanm unzip
-        #####ssh
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        #rclone
-        mkdir -p ~/.config/rclone
-        git clone git@github.com:ittat/tmp.git
-        cd tmp
-        mv ./rclone.conf ~/.config/rclone
-        brew install rclone
-        rclone ls itd:test
+    - name: Initialization system environment
+      working-directory: ${{ env.CloudPower }}
+      run: |
+        df -h
+        ls 
+        ./init/docker_env_darwin.sh
       
             
     - name: Fetch Source
