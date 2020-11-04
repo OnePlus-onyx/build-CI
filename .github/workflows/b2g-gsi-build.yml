@@ -52,6 +52,7 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         
+        cd ~
         git clone git@github.com:ittat/CloudPower.git
 
 
@@ -203,6 +204,8 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+        
+        cd ~
         
         git clone git@github.com:ittat/CloudPower.git
 #     - name: Clean system environment
