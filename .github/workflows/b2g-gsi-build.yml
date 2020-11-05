@@ -58,11 +58,10 @@ jobs:
 
 
     - name: Clean system environment
+      working-directory: ${{ env.CloudPower }}
       continue-on-error: true
       run: |
         cd ~
-        cd CloudPower/gsi/init/
-        chmod +x all_unmount_darwin.sh
         ./all_unmount_darwin.sh
         
         
