@@ -28,7 +28,7 @@ env:
   systemimage: system.img.xz
   sourceimage: source
   outimage: out
-  CloudPower: CloudPower/gsi/
+  CloudPower: ~/CloudPower/gsi/
 #phhgsi_arm64_a  
 #phhgsi_arm64_ab
 #phhgsi_arm_a 
