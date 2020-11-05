@@ -81,16 +81,12 @@ jobs:
         hdiutil attach /Users/runner/${sourceimage}.dmg.sparseimage -mountpoint ${work}
            
     - name: Fetch source
+      working-directory: ${{ env.CloudPower }}
       run: |
         df -h
-        git config --global user.name "ci"
-        git config --global user.email "ci@github.com"
-        cd ${work}
-        git clone https://github.com/ittat/B2G -b ittat-patch-gsi  --depth=1 
-        cd ./B2G
-        echo Download ...
-        REPO_INIT_FLAGS="--depth=1" REPO_SYNC_FLAGS=" -j128 --force-sync --current-branch --no-tags --no-clone-bundle --optimized-fetch --prune" ./config.sh ${device_name}
+        ./source/repo_source.sh
         df -h
+        
     - name: Fix soucre
       run: | 
         df -h   
@@ -132,13 +128,14 @@ jobs:
 #         cd CloudPower/gsi/init/
 #         chmod +x all_unmount_darwin.sh
 #         ./all_unmount_darwin.sh
-    - name: Clean system environment
+    - name: unmount docker
+      working-directory: ${{ env.CloudPower }}
       continue-on-error: true
       run: |
         cd ~
-        cd CloudPower/gsi/init/
-        chmod +x all_unmount_darwin.sh
+        df -h
         ./all_unmount_darwin.sh
+        df -h
         
 #     - name: Clean system environment
 #       continue-on-error: true
@@ -148,31 +145,20 @@ jobs:
 #         df -h
         
     - name: Compress sourceimage Soucre
+      working-directory: ${{ env.CloudPower }}
       run: |
-        cd ~ 
-        zstd  --fast=7 ${sourceimage}.dmg.sparseimage
-        rm ${sourceimage}.dmg.sparseimage
-        ls -al ${sourceimage}.dmg.sparseimage*
+        ./source/compress_sourceimage.sh
         
         
     - name: create sourceimage Soucre
-      if: 
+      working-directory: ${{ env.CloudPower }}
       run: |
-        cd ~ 
-        cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 100g ~/${outimage}.dmg
-        #zstd  --fast=7 ${outimage}.dmg.sparseimage
-        #rm ${outimage}.dmg.sparseimage
-        ls -al ${outimage}.dmg.sparseimage*
+        ./source/create_outimage.sh
         
     - name: Uplaod Source 
+      working-directory: ${{ env.CloudPower }}
       run: |
-        df -h
-        rclone copy ~/${sourceimage}.dmg.sparseimage.zst itd:ci/${remotepath}
-        sudo rm -rf ${sourceimage}.dmg.sparseimage.zst
-        rclone copy ~/${outimage}.dmg.sparseimage itd:ci/${remotepath}
-        sudo rm -rf ${outimage}.dmg.sparseimage
-        df -h
+        ./source/uplaod_image.sh
         
     - name: Send "gsi_aosp_build" WebHook          
       run: |
