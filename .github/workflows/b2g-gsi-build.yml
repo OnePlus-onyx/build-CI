@@ -75,7 +75,7 @@ jobs:
         
         ####mount
         cd /Users/runner
-        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 170g ~/${sourceimage}.dmg
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 100g ~/${sourceimage}.dmg
         ls
         hdiutil attach /Users/runner/${sourceimage}.dmg.sparseimage -mountpoint ${work}
            
