@@ -67,10 +67,6 @@ jobs:
     - name: Initialization system environment
       working-directory: ${{ env.CloudPower }}
       run: |
-        pwd
-        df -h
-        ls 
-        pwd
         ./init/docker_env_darwin.sh
         
         ####mount
