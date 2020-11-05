@@ -38,6 +38,10 @@ env:
 
 jobs: 
   gsi_repack_aosp:
+    defaults:
+      run:
+        working-directory: ${{ env.CloudPower }}
+        
     if: github.event.action == 'gsi_repack_aosp'
     runs-on: macos-latest
     timeout-minutes: 360
@@ -58,14 +62,12 @@ jobs:
 
 
     - name: Clean system environment
-      working-directory: ${{ env.CloudPower }}
       continue-on-error: true
       run: |
         ./init/all_unmount_darwin.sh
         
         
     - name: Initialization system environment
-      working-directory: ${{ env.CloudPower }}
       run: |
         ./init/docker_env_darwin.sh
         
@@ -76,14 +78,12 @@ jobs:
         hdiutil attach /Users/runner/${sourceimage}.dmg.sparseimage -mountpoint ${work}
            
     - name: Fetch source
-      working-directory: ${{ env.CloudPower }}
       run: |
         df -h
         ./source/repo_source.sh
         df -h
         
     - name: Fix soucre
-      working-directory: ${{ env.CloudPower }}
       run: | 
         df -h   
         ./source/fix_soucre.sh
@@ -91,27 +91,21 @@ jobs:
         
 
     - name: unmount docker
-      working-directory: ${{ env.CloudPower }}
       continue-on-error: true
       run: |
         df -h
         ./init/all_unmount_darwin.sh
         df -h
-        
-        
+               
     - name: Compress sourceimage Soucre
-      working-directory: ${{ env.CloudPower }}
       run: |
         ./source/compress_sourceimage.sh
-        
-        
+               
     - name: create sourceimage Soucre
-      working-directory: ${{ env.CloudPower }}
       run: |
         ./source/create_outimage.sh
         
     - name: Uplaod Source 
-      working-directory: ${{ env.CloudPower }}
       run: |
         ./source/uplaod_image.sh
         
