@@ -61,8 +61,7 @@ jobs:
       working-directory: ${{ env.CloudPower }}
       continue-on-error: true
       run: |
-        cd ~
-        ./all_unmount_darwin.sh
+        ./init/all_unmount_darwin.sh
         
         
     - name: Initialization system environment
@@ -132,9 +131,8 @@ jobs:
       working-directory: ${{ env.CloudPower }}
       continue-on-error: true
       run: |
-        cd ~
         df -h
-        ./all_unmount_darwin.sh
+        ./init/all_unmount_darwin.sh
         df -h
         
 #     - name: Clean system environment
