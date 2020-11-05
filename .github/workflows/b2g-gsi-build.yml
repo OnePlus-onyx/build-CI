@@ -116,6 +116,9 @@ jobs:
   aosp_build:
     if: github.event.action == 'gsi_aosp_build' || github.event.action == 'gsi_b2g_build' 
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ${{ env.CloudPower }}
     timeout-minutes: 360
     steps:
       
@@ -135,7 +138,6 @@ jobs:
 
 
     - name: Clean system environment
-      working-directory: ${{ env.CloudPower }}
       continue-on-error: true
       run: |
         ./init/all_unmount_darwin.sh
@@ -143,21 +145,18 @@ jobs:
 
     - name: Clean  environment
       if: github.event.action == 'gsi_aosp_build'
-      working-directory: ${{ env.CloudPower }}
       run: |
         df -h
         ls 
         ./init/clean_space_darwin.sh
         
     - name: Initialization system environment
-      working-directory: ${{ env.CloudPower }}
       run: |
         df -h
         ./init/docker_env_darwin.sh
       
             
     - name: Fetch Source
-      working-directory: ${{ env.CloudPower }}
       run: |
         ./source/download_source.sh
 
@@ -299,7 +298,6 @@ jobs:
         
     - name: Repack “b2g-sysroot” for gsi
       id: sysroot
-      working-directory: ${{ env.CloudPower }}
       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
         ./build/repack_b2g-sysroot.sh
@@ -314,7 +312,6 @@ jobs:
         
     - name: Repack “api-sysroot” for gsi 
       id: gsi_sysroot
-      working-directory: ${{ env.CloudPower }}
       if: github.event.action == 'gsi_aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
       run: |
           ./build/repack_api-sysroot.sh
@@ -354,7 +351,6 @@ jobs:
 
 
     - name: Clean system environment
-      working-directory: ${{ env.CloudPower }}
       continue-on-error: true
       run: |
         ./init/all_unmount_darwin.sh
