@@ -83,37 +83,10 @@ jobs:
         df -h
         
     - name: Fix soucre
+      working-directory: ${{ env.CloudPower }}
       run: | 
         df -h   
-        ####
-        echo apply patch
-        cd ${work}/B2G
-        chmod +x ./patcher/patcher.sh 
-        ./patcher/patcher.sh 
-        
-        ####
-        cd ${work}/B2G
-        sed -i '' '14d'  system/sepolicy/tests/Android.bp
-        sed -i '' '65i\'$'\n\"10\.15\"\,\n' build/soong/cc/config/x86_darwin_host.go
-      
-        ####
-        cd ${work}
-        cp B2G/gonk-misc/Android.mk ./Android.mk.gonk.old
-        cp B2G/gonk-misc/api-daemon/Android.mk ./Android.mk.api-daemon.old
-        
-        export CI_WORK=${work}
-        cd ~
-        git clone https://github.com/OnePlus-onyx/build-CI -b b2g
-        sudo chmod +x ~/build-CI/patch-b2g-aosp.sh
-        ~/build-CI/patch-b2g-aosp.sh
-        
-        cd ${work}
-        cp B2G/gonk-misc/Android.mk ./Android.mk.gonk.patch
-        cp B2G/gonk-misc/api-daemon/Android.mk ./Android.mk.api-daemon.patch
-        
-        ####
-        cd ${CI_WORK}/B2G
-        sudo rm -rf .repo
+        ./source/fix_soucre.sh
         df -h
         
 
