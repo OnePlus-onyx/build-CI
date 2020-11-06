@@ -4,7 +4,7 @@
 #!/bin/bash
 set -x -e -v
 
-cd "${CI_WORK}/B2G"
+cd "${work}/B2G"
 
 # Remove the Gecko build & packaging steps
 patch -d gonk-misc -p1 <<'EOF'
