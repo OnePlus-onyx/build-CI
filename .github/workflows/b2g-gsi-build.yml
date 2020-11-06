@@ -386,10 +386,13 @@ jobs:
     if: github.event.action == 'gsi_gecko_build' || github.event_name == 'schedule' 
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    defaults:
+      run:
+        working-directory: /home/runner/CloudPower/gsi/
     steps:
 
     - name: link script
-      #working-directory: /Users/runner
+      working-directory: /Users/runner
       run: |
         pwd
         #####ssh
