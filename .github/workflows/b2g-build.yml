@@ -159,16 +159,7 @@ jobs:
  
     - name: fix
 #       continue-on-error: true
-      run: |
-         cd ${work}/B2G/gonk-misc
-         if [ -d "${work}/B2G/gonk-misc/api-daemon" ];then
-          sudo rm -r ${work}/B2G/gonk-misc/api-daemon
-         fi
-         git clone https://github.com/ittat/api-daemon -b ittat-patch-without-api-daemon
-         cd ${work}
-         #sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
-         #cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
-         
+      run: |         
          brew install cpanm 
          sudo cpan LWP::UserAgent
          
@@ -177,15 +168,6 @@ jobs:
          curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 -o mozbuild.tar.bz2
          tar -xvf mozbuild.tar.bz2
          sudo rm mozbuild.tar.bz2
-         
-         #cd ${work}/B2G/vendor
-         #ls
-         #sudo rm -r vndk-tests
-         #git clone https://github.com/ittat/vendor_vndk-tests -b ittat-patch-mac
-         #mv vendor_vndk-tests vndk-tests
-         #echo vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-         #ls ${work}/B2G/out/host/darwin-x86/bin
-         
         
     - name: Check The Previous “error.log”
       run: |
@@ -307,13 +289,7 @@ jobs:
       if:  github.event.action == 'b2g_build' 
       continue-on-error: true
       run: |
-        ####   ####
-        cd  ${work}
-        #TODO
-        #zip -r img.zip B2G/out/target/product/${device_name}/system.img
-        #mv img.zip ~
-        #cd ~
-        #rclone copy img.zip itd:ci/${remotepath}
+        ####  
         cd  ${work}
         xz -c  B2G/out/target/product/${device_name}/system.img > ~/${systemimage}
         cd ~
