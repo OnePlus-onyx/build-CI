@@ -365,7 +365,7 @@ jobs:
     steps:
 
     - name: link script
-      working-directory: /Users/runner
+      working-directory: /home/runner
       run: |
         pwd
         #####ssh
