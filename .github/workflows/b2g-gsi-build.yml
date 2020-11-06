@@ -272,7 +272,7 @@ jobs:
           
         ####  build
         cd ${CloudPower}
-        ./build/build_gecko.sh
+        ./build/build_with_gecko.sh
         
     - name: Check Current ”error.log“ Status
 #       continue-on-error: true
