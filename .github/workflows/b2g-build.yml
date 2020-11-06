@@ -1,0 +1,572 @@
+name: b2g-gsi
+on: 
+  repository_dispatch:
+      types: 
+      - repack_aosp
+      - aosp_build
+      - gecko_build
+      - b2g_build
+      - api_daemon_build
+      - kernel_build
+      
+env:
+  SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}} 
+  image: ${{github.event.client_payload.image}}
+  PROIMAGE: ${{github.event.client_payload.image}}_${{github.event.client_payload.device_name}}
+  remotepath: ${{github.event.client_payload.image}}_${{github.event.client_payload.device_name}}
+  work: /Volumes/${{github.event.client_payload.image}} 
+  out_work: /Volumes/out
+  out_path: /Volumes/out/B2G
+  action_type: ${{ github.event.action }} 
+  gecko_version:  ${{github.event.client_payload.gecko_version}} 
+  device_name: ${{github.event.client_payload.device_name}} 
+  device_arch: ${{github.event.client_payload.device_arch}} 
+  systemimage: system.img.xz
+  sourceimage: source
+  outimage: out
+  CloudPower: /Users/runner/CloudPower/gsi/
+  kernel: ${{github.event.client_payload.kernel}}
+#phhgsi_arm64_a  
+#phhgsi_arm64_ab
+#phhgsi_arm_a 
+#phhgsi_arm_ab  
+#RUST_TARGET := armv7-linux-androideabi
+#RUST_TARGET := aarch64-linux-android
+
+jobs: 
+  repack_aosp:
+    defaults:
+      run:
+        working-directory: ${{ env.CloudPower }}
+        
+    if: github.event.action == 'repack_aosp'
+    runs-on: macos-latest
+    timeout-minutes: 360
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: link script
+      working-directory: /Users/runner
+      run: |
+        #####ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        cd ~
+        git clone git@github.com:ittat/CloudPower.git
+
+
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        ./init/all_unmount_darwin.sh
+        
+        
+    - name: Initialization system environment
+      run: |
+        ./init/docker_env_darwin.sh
+        
+        ####mount
+        cd /Users/runner
+        hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 100g ~/${sourceimage}.dmg
+        ls
+        hdiutil attach /Users/runner/${sourceimage}.dmg.sparseimage -mountpoint ${work}
+           
+    - name: Fetch source
+      run: |
+        df -h
+        ./source/repo_source.sh
+        df -h
+        
+    - name: Fix soucre
+      run: | 
+        df -h   
+        ./source/fix_soucre.sh
+        df -h      
+
+    - name: unmount docker
+      continue-on-error: true
+      run: |
+        df -h
+        ./init/all_unmount_darwin.sh
+        df -h
+               
+    - name: Compress sourceimage Soucre
+      run: |
+        ./source/compress_sourceimage.sh
+               
+    - name: create sourceimage Soucre
+      run: |
+        ./source/create_outimage.sh
+        
+    - name: Uplaod Source 
+      run: |
+        ./source/uplaod_image.sh
+        
+    - name: Send "aosp_build" WebHook          
+      run: |
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "aosp_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+   
+  aosp_build:
+    if: github.event.action == 'aosp_build' || github.event.action == 'b2g_build' 
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ${{ env.CloudPower }}
+    timeout-minutes: 360
+    steps:
+      
+    - name: Checkout
+      uses: actions/checkout@v1   
+          
+    - name: link script
+      working-directory: /Users/runner
+      run: |
+        #####ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        cd ~
+        git clone git@github.com:ittat/CloudPower.git
+
+
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        ./init/all_unmount_darwin.sh
+
+
+    - name: Clean  environment
+      if: github.event.action == 'aosp_build'
+      run: |
+        df -h
+        ls 
+        ./init/clean_space_darwin.sh
+        
+    - name: Initialization system environment
+      run: |
+        df -h
+        ./init/docker_env_darwin.sh
+      
+            
+    - name: Fetch Source
+      run: |
+        ./source/download_source.sh
+
+ 
+    - name: fix
+#       continue-on-error: true
+      run: |
+         cd ${work}/B2G/gonk-misc
+         if [ -d "${work}/B2G/gonk-misc/api-daemon" ];then
+          sudo rm -r ${work}/B2G/gonk-misc/api-daemon
+         fi
+         git clone https://github.com/ittat/api-daemon -b ittat-patch-without-api-daemon
+         cd ${work}
+         #sudo rm -rf ./B2G/gonk-misc/api-daemon/Android.mk
+         #cp ./Android.mk.api-daemon.patch B2G/gonk-misc/api-daemon/Android.mk 
+         
+         brew install cpanm 
+         sudo cpan LWP::UserAgent
+         
+         ####pre-api-daemon
+         cd ~
+         curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+         tar -xvf mozbuild.tar.bz2
+         sudo rm mozbuild.tar.bz2
+         
+         #cd ${work}/B2G/vendor
+         #ls
+         #sudo rm -r vndk-tests
+         #git clone https://github.com/ittat/vendor_vndk-tests -b ittat-patch-mac
+         #mv vendor_vndk-tests vndk-tests
+         #echo vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+         #ls ${work}/B2G/out/host/darwin-x86/bin
+         
+        
+    - name: Check The Previous “error.log”
+      run: |
+        if [ -d "${out_path}/error.log" ];then
+          ls -al ${out_path}/error*
+          echo "old error.log:"
+          cat ${out_path}/error.log
+          sudo rm ${out_path}/error.log
+          touch ${out_path}/error.log
+        fi
+        
+    - name: Build Source Without Gecko
+      if: github.event.action == 'aosp_build'
+      continue-on-error: true
+      id: build
+      run: |
+        df -h
+        ####
+        cd ${work}
+        sudo rm -rf ./B2G/gonk-misc/Android.mk
+        cp ./Android.mk.gonk.patch B2G/gonk-misc/Android.mk 
+        
+        cd ${CloudPower}
+        ./build/build_without_gecko.sh
+        
+    - name: Add prebuilt api daemon
+#       continue-on-error: true
+      if: github.event.action == 'b2g_build'
+      run: |
+        cd ${work}
+        mkdir pre-api
+        cd pre-api
+        rclone copy itd:ci/${remotepath}/prebuilts.zip ./
+        unzip ./prebuilts.zip
+        APIDeamon_PreBuild="${work}/pre-api/home/runner/api-daemon/prebuilts"
+        ls ${APIDeamon_PreBuild}
+        
+        ####
+        TARGET_OUT=${out_path}/target/product/${device_name}/system
+        path_api=${TARGET_OUT}/api-daemon
+        if [ -d "${path_api}" ]; then
+           sudo rm -r "${path_api}"
+        fi
+        
+        path_b2g=${TARGET_OUT}/b2g
+        if [ -d "${path_b2g}" ]; then
+           sudo rm -r "${path_b2g}"
+        fi
+        
+        mkdir -p ${path_api}
+        mkdir -p ${path_b2g}/defaults
+        
+        cp -r  ${APIDeamon_PreBuild}/http_root  ${TARGET_OUT}/api-daemon
+        cp ${APIDeamon_PreBuild}/${device_arch}/api-daemon ${TARGET_OUT}/bin
+        chmod +x ${TARGET_OUT}/bin/api-daemon
+        
+    - name: B2G Build - Build Source include Gecko
+      if: github.event.action == 'b2g_build'
+      run: |
+        df -h
+        ####
+        cd ${work}
+        sudo rm -rf ./B2G/gonk-misc/Android.mk
+        cp ./Android.mk.gonk.old B2G/gonk-misc/Android.mk 
+          
+        ####  build
+        cd ${CloudPower}
+        ./build/build_with_gecko.sh
+        
+    - name: Check Current ”error.log“ Status
+#       continue-on-error: true
+      id: check
+      run: |
+        if [ -s ${out_path}/error.log ]; then
+          echo Error!
+          cat ${out_path}/error.log
+          today=$(date +%Y-%m-%d)
+          cd ~
+          hdiutil detach ${work}
+          sleep 20
+          hdiutil detach ${out_work}
+          #sudo rm -rf ${PROIMAGE}.dmg.sparseimage*
+          df -h
+          exit 211
+        else
+          exit 0
+        fi
+        
+        
+    - name: Repack “b2g-sysroot” for gsi
+      id: sysroot
+      if: github.event.action == 'aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+        ./build/repack_b2g-sysroot.sh
+        
+    - name: Upload “b2g-sysroot”
+#       continue-on-error: true
+      if:  github.event.action == 'aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+        cd ${work}
+        rclone copy b2g-sysroot.tar.zst itd:ci/${remotepath}
+        sudo rm b2g-sysroot.tar.zst
+        
+    - name: Repack “api-sysroot” for gsi 
+      id: gsi_sysroot
+      if: github.event.action == 'aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+          ./build/repack_api-sysroot.sh
+        
+    - name: Upload “api-sysroot”
+#       continue-on-error: true
+      if:  github.event.action == 'aosp_build' && steps.sysroot.conclusion == 'success' &&  steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+        cd ${work}
+        rclone copy api-sysroot.tar.zst itd:ci/${remotepath}
+        sudo rm api-sysroot.tar.zst
+        
+    - name: Update b2g-gsi  !!!!
+      if:  github.event.action == 'b2g_build' 
+      continue-on-error: true
+      run: |
+        ####   ####
+        cd  ${work}
+        #TODO
+        #zip -r img.zip B2G/out/target/product/${device_name}/system.img
+        #mv img.zip ~
+        #cd ~
+        #rclone copy img.zip itd:ci/${remotepath}
+        cd  ${work}
+        xz -c  B2G/out/target/product/${device_name}/system.img > ~/${systemimage}
+        cd ~
+        rclone copy system.img.xz itd:ci/${remotepath}
+        
+
+    - name: Clean system environment
+      continue-on-error: true
+      run: |
+        ./init/all_unmount_darwin.sh
+        
+    - name: Send "build_gecko" WebHook
+      if: github.event.action == 'aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
+      run: |
+       #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
+       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "gecko_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+ 
+    - name: release WebHook
+      if: github.event.action == 'b2g_build' 
+      run: |
+       #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}.out${outversion}.exitcode.${{steps.name.build.exitcode}} Done!"
+       curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "release","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/ittat/SuperBot/dispatches
+   
+
+    - name: Update Build Source
+      if: steps.check.conclusion == 'success' &&  github.event.action == 'aosp_build' 
+      run: |
+        df -h
+        cd ~
+        rclone copy ./${outimage}.dmg.sparseimage itd:ci/${remotepath}
+        sudo rm  -rf ./${outimage}.dmg.sparseimage
+        df -h
+            
+    - name: Send "aosp_build" WebHook Again
+      if: github.event.action == 'aosp_build' && steps.build.outcome == 'failure' && steps.build.conclusion == 'success'  &&  steps.check.conclusion == 'success'         
+      run: |
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "aosp_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+  
+   
+  gecko_build:
+    if: github.event.action == 'gecko_build' || github.event_name == 'schedule' 
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    defaults:
+      run:
+        working-directory: /home/runner/CloudPower/gsi/
+    steps:
+
+    - name: link script
+      working-directory: /home/runner
+      run: |
+        pwd
+        #####ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        cd ~
+        git clone git@github.com:ittat/CloudPower.git
+        
+    - name: Initialization system environment
+      run: |
+          ./init/docker_env_linux.sh
+        
+    - name: clean disk
+      #continue-on-error: true
+      run: |
+         ./init/clean_space_linux.sh
+        
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: stable
+    - uses: actions/checkout@master
+    - name: Install sccache
+      run: cargo install sccache
+
+    - name: Fetch Source
+      run: |
+        df -h
+        cd ~
+        curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 -o mozbuild.tar.bz2
+        tar -xvf mozbuild.tar.bz2
+        sudo rm mozbuild.tar.bz2
+        cd ~
+        git clone https://github.com/kaiostech/gecko-b2g -b gonk 
+        cd gecko-b2g
+        git checkout -b 8adcdfd21c3dea054c31b2552c0c00e3517ebd7c 
+        #git clone https://github.com/ittat/gecko-b2g-1 -b ittat-patch-2 --depth=1
+        #mv gecko-b2g-1 gecko-b2g
+        df -h
+        
+    - name: Bootstrap Gecko
+      run: |
+        df -h
+        cd ~/gecko-b2g
+        export SHELL=/bin/bash
+        sudo apt update
+        export LOCAL_NDK_BASE_URL='ftp://ftp.kaiostech.com/ndk/android-ndk'
+        ./mach bootstrap --no-interactive --application-choice 'GeckoView/Firefox for Android'
+        df -h
+       
+    - name: Build Gecko for gsi
+      run: |
+          ./build/build_gecko.sh
+      
+    - name: Get Gecko Version
+      run: |
+        cd ~/gecko-b2g
+        echo `cat browser/config/version.txt`
+        export version=`cat browser/config/version.txt`
+        
+        if [ "$device_arch" == "aarch64-linux-android" ]; then
+          TARGET_ARCH=aarch64
+          ARCH_ABI="android"
+        else
+          TARGET_ARCH=arm
+          ARCH_ABI="androideabi"
+        fi
+        echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-${ARCH_ABI}-${TARGET_ARCH}.tar.gz"
+        
+    - name: Upload Artifact
+#       if: github.event_name == 'schedule'
+      uses: actions/upload-artifact@master
+      with:
+        name: ${{ env.B2G_OUT }}
+        path: ~/objdir-gsi-gecko/dist/${{ env.B2G_OUT }}
+
+    - name: Upload to Gdrive
+      run: |
+        df -h
+        cd ~/objdir-gsi-gecko/dist
+        rclone copy ${{ env.B2G_OUT }} itd:ci/${remotepath}
+        df -h
+        
+    - name: Send "api-daemon_build" WebHook
+      run: |
+        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "api_daemon_build","client_payload": {"image":"'${image}'", "gecko_version":"'${B2G_OUT}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+  
+
+  api-daemon_build:
+    if: github.event.action == 'api_daemon_build'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    
+    - name: Initialization system environment
+      run: |
+        df -h
+        sudo apt install git make gcc g++ libfuse-dev
+        git config --global user.name "ci"
+        git config --global user.email "ci@github.com"
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
+        
+        
+    - name: Download Source
+      run: |
+        cd ~
+        ####
+        rustup target add aarch64-linux-android armv7-linux-androideabi
+        cd ~
+        curl https://packages.preprod.kaiostech.com/ndk/v3/mozbuild.tar.bz2 | tar -C ${HOME}/ -xj
+        rclone copy  itd:ci/${remotepath}/api-sysroot.tar.zst ./
+        mkdir ~/.mozbuild/api-sysroot
+        tar -C "$HOME/.mozbuild/api-sysroot" -I zstd -x -a -f api-sysroot.tar.zst
+        #sudo rm api-sysroot.tar.zst
+        #sudo rm mozbuild.tar.bz2
+        ls ~/.mozbuild/api-sysroot
+        
+        cd ~
+        git clone https://github.com/kaiostech/api-daemon --depth=1
+        ls -al
+    - name: build Source
+      run: |
+        ####
+        export TARGET_ARCH=${device_arch}
+        export BUILD_WITH_NDK_DIR=~/.mozbuild/android-ndk-r20b-canary
+        export GONK_DIR=~/.mozbuild/api-sysroot
+        export GONK_PRODUCT=${device_name}
+        cd ~/api-daemon
+        ./update-prebuilts.sh
+        
+    - name: zip Artifact
+      run: |
+        cd ~
+        zip -r ~/prebuilts.zip ~/api-daemon/prebuilts 
+        rclone copy ~/prebuilts.zip itd:ci/${remotepath} 
+        ls -al -h
+        
+    - name: Upload Artifact
+      continue-on-error: true
+      uses: actions/upload-artifact@master
+      with:
+        name: prebuilts.zip
+        path: ~/prebuilts.zip
+
+    - name: Send Done Notify && Send "b2g_build" WebHook
+      run: |
+        today=$(date +%Y-%m-%d)
+        #curl -X POST "https://api.telegram.org/bot${{secrets.TG_BOT_TOKEN}}/sendMessage" -d "chat_id=${{secrets.TG_GROUP_KAIOS}}&text=${today}.BuildType.${{github.event.action}}:onyx-kernel-gecko PASS!"
+        if [ ${kernel} == "true" ]; then
+          curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "kernel_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        else
+          curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
+        fi
+
+
+
+  kernel_build:
+    if: github.event.action == 'kernel_build'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - name: Initialization system environment
+      run: |
+        df -h
+        sudo apt install git make gcc g++ libfuse-dev
+        cd ~
+        git config --global user.name "ci"
+        git config --global user.email "ci@github.com"
+        #ssh
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        #rclone
+        mkdir -p ~/.config/rclone
+        git clone git@github.com:ittat/tmp.git
+        cd tmp
+        mv ./rclone.conf ~/.config/rclone
+        brew install rclone
+        rclone ls itd:test
+        
+    - name: Download Source
+      run: |
+        cd ~
+        git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8
+        git clone https://github.com/OnePlus-onyx/kernel_oneplus_onyx -b gonk_android-10.0.0_r11  --depth=1
+        cd ~/kernel_oneplus_onyx 
+        make onyx_defconfig ARCH=arm CROSS_COMPILE=/home/runner/arm-eabi-4.8/bin/arm-eabi-
+        ls -al ./.config
+        make ARCH=arm CROSS_COMPILE=/home/runner/arm-eabi-4.8/bin/arm-eabi-  CONFIG_NO_ERROR_ON_MISMATCH=y zImage-dtb
+        ls -al arch/arm/boot/
+        rclone copy arch/arm/boot/zImage-dtb itd:ci/${remotepath}
+        
+    - name: Send Done Notify && Send "onyx_b2g_build" WebHook
+      run: |
+          curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
