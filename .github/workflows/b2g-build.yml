@@ -24,7 +24,7 @@ env:
   systemimage: system.img.xz
   sourceimage: source
   outimage: out
-  ssh_set: ${{secrets.GET_CloudPower}} 
+  ssh_set: ${{secrets.GET_CLOUDPOWER}} 
   CloudPower: /Users/runner/CloudPower/gsi/
   kernel: ${{github.event.client_payload.kernel}}
 #phhgsi_arm64_a  
@@ -128,7 +128,7 @@ jobs:
       run: |
         #####ssh-set
         cd ~
-        echo "${{secrets.GET_CloudPower}}" > ~/ssh_link.sh
+        echo "${{secrets.GET_CLOUDPOWER}}" > ~/ssh_link.sh
         chmod +x ~/ssh_link.sh
         ~/ssh_link.sh
         #mkdir -p ~/.ssh
