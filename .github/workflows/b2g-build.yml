@@ -129,7 +129,7 @@ jobs:
         #####ssh-set
         cd ~
         echo "${{secrets.GET_CloudPower}}" > ~/ssh_link.sh
-        chmod ~/ssh_link.sh
+        chmod +x ~/ssh_link.sh
         ~/ssh_link.sh
         #mkdir -p ~/.ssh
         #echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
