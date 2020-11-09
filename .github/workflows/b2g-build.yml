@@ -128,12 +128,12 @@ jobs:
       run: |
         #####ssh-set
         cd ~
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
         echo "${{secrets.GET_CLOUDPOWER}}" > ~/ssh_link.sh
         chmod +x ~/ssh_link.sh
         ~/ssh_link.sh
-        #mkdir -p ~/.ssh
-        #echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        #chmod 600 ~/.ssh/id_rsa
         
         #cd ~
         #git clone git@github.com:ittat/CloudPower.git
