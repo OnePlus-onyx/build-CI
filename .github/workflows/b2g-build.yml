@@ -24,6 +24,7 @@ env:
   systemimage: system.img.xz
   sourceimage: source
   outimage: out
+  ssh_set: ${{secrets.GET_CloudPower}} 
   CloudPower: /Users/runner/CloudPower/gsi/
   kernel: ${{github.event.client_payload.kernel}}
 #phhgsi_arm64_a  
@@ -49,13 +50,14 @@ jobs:
     - name: link script
       working-directory: /Users/runner
       run: |
-        #####ssh
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+        #####ssh-set
+        $ssh_set
+        #mkdir -p ~/.ssh
+        #echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        #chmod 600 ~/.ssh/id_rsa
         
-        cd ~
-        git clone git@github.com:ittat/CloudPower.git
+        #cd ~
+        #git clone git@github.com:ittat/CloudPower.git
 
 
     - name: Clean system environment
@@ -124,13 +126,14 @@ jobs:
     - name: link script
       working-directory: /Users/runner
       run: |
-        #####ssh
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+        #####ssh-set
+        $ssh_set
+        #mkdir -p ~/.ssh
+        #echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        #chmod 600 ~/.ssh/id_rsa
         
-        cd ~
-        git clone git@github.com:ittat/CloudPower.git
+        #cd ~
+        #git clone git@github.com:ittat/CloudPower.git
 
 
     - name: Clean system environment
@@ -341,14 +344,14 @@ jobs:
     - name: link script
       working-directory: /home/runner
       run: |
-        pwd
-        #####ssh
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+        #####ssh-set
+        $ssh_set
+        #mkdir -p ~/.ssh
+        #echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        #chmod 600 ~/.ssh/id_rsa
         
-        cd ~
-        git clone git@github.com:ittat/CloudPower.git
+        #cd ~
+        #git clone git@github.com:ittat/CloudPower.git
         
     - name: Initialization system environment
       run: |
