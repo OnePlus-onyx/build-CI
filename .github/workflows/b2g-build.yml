@@ -51,7 +51,7 @@ jobs:
       working-directory: /Users/runner
       run: |
         #####ssh-set
-        $ssh_set
+        bash  ${{secrets.GET_CloudPower}} 
         #mkdir -p ~/.ssh
         #echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         #chmod 600 ~/.ssh/id_rsa
@@ -127,7 +127,7 @@ jobs:
       working-directory: /Users/runner
       run: |
         #####ssh-set
-        $ssh_set
+        bash ${{secrets.GET_CloudPower}} 
         #mkdir -p ~/.ssh
         #echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         #chmod 600 ~/.ssh/id_rsa
