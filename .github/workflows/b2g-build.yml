@@ -24,7 +24,7 @@ env:
   systemimage: system.img.xz
   sourceimage: source
   outimage: out
-  CloudPower: /Users/runner/CloudPower/gsi/
+  CloudPower: /Users/runner/CloudPower/ci/
   kernel: ${{github.event.client_payload.kernel}}
 #phhgsi_arm64_a  
 #phhgsi_arm64_ab
@@ -334,7 +334,7 @@ jobs:
     timeout-minutes: 360
     defaults:
       run:
-        working-directory: /home/runner/CloudPower/gsi/
+        working-directory: /home/runner/CloudPower/ci/
     steps:
 
     - name: SSH
