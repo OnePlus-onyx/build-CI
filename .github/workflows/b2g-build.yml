@@ -1,4 +1,4 @@
-name: b2g-gsi
+name: b2g-ci
 on: 
   repository_dispatch:
       types: 
