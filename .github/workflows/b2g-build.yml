@@ -138,7 +138,6 @@ jobs:
       run: |
         ./init/all_unmount_darwin.sh
 
-
     - name: Clean  environment
       if: github.event.action == 'aosp_build'
       run: |
@@ -150,13 +149,11 @@ jobs:
       run: |
         df -h
         ./init/docker_env_darwin.sh
-      
-            
+           
     - name: Fetch Source
       run: |
         ./source/download_source.sh
 
- 
     - name: fix
 #       continue-on-error: true
       run: |         
@@ -223,8 +220,7 @@ jobs:
         else
           exit 0
         fi
-        
-        
+         
     - name: Repack b2g-sysroot and api-sysroot
       id: sysroot
       if: github.event.action == 'aosp_build' && steps.check.conclusion == 'success' &&  steps.build.outcome == 'success' && steps.build.conclusion == 'success'
@@ -239,7 +235,6 @@ jobs:
       run: |
         ./source/upload_sysroot.sh
 
-        
     - name: Updoal systemimage
       if:  github.event.action == 'b2g_build' 
       continue-on-error: true
@@ -247,7 +242,6 @@ jobs:
         ####  
         ./source/upload_systemimage.sh
         
-
     - name: Clean system environment
       continue-on-error: true
       run: |
@@ -262,8 +256,7 @@ jobs:
       if: github.event.action == 'b2g_build' 
       run: |
        curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "release","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/ittat/SuperBot/dispatches
-   
-
+ 
     - name: Update Build Source
       if: steps.check.conclusion == 'success' &&  github.event.action == 'aosp_build' 
       run: |
@@ -274,7 +267,6 @@ jobs:
       run: |
         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "aosp_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
   
-   
   gecko_build:
     if: github.event.action == 'gecko_build' || github.event_name == 'schedule' 
     runs-on: ubuntu-latest
@@ -354,7 +346,6 @@ jobs:
         echo "::set-env name=B2G_OUT::b2g-${version}.en-US.linux-${ARCH_ABI}-${TARGET_ARCH}.tar.gz"
         
     - name: Upload Artifact
-#       if: github.event_name == 'schedule'
       uses: actions/upload-artifact@master
       with:
         name: ${{ env.B2G_OUT }}
@@ -371,7 +362,6 @@ jobs:
       run: |
         curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "api_daemon_build","client_payload": {"image":"'${image}'", "gecko_version":"'${B2G_OUT}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
   
-
   api-daemon_build:
     if: github.event.action == 'api_daemon_build'
     runs-on: ubuntu-latest
@@ -445,8 +435,6 @@ jobs:
         else
           curl -H "Authorization: token ${{secrets.GIT_ACCESS_TOKEN}}"   --request POST   --data '{"event_type": "b2g_build","client_payload": {"image":"'${image}'", "gecko_version":"'${gecko_version}'", "device_name":"'${device_name}'","device_arch":"'${device_arch}'","kernel":"'${kernel}'"}}'   https://api.github.com/repos/OnePlus-onyx/build-CI/dispatches
         fi
-
-
 
   kernel_build:
     if: github.event.action == 'kernel_build'
