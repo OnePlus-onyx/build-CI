@@ -66,7 +66,7 @@ jobs:
         
     - name: Initialization system environment
       run: |
-        ./init/docker_env_darwin.sh
+        ./init/env_darwin.sh
         
         ####mount
         cd /Users/runner
@@ -147,7 +147,7 @@ jobs:
     - name: Initialization system environment
       run: |
         df -h
-        ./init/docker_env_darwin.sh
+        ./init/env_darwin.sh
            
     - name: Fetch Source
       run: |
