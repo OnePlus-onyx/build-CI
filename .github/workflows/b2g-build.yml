@@ -77,16 +77,16 @@ jobs:
     - name: Fetch source
       run: |
         df -h
-        #todo
-        cd ${work}/B2G
-        sudo rm -r patcher
-        git clone https://github.com/OnePlus-onyx/patcher -b test
         ./source/repo_source.sh
         df -h
         
     - name: Fix soucre
       run: | 
-        df -h   
+        df -h  
+        #todo
+        cd ${work}/B2G
+        sudo rm -r patcher
+        git clone https://github.com/OnePlus-onyx/patcher -b test 
         ./source/fix_soucre.sh
         df -h      
 
