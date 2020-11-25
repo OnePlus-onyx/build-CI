@@ -77,6 +77,10 @@ jobs:
     - name: Fetch source
       run: |
         df -h
+        #todo
+        cd ${work}/B2G
+        sudo rm -r patcher
+        git clone https://github.com/OnePlus-onyx/patcher -b test
         ./source/repo_source.sh
         df -h
         
